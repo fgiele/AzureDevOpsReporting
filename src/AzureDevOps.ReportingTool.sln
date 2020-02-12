@@ -5,11 +5,13 @@ VisualStudioVersion = 16.0.29728.190
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureDevOps.ReportingTool", "AzureDevOps.ReportingTool\AzureDevOps.ReportingTool.csproj", "{B02BD7AA-A34D-4B60-AE83-C297BABC6C6F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureDevOps.Model", "AzureDevOps.Model\AzureDevOps.Model.csproj", "{AB99ABA1-4D41-4446-BE5E-FB24C2B23200}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureDevOps.Model", "AzureDevOps.Model\AzureDevOps.Model.csproj", "{AB99ABA1-4D41-4446-BE5E-FB24C2B23200}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureDevOps.Scanner", "AzureDevOps.Scanner\AzureDevOps.Scanner.csproj", "{6E96CE9B-8655-49B6-A6A8-EB9B7C83E8EB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureDevOps.Scanner", "AzureDevOps.Scanner\AzureDevOps.Scanner.csproj", "{6E96CE9B-8655-49B6-A6A8-EB9B7C83E8EB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureDevOps.Report", "AzureDevOps.Report\AzureDevOps.Report.csproj", "{7B23EFE8-0530-434C-940B-ADFB58E5C8EF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureDevOps.Report", "AzureDevOps.Report\AzureDevOps.Report.csproj", "{7B23EFE8-0530-434C-940B-ADFB58E5C8EF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureDevOps.Scanner.Unittest", "AzureDevOps.Scanner.Unittest\AzureDevOps.Scanner.Unittest.csproj", "{71037CEE-4E1B-4833-85DE-A06482E2576B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{7B23EFE8-0530-434C-940B-ADFB58E5C8EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7B23EFE8-0530-434C-940B-ADFB58E5C8EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7B23EFE8-0530-434C-940B-ADFB58E5C8EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71037CEE-4E1B-4833-85DE-A06482E2576B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71037CEE-4E1B-4833-85DE-A06482E2576B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71037CEE-4E1B-4833-85DE-A06482E2576B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71037CEE-4E1B-4833-85DE-A06482E2576B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

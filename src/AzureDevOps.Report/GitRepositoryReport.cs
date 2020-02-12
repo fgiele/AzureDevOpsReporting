@@ -1,6 +1,5 @@
 ﻿using AzureDevOps.Model;
 using System;
-using System.Linq;
 
 namespace AzureDevOps.Report
 {

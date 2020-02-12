@@ -21,5 +21,9 @@ namespace AzureDevOps.Model
         public bool IsAutomated { get; set; }
 
         public string Url { get; set; }
+
+        public AzureDevOpsIdentity Approver { get; set; }
+
+        public AzureDevOpsIdentity ApprovedBy { get; set; }
     }
 }

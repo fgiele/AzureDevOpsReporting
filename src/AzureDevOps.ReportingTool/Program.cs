@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
 namespace AzureDevOps.ReportingTool
@@ -12,6 +14,7 @@ namespace AzureDevOps.ReportingTool
     class Program
     {
         private static HashSet<IReport> Reports = new HashSet<IReport>();
+        private static HttpClient httpClient = new HttpClient();
 
         private class Options
         {
@@ -38,7 +41,13 @@ namespace AzureDevOps.ReportingTool
             var azDOUrl = ConfigurationManager.AppSettings.Get("AzureDevOps.URL");
             var pat = ConfigurationManager.AppSettings.Get("AzureDevOps.PAT");
 
-            var scanClient = new Client(pat);
+            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
+                Convert.ToBase64String(
+                    System.Text.Encoding.ASCII.GetBytes(
+                        string.Format("{0}:{1}", "", pat))));
+
+            var scanClient = new Client(httpClient);
             var generator = new Generator();
 
             var dataOptions = Reports.Select(rep => rep.DataOptions).Aggregate((x, y) => x | y);
