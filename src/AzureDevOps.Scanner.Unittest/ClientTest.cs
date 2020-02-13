@@ -34,7 +34,23 @@ namespace AzureDevOps.Scanner.Unittest
             Id = 12345,
             Result = "testResult",
             Status = "testStatus",
-            Url = "testUrl"
+            Url = $"{testUrl}/testUrl"
+        };
+
+        private readonly AzureDevOpsBuildArtifact testArtifact = new AzureDevOpsBuildArtifact
+        {
+            Id = 54321,
+            Name = "testArtifact",
+            Resource = new AzureDevOpsArtifactResource
+            {
+                DownloadUrl = "testArtifactUrl",
+                Type = "testType"
+            }
+        };
+
+        private readonly AzureDevOpsRelease testRelease = new AzureDevOpsRelease
+        {
+
         };
 
         public ClientTest()
@@ -204,6 +220,36 @@ namespace AzureDevOps.Scanner.Unittest
         }
 
         [Fact]
+        public async Task ScanAsync_WhenBuildsWithArtifacts_ShouldReturnProperInstance()
+        {
+            // Arrange
+            HttpMockOneProject();
+            HttpMockOneBuild();
+            HttpMockOneArtifact();
+
+            var filledProject = testProject;
+            var filledBuild = testBuild;
+            filledBuild.Artifacts = new HashSet<AzureDevOpsBuildArtifact> { testArtifact };
+            filledProject.Builds = new HashSet<AzureDevOpsBuild> { filledBuild }; ;
+
+            var systemUnderTest = new Client(httpClient);
+
+            // Act
+            var actual = await systemUnderTest.ScanAsync(DataOptions.Build | DataOptions.BuildArtifacts, new string[] { testCollection }, testUrl);
+
+            // Assert
+            mockHttpMessageHandler.Verify();
+            actual.Should().BeOfType<AzureDevOpsInstance>();
+            actual.Collections.Should().HaveCount(1);
+            actual.Collections[0].Projects.Should().HaveCount(1);
+            actual.Collections[0].Projects[0].Should().BeEquivalentTo(filledProject);
+            actual.Collections[0].Projects[0].Builds.Should().HaveCount(1);
+            actual.Collections[0].Projects[0].Builds.First().Should().BeEquivalentTo(testBuild);
+            actual.Collections[0].Projects[0].Builds.First().Artifacts.Should().HaveCount(1);
+            actual.Collections[0].Projects[0].Builds.First().Artifacts.First().Should().BeEquivalentTo(testArtifact);
+        }
+
+        [Fact]
         public async Task ScanAsync_WhenNoReleases_ShouldReturnProperInstance()
         {
             // Arrange
@@ -255,6 +301,19 @@ namespace AzureDevOps.Scanner.Unittest
                                 StatusCode = HttpStatusCode.OK,
                                 Content = new StringContent($"{{\"count\":1,\"value\":[{{\"id\":{testBuild.Id},\"buildNumber\":\"{testBuild.BuildNumber}\",\"status\":\"{testBuild.Status}\",\"result\":\"{testBuild.Result}\",\"url\":\"{testBuild.Url}\"}}]}}")
                             });
+        }
+
+        private void HttpMockOneArtifact()
+        {
+            mockHttpMessageHandler.Setup(
+                    mh => mh.Send(
+                        It.Is<HttpRequestMessage>(
+                            req => req.RequestUri.ToString() == $"{testBuild.Url}/artifacts?api-version=5.1")))
+                .Returns(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent($"{{\"count\":1,\"value\":[{{\"id\":{testArtifact.Id},\"name\":\"{testArtifact.Name}\",\"resource\":{{\"type\":\"{testArtifact.Resource.Type}\",\"downloadUrl\":\"{ testArtifact.Resource.DownloadUrl }\"}}}}]}}") 
+                });
         }
     }
 }
