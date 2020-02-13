@@ -30,4 +30,4 @@ steps:
     displayName: 'Publish code coverage'
     inputs:
       codeCoverageTool: Cobertura
-      summaryFileLocation: $(Build.SourcesDirectory)/**/coverage.cobertura.xml
+      summaryFileLocation: /home/vsts/work/_temp/**/coverage.cobertura.xml
