@@ -9,6 +9,9 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
+variables:
+  disable.coverage.autogenerate: 'true'
+
 steps:
   - task: UseDotNet@2
     displayName: "Install .Net Core 3.x"
@@ -21,7 +24,29 @@ steps:
       command: 'build'
       projects: '**/*.sln'
   - task: DotNetCoreCLI@2
+    displayName: "Unit-test application"
     inputs:
       command: 'test'
-      projects: '**/*test.csproj'
-      testRunTitle: 'Unittests'
+      projects: '**/*.Unittest.csproj'
+      arguments: -c $(BuildConfiguration) --collect:"XPlat Code Coverage" -- RunConfiguration.DisableAppDomain=true
+  - task: DotNetCoreCLI@2
+    displayName: Install ReportGenerator tool
+    inputs:
+      command: custom
+      custom: tool
+      arguments: install --tool-path . dotnet-reportgenerator-globaltool
+      
+  - task: reportgenerator@4
+    displayName: Generate Code Coverage Report
+    inputs:
+      reports: $(Agent.TempDirectory)/**/coverage.cobertura.xml
+      targetdir: $(build.artifactstagingdirectory)/TestResults/
+      reporttypes: 'HtmlInline_AzurePipelines;Cobertura'
+  - task: PublishCodeCoverageResults@1
+    displayName: 'Publish code coverage'
+    inputs:
+      codeCoverageTool: cobertura
+      summaryFileLocation: $(build.artifactstagingdirectory)/TestResults/Cobertura.xml
+      # To make the task not regenerate the report an environment variable was added to the pipeline in Azure DevOps; "disable.coverage.autogenerate: 'true'"
+      # see: https://github.com/danielpalme/ReportGenerator/wiki/Integration#attention
+      reportDirectory: '$(build.artifactstagingdirectory)/TestResults'
