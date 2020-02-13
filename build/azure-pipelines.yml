@@ -27,21 +27,20 @@ steps:
     displayName: "Unit-test application"
     inputs:
       command: 'test'
-      modifyOutputPath: true
       projects: '**/*.Unittest.csproj'
-      arguments: '--collect:"XPlat Code Coverage" -o:$(Build.SourcesDirectory)/tests'
-  - task: Palmmedia.reportgenerator.reportgenerator-build-release-task.reportgenerator@4
-    displayName: Generate Code Coverage Report
+      arguments: -c $(BuildConfiguration) --settings $(System.DefaultWorkingDirectory)/CodeCoverage.runsettings --collect:"XPlat Code Coverage" -- RunConfiguration.DisableAppDomain=true
+  - task: DotNetCoreCLI@2
     inputs:
-      reports: $(Build.SourcesDirectory)/tests/**/coverage.cobertura.xml
-      targetdir: $(build.artifactstagingdirectory)/TestResults/
-      reporttypes: 'HtmlInline_AzurePipelines;Cobertura;Badges'
-
+      command: custom
+      custom: tool
+      arguments: install --tool-path . dotnet-reportgenerator-globaltool
+    displayName: Install ReportGenerator tool
+    
+  - script: ./reportgenerator -reports:$(Agent.TempDirectory)/**/coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/coverlet/reports -reporttypes:"Cobertura"
+    displayName: Create reports
+    
   - task: PublishCodeCoverageResults@1
     displayName: 'Publish code coverage'
     inputs:
-      codeCoverageTool: cobertura
-      summaryFileLocation: $(build.artifactstagingdirectory)/TestResults/cobertura.xml
-      # To make the task not regenerate the report an environment variable was added to the pipeline in Azure DevOps; "disable.coverage.autogenerate: 'true'"
-      # see: https://github.com/danielpalme/ReportGenerator/wiki/Integration#attention
-      reportDirectory: '$(build.artifactstagingdirectory)/TestResults'
+      codeCoverageTool: Cobertura
+      summaryFileLocation: $(Build.SourcesDirectory)/coverlet/reports/Cobertura.xml  
