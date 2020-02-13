@@ -27,6 +27,7 @@ steps:
     displayName: "Unit-test application"
     inputs:
       command: 'test'
+      modifyOutputPath: true
       projects: '**/*.Unittest.csproj'
       arguments: '--collect:"XPlat Code Coverage" -p:CollectCoverage=true -p:CoverletOutputFormat=cobertura -p:Exclude="[*test]*"'
   - task: Palmmedia.reportgenerator.reportgenerator-build-release-task.reportgenerator@4
