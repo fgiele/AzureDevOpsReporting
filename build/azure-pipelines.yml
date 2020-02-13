@@ -35,13 +35,13 @@ steps:
       command: custom
       custom: tool
       arguments: install --tool-path . dotnet-reportgenerator-globaltool
-  - task: Palmmedia.reportgenerator.reportgenerator-build-release-task.reportgenerator@4
+      
+  - task: reportgenerator@4
     displayName: Generate Code Coverage Report
     inputs:
       reports: $(Agent.TempDirectory)/**/coverage.cobertura.xml
       targetdir: $(build.artifactstagingdirectory)/TestResults/
-      reporttypes: 'HtmlInline_AzurePipelines;Cobertura;Badges'
-
+      reporttypes: 'HtmlInline_AzurePipelines;Cobertura'
   - task: PublishCodeCoverageResults@1
     displayName: 'Publish code coverage'
     inputs:
