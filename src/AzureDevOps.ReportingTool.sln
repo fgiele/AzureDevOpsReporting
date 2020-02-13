@@ -11,7 +11,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureDevOps.Scanner", "Azur
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureDevOps.Report", "AzureDevOps.Report\AzureDevOps.Report.csproj", "{7B23EFE8-0530-434C-940B-ADFB58E5C8EF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureDevOps.Scanner.Unittest", "AzureDevOps.Scanner.Unittest\AzureDevOps.Scanner.Unittest.csproj", "{71037CEE-4E1B-4833-85DE-A06482E2576B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureDevOps.Scanner.Unittest", "AzureDevOps.Scanner.Unittest\AzureDevOps.Scanner.Unittest.csproj", "{71037CEE-4E1B-4833-85DE-A06482E2576B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{02B042C5-342A-47FF-9FDF-E19C6E7EFD0E}"
+	ProjectSection(SolutionItems) = preProject
+		CodeCoverage.runsettings = CodeCoverage.runsettings
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

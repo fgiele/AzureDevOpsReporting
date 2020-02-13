@@ -9,7 +9,11 @@ namespace AzureDevOps.Model
 
         public string BuildNumber { get; set; }
 
-        public string Url {get;set;}
+        public string Status { get; set; }
+
+        public string Result { get; set; }
+
+        public string Url { get; set; }
 
         public IEnumerable<AzureDevOpsBuildArtifact> Artifacts { get; set; }
     }
