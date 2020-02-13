@@ -9,6 +9,9 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
+variables:
+  disable.coverage.autogenerate: 'true'
+
 steps:
   - task: UseDotNet@2
     displayName: "Install .Net Core 3.x"
@@ -25,9 +28,19 @@ steps:
     inputs:
       command: 'test'
       projects: '**/*.Unittest.csproj'
-      arguments: '--collect:"XPlat Code Coverage" --results-directory:$(Build.ArtifactStagingDirectory)/tests'
+      arguments: '--configuration $(buildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:Exclude="[*test]*"'
+  - task: Palmmedia.reportgenerator.reportgenerator-build-release-task.reportgenerator@4
+    displayName: Generate Code Coverage Report
+    inputs:
+      reports: $(Build.SourcesDirectory)/tests/**/coverage.cobertura.xml
+      targetdir: $(build.artifactstagingdirectory)/TestResults/
+      reporttypes: 'HtmlInline_AzurePipelines;Cobertura;Badges'
+
   - task: PublishCodeCoverageResults@1
     displayName: 'Publish code coverage'
     inputs:
-      codeCoverageTool: 'Cobertura'
-      summaryFileLocation: '$(Build.ArtifactStagingDirectory)/**/coverage.cobertura.xml'
+      codeCoverageTool: cobertura
+      summaryFileLocation: $(build.artifactstagingdirectory)/TestResults/cobertura.xml
+      # To make the task not regenerate the report an environment variable was added to the pipeline in Azure DevOps; "disable.coverage.autogenerate: 'true'"
+      # see: https://github.com/danielpalme/ReportGenerator/wiki/Integration#attention
+      reportDirectory: '$(build.artifactstagingdirectory)/TestResults'
