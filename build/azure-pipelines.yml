@@ -16,12 +16,22 @@ steps:
       packageType: 'sdk'
       version: '3.x'
   - task: DotNetCoreCLI@2
+    displayName: "Restore packages"
+    inputs:
+     command: 'restore'
+  - task: DotNetCoreCLI@2
     displayName: "Build application"
     inputs:
       command: 'build'
       projects: '**/*.sln'
   - task: DotNetCoreCLI@2
+    displayName: "Unit-test application"
     inputs:
       command: 'test'
-      projects: '**/*test.csproj'
-      testRunTitle: 'Unittests'
+      projects: '**/*.Unittest.csproj'
+      arguments: '--collect:"XPlat Code Coverage"'
+  - task: PublishCodeCoverageResults@1
+    displayName: 'Publish code coverage'
+    inputs:
+      codeCoverageTool: Cobertura
+      summaryFileLocation: $(Build.SourcesDirectory)/**/coverage.cobertura.xml
