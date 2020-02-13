@@ -1,7 +1,4 @@
 ﻿using AzureDevOps.Model;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace AzureDevOps.Report
 {

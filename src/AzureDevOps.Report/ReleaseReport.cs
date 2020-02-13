@@ -1,7 +1,5 @@
 ﻿using AzureDevOps.Model;
 using System;
-using System.Linq;
-using System.Text;
 
 namespace AzureDevOps.Report
 {
@@ -13,7 +11,18 @@ namespace AzureDevOps.Report
 
         public string Generate(AzureDevOpsInstance instance)
         {
-            CreateHeaders("Collection", "Project", "Release name", "R. Status", "Environment", "E. Status", "Attempt", "Auto approve", "Approvers");
+            CreateHeaders("Collection",
+                            "Project",
+                            "Release name",
+                            "Release date", 
+                            "R. Status", 
+                            "Environment", 
+                            "E. Status", 
+                            "Attempt", 
+                            "Attempt date", 
+                            "Auto approve", 
+                            "Required approval", 
+                            "Approval given by");
 
             foreach (var collection in instance.Collections)
             {
@@ -28,12 +37,15 @@ namespace AzureDevOps.Report
                                 AddLine(collection.Name,
                                         project.Name,
                                         release.Name,
+                                        release.CreatedOn,
                                         release.Status,
                                         environment.Name,
                                         environment.Status,
                                         preDeployApproval.Attempt,
+                                        preDeployApproval.CreatedOn,
                                         preDeployApproval.IsAutomated,
-                                        string.Join("&", environment.PreApprovalsSnapshot.Approvals.Select(app => app.Approver?.DisplayName))
+                                        preDeployApproval.IsAutomated ? string.Empty : $"{preDeployApproval.Approver?.DisplayName}",
+                                        preDeployApproval.IsAutomated ? string.Empty : $"{preDeployApproval.ApprovedBy?.DisplayName}"
                                         );
 
                             }

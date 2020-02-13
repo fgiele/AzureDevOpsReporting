@@ -11,23 +11,19 @@ namespace AzureDevOps.Scanner
 {
     public class Client
     {
-        private static readonly HttpClient RestClient = new HttpClient();
+        private readonly HttpClient RestClient = new HttpClient();
 
-        private static int ProjectsDoneCount = 0;
+        private int ProjectsDoneCount = 0;
 
-        public Client(string pat)
+        public Client(HttpClient httpClient)
         {
-            RestClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            RestClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
-                Convert.ToBase64String(
-                    System.Text.Encoding.ASCII.GetBytes(
-                        string.Format("{0}:{1}", "", pat))));
+            RestClient = httpClient;
         }
 
         public async Task<AzureDevOpsInstance> ScanAsync(DataOptions dataOptions, IEnumerable<string> collections, string azureDevOpsUrl)
         {
             ProjectsDoneCount = 0;
-
+            
             var azureDevOpsInstance = new AzureDevOpsInstance();
 
             if (azureDevOpsUrl.ToLower().StartsWith("https://dev.azure.com"))
@@ -76,7 +72,7 @@ namespace AzureDevOps.Scanner
             return azDOCollection;
         }
 
-        private static async Task<AzureDevOpsProject> ScanProjectAsync(DataOptions dataOptions, string projectUrl, AzureDevOpsProject project)
+        private async Task<AzureDevOpsProject> ScanProjectAsync(DataOptions dataOptions, string projectUrl, AzureDevOpsProject project)
         {
             var buildScanTasks = ScanBuildsAsync(dataOptions, projectUrl);
             var releaseScanTasks = ScanReleasesAsync(dataOptions, projectUrl);
@@ -91,7 +87,7 @@ namespace AzureDevOps.Scanner
 
             return project;
         }
-        private static async Task<IEnumerable<AzureDevOpsBuild>> ScanBuildsAsync(DataOptions dataOptions, string projectUrl)
+        private async Task<IEnumerable<AzureDevOpsBuild>> ScanBuildsAsync(DataOptions dataOptions, string projectUrl)
         {
             if (!(dataOptions.HasFlag(DataOptions.Build) ||
                 dataOptions.HasFlag(DataOptions.BuildArtifacts)))
@@ -120,7 +116,7 @@ namespace AzureDevOps.Scanner
             return builds;
         }
 
-        private static async Task<AzureDevOpsBuild> ScanBuildAsync(AzureDevOpsBuild build)
+        private async Task<AzureDevOpsBuild> ScanBuildAsync(AzureDevOpsBuild build)
         {
             HttpResponseMessage httpArtifactResponse = await RestClient.GetAsync($"{build.Url}/artifacts?api-version=5.1").ConfigureAwait(false);
             var artifactResponseContent = await httpArtifactResponse.Content.ReadAsStringAsync();
@@ -128,7 +124,7 @@ namespace AzureDevOps.Scanner
             return build;
         }
 
-        private static async Task<IEnumerable<AzureDevOpsRelease>> ScanReleasesAsync(DataOptions dataOptions, string projectUrl)
+        private async Task<IEnumerable<AzureDevOpsRelease>> ScanReleasesAsync(DataOptions dataOptions, string projectUrl)
         {
             if (!(dataOptions.HasFlag(DataOptions.Release) ||
                 dataOptions.HasFlag(DataOptions.ReleaseDetails)))
@@ -159,14 +155,14 @@ namespace AzureDevOps.Scanner
             return releases;
         }
 
-        private static async Task<AzureDevOpsRelease> ScanReleaseDetailAsync(AzureDevOpsRelease release)
+        private async Task<AzureDevOpsRelease> ScanReleaseDetailAsync(AzureDevOpsRelease release)
         {
             HttpResponseMessage httpReleaseDetailResponse = await RestClient.GetAsync($"{release.Url}").ConfigureAwait(false);
             var releaseDetailResponseContent = await httpReleaseDetailResponse.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<AzureDevOpsRelease>(releaseDetailResponseContent);
         }
 
-        private static async Task<IEnumerable<AzureDevOpsRepository>> ScanRepositoriesAsync(DataOptions dataOptions, string projectUrl)
+        private async Task<IEnumerable<AzureDevOpsRepository>> ScanRepositoriesAsync(DataOptions dataOptions, string projectUrl)
         {
             if (!(dataOptions.HasFlag(DataOptions.Git) ||
                 dataOptions.HasFlag(DataOptions.GitPolicies)))
@@ -195,7 +191,7 @@ namespace AzureDevOps.Scanner
             return repositories;
         }
 
-        private static async Task<AzureDevOpsRepository> ScanBranchPoliciesAsync(string projectUrl, AzureDevOpsRepository repository, string branchName = "refs/heads/master")
+        private async Task<AzureDevOpsRepository> ScanBranchPoliciesAsync(string projectUrl, AzureDevOpsRepository repository, string branchName = "refs/heads/master")
         {
             HttpResponseMessage httpPoliciesResponse = await RestClient.GetAsync($"{projectUrl}/_apis/git/policy/configurations?repositoryId={repository.Id}&refName={branchName}").ConfigureAwait(false);
             var policiesResponseContent = await httpPoliciesResponse.Content.ReadAsStringAsync();

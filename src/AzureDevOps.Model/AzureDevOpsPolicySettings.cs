@@ -1,7 +1,6 @@
 ﻿using AzureDevOps.Model.Policies;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace AzureDevOps.Model
 {
