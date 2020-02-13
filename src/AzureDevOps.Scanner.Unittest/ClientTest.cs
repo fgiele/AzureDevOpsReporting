@@ -98,6 +98,32 @@ namespace AzureDevOps.Scanner.Unittest
         }
 
         [Fact]
+        public async Task ScanAsync_WhenAzureDevOpsUrl_OkOnSingleCollection()
+        {
+            // Arrange
+            var azureUrl = "https://dev.azure.com";
+            mockHttpMessageHandler.Setup(
+                    mh => mh.Send(
+                        It.Is<HttpRequestMessage>(
+                            req => req.RequestUri.ToString() == $"{azureUrl}/{testCollection}/_apis/projects")))
+                .Returns(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent("{\"count\":0,\"value\":[]}")
+                });
+            var systemUnderTest = new Client(httpClient);
+
+            // Act
+            var actual = await systemUnderTest.ScanAsync(DataOptions.Build, new string[] { testCollection }, azureUrl);
+
+            // Assert
+            mockHttpMessageHandler.Verify();
+            actual.Should().BeOfType<AzureDevOpsInstance>();
+            actual.Collections.Should().HaveCount(1);
+            actual.Collections[0].Projects.Should().BeEmpty();
+        }
+
+        [Fact]
         public void ScanAsync_WhenAzureDevOpsUrl_FailsOnMultipleCollection()
         {
             // Arrange
@@ -166,7 +192,7 @@ namespace AzureDevOps.Scanner.Unittest
 
             // Assert
             var filledProject = testProject;
-            filledProject.Builds = new HashSet<AzureDevOpsBuild> { testBuild};
+            filledProject.Builds = new HashSet<AzureDevOpsBuild> { testBuild };
             mockHttpMessageHandler.Verify();
             actual.Should().BeOfType<AzureDevOpsInstance>();
             actual.Collections.Should().HaveCount(1);
