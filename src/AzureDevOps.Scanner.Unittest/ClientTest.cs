@@ -1,58 +1,21 @@
+using AzureDevOps.Model;
+using FluentAssertions;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
-using FluentAssertions;
-using AzureDevOps.Model;
-using System;
-using System.Linq;
-using System.Collections.Generic;
 
 namespace AzureDevOps.Scanner.Unittest
 {
-    public class ClientTest
+    public partial class ClientTest
     {
         private Mock<MockHttpMessageHandler> mockHttpMessageHandler;
         private HttpClient httpClient;
-        private const string testUrl = "https://example.com";
-        private const string testCollection = "testcol";
-        private readonly AzureDevOpsProject testProject = new AzureDevOpsProject
-        {
-            Description = "testDescription",
-            Id = Guid.NewGuid(),
-            Name = "testproj",
-            Url = $"{testUrl}/12345678",
-            Builds = Array.Empty<AzureDevOpsBuild>(),
-            Releases = Array.Empty<AzureDevOpsRelease>(),
-            Repositories = Array.Empty<AzureDevOpsRepository>()
-        };
-
-        private readonly AzureDevOpsBuild testBuild = new AzureDevOpsBuild
-        {
-            BuildNumber = "testBuildNumber",
-            Id = 12345,
-            Result = "testResult",
-            Status = "testStatus",
-            Url = $"{testUrl}/testUrl"
-        };
-
-        private readonly AzureDevOpsBuildArtifact testArtifact = new AzureDevOpsBuildArtifact
-        {
-            Id = 54321,
-            Name = "testArtifact",
-            Resource = new AzureDevOpsArtifactResource
-            {
-                DownloadUrl = "testArtifactUrl",
-                Type = "testType"
-            }
-        };
-
-        private readonly AzureDevOpsRelease testRelease = new AzureDevOpsRelease
-        {
-
-        };
-
+        
         public ClientTest()
         {
             mockHttpMessageHandler = new Mock<MockHttpMessageHandler> { CallBase = true };
@@ -277,6 +240,29 @@ namespace AzureDevOps.Scanner.Unittest
             actual.Collections[0].Projects[0].Releases.Should().BeEmpty();
         }
 
+        [Fact]
+        public async Task ScanAsync_WhenRelease_ShouldReturnProperInstance()
+        {
+            // Arrange
+            HttpMockOneProject();
+            HttpMockOneRelease();
+
+            var filledProject = testProject;
+            filledProject.Releases = new HashSet<AzureDevOpsRelease> { testRelease };
+
+            var systemUnderTest = new Client(httpClient);
+
+            // Act
+            var actual = await systemUnderTest.ScanAsync(DataOptions.Release, new string[] { testCollection }, testUrl);
+
+            // Assert
+            mockHttpMessageHandler.Verify();
+            actual.Should().BeOfType<AzureDevOpsInstance>();
+            actual.Collections.Should().HaveCount(1);
+            actual.Collections[0].Projects.Should().HaveCount(1);
+            actual.Collections[0].Projects[0].Should().BeEquivalentTo(filledProject);
+        }
+
         private void HttpMockOneProject()
         {
             mockHttpMessageHandler.Setup(
@@ -312,8 +298,34 @@ namespace AzureDevOps.Scanner.Unittest
                 .Returns(new HttpResponseMessage
                 {
                     StatusCode = HttpStatusCode.OK,
-                    Content = new StringContent($"{{\"count\":1,\"value\":[{{\"id\":{testArtifact.Id},\"name\":\"{testArtifact.Name}\",\"resource\":{{\"type\":\"{testArtifact.Resource.Type}\",\"downloadUrl\":\"{ testArtifact.Resource.DownloadUrl }\"}}}}]}}") 
+                    Content = new StringContent($"{{\"count\":1,\"value\":[{{\"id\":{testArtifact.Id},\"name\":\"{testArtifact.Name}\",\"resource\":{{\"type\":\"{testArtifact.Resource.Type}\",\"downloadUrl\":\"{ testArtifact.Resource.DownloadUrl }\"}}}}]}}")
                 });
+        }
+
+        private void HttpMockOneRelease()
+        {
+            mockHttpMessageHandler.Setup(
+                                mh => mh.Send(
+                                    It.Is<HttpRequestMessage>(
+                                        req => req.RequestUri.ToString() == $"{testUrl}/{testCollection}/{testProject.Id}/_apis/release/releases")))
+                            .Returns(new HttpResponseMessage
+                            {
+                                StatusCode = HttpStatusCode.OK,
+                                Content = new StringContent($"{{\"count\":1,\"value\":[{{\"id\":{testRelease.Id},\"name\":\"{testRelease.Name}\",\"status\":\"{testRelease.Status}\",\"createdOn\":\"{testRelease.CreatedOn}\",\"createdBy\":{{\"displayName\":\"{testRelease.CreatedBy.DisplayName}\",\"id\":\"{testRelease.CreatedBy.Id}\",\"uniqueName\":\"{testRelease.CreatedBy.UniqueName}\"}},\"url\":\"{testRelease.Url}\"}}]}}")
+                            });
+        }
+
+        private void HttpMockOneReleaseDetails()
+        {
+            mockHttpMessageHandler.Setup(
+                                mh => mh.Send(
+                                    It.Is<HttpRequestMessage>(
+                                        req => req.RequestUri.ToString() == $"{testRelease.Url}")))
+                            .Returns(new HttpResponseMessage
+                            {
+                                StatusCode = HttpStatusCode.OK,
+                                Content = new StringContent($"{{\"count\":1,\"value\":[{{\"id\":{testRelease.Id},\"name\":\"{testRelease.Name}\",\"status\":\"{testRelease.Status}\",\"createdOn\":\"{testRelease.CreatedOn}\",\"createdBy\":{{\"displayName\":\"{testRelease.CreatedBy.DisplayName}\",\"id\":\"{testRelease.CreatedBy.Id}\",\"uniqueName\":\"{testRelease.CreatedBy.UniqueName}\"}},\"url\":\"{testRelease.Url}\"}}]}}")
+                            });
         }
     }
 }
