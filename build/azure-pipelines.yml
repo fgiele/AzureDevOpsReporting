@@ -28,7 +28,7 @@ steps:
     inputs:
       command: 'test'
       projects: '**/*.Unittest.csproj'
-      arguments: '-p:CollectCoverage=true -p:CoverletOutputFormat=cobertura -p:Exclude="[*test]*"'
+      arguments: '--collect:"XPlat Code Coverage" -p:CollectCoverage=true -p:CoverletOutputFormat=cobertura -p:Exclude="[*test]*"'
   - task: Palmmedia.reportgenerator.reportgenerator-build-release-task.reportgenerator@4
     displayName: Generate Code Coverage Report
     inputs:
