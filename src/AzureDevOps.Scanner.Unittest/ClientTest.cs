@@ -1,19 +1,21 @@
+using AzureDevOps.Model;
+using FluentAssertions;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
-using FluentAssertions;
-using AzureDevOps.Model;
-using System;
 
 namespace AzureDevOps.Scanner.Unittest
 {
-    public class ClientTest
+    public partial class ClientTest
     {
         private Mock<MockHttpMessageHandler> mockHttpMessageHandler;
         private HttpClient httpClient;
-
+        
         public ClientTest()
         {
             mockHttpMessageHandler = new Mock<MockHttpMessageHandler> { CallBase = true };
@@ -24,16 +26,14 @@ namespace AzureDevOps.Scanner.Unittest
         public async Task ScanAsync_WhenNoProjects_ShouldReturnProperInstance()
         {
             // Arrange
-            var testUrl = "https://example.com";
-            var testCollection = "testcol";
             mockHttpMessageHandler.Setup(
-                    mh => mh.Send(
+                mh => mh.Send(
                         It.Is<HttpRequestMessage>(
                             req => req.RequestUri.ToString() == $"{testUrl}/{testCollection}/_apis/projects")))
                 .Returns(new HttpResponseMessage
                 {
                     StatusCode = HttpStatusCode.OK,
-                    Content = new StringContent("{\"count\":1,\"value\":[]}")
+                    Content = new StringContent("{\"count\":0,\"value\":[]}")
                 });
             var systemUnderTest = new Client(httpClient);
 
@@ -51,7 +51,6 @@ namespace AzureDevOps.Scanner.Unittest
         public async Task ScanAsync_WhenMultipleCollectionsOnPrem_ShouldReturnProperInstance()
         {
             // Arrange
-            var testUrl = "https://example.com";
             var testCollection1 = "testcol1";
             var testCollection2 = "testcol2";
             mockHttpMessageHandler.Setup(
@@ -78,17 +77,14 @@ namespace AzureDevOps.Scanner.Unittest
         }
 
         [Fact]
-        public async Task ScanAsync_WhenAzureDevOpsUrl_FailsOnMultipleCollection()
+        public async Task ScanAsync_WhenAzureDevOpsUrl_OkOnSingleCollection()
         {
             // Arrange
-            var testUrl = "https://dev.azure.com";
-            var testCollection1 = "testcol1";
-            var testCollection2 = "testcol2";
+            var azureUrl = "https://dev.azure.com";
             mockHttpMessageHandler.Setup(
                     mh => mh.Send(
                         It.Is<HttpRequestMessage>(
-                            req => req.RequestUri.ToString() == $"{testUrl}/{testCollection1}/_apis/projects" ||
-                                    req.RequestUri.ToString() == $"{testUrl}/{testCollection2}/_apis/projects")))
+                            req => req.RequestUri.ToString() == $"{azureUrl}/{testCollection}/_apis/projects")))
                 .Returns(new HttpResponseMessage
                 {
                     StatusCode = HttpStatusCode.OK,
@@ -97,34 +93,52 @@ namespace AzureDevOps.Scanner.Unittest
             var systemUnderTest = new Client(httpClient);
 
             // Act
-            var actualException = Record.ExceptionAsync(async () => await systemUnderTest.ScanAsync(DataOptions.Build, new string[] { testCollection1, testCollection2 }, testUrl));
+            var actual = await systemUnderTest.ScanAsync(DataOptions.Build, new string[] { testCollection }, azureUrl);
+
+            // Assert
+            mockHttpMessageHandler.Verify();
+            actual.Should().BeOfType<AzureDevOpsInstance>();
+            actual.Collections.Should().HaveCount(1);
+            actual.Collections[0].Projects.Should().BeEmpty();
+        }
+
+        [Fact]
+        public void ScanAsync_WhenAzureDevOpsUrl_FailsOnMultipleCollection()
+        {
+            // Arrange
+            var azureUrl = "https://dev.azure.com";
+            var testCollection1 = "testcol1";
+            var testCollection2 = "testcol2";
+            mockHttpMessageHandler.Setup(
+                    mh => mh.Send(
+                        It.Is<HttpRequestMessage>(
+                            req => req.RequestUri.ToString() == $"{azureUrl}/{testCollection1}/_apis/projects" ||
+                                    req.RequestUri.ToString() == $"{azureUrl}/{testCollection2}/_apis/projects")))
+                .Returns(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent("{\"count\":0,\"value\":[]}")
+                });
+            var systemUnderTest = new Client(httpClient);
+
+            // Act
+            var actualException = Record.ExceptionAsync(async () => await systemUnderTest.ScanAsync(DataOptions.Build, new string[] { testCollection1, testCollection2 }, azureUrl));
 
             // Assert
             actualException.Should().NotBeNull();
             actualException.Result.Should().BeOfType<InvalidOperationException>();
         }
 
-
         [Fact]
         public async Task ScanAsync_WhenNoBuilds_ShouldReturnProperInstance()
         {
             // Arrange
-            var testUrl = "https://example.com";
-            var testCollection = "testcol";
-            var testProjectId = Guid.NewGuid();
+            HttpMockOneProject();
+
             mockHttpMessageHandler.Setup(
                     mh => mh.Send(
                         It.Is<HttpRequestMessage>(
-                            req => req.RequestUri.ToString() == $"{testUrl}/{testCollection}/_apis/projects")))
-                .Returns(new HttpResponseMessage
-                {
-                    StatusCode = HttpStatusCode.OK,
-                    Content = new StringContent("{\"count\":1,\"value\":[{\"id\":\"" + testProjectId.ToString() + "\",\"name\":\"AzureDevOps\",\"description\":\"All kinds of Azure DevOps related tools and work\",\"url\":\"https://dev.azure.com/fgi/_apis/projects/52f6679b-c352-47ea-af8a-db4c15d02f34\",\"state\":\"wellFormed\",\"revision\":407902160,\"visibility\":\"private\",\"lastUpdateTime\":\"2020-02-12T06:14:14.547Z\"}]}")
-                });
-            mockHttpMessageHandler.Setup(
-                    mh => mh.Send(
-                        It.Is<HttpRequestMessage>(
-                            req => req.RequestUri.ToString() == $"{testUrl}/{testCollection}/{testProjectId}/_apis/build/builds")))
+                            req => req.RequestUri.ToString() == $"{testUrl}/{testCollection}/{testProject.Id}/_apis/build/builds")))
                 .Returns(new HttpResponseMessage
                 {
                     StatusCode = HttpStatusCode.OK,
@@ -140,7 +154,178 @@ namespace AzureDevOps.Scanner.Unittest
             actual.Should().BeOfType<AzureDevOpsInstance>();
             actual.Collections.Should().HaveCount(1);
             actual.Collections[0].Projects.Should().HaveCount(1);
+            actual.Collections[0].Projects[0].Should().BeEquivalentTo(testProject);
             actual.Collections[0].Projects[0].Builds.Should().BeEmpty();
+        }
+
+        [Fact]
+        public async Task ScanAsync_WhenBuildsNoArtifacts_ShouldReturnProperInstance()
+        {
+            // Arrange
+            HttpMockOneProject();
+            HttpMockOneBuild();
+            var systemUnderTest = new Client(httpClient);
+
+            // Act
+            var actual = await systemUnderTest.ScanAsync(DataOptions.Build, new string[] { testCollection }, testUrl);
+
+            // Assert
+            var filledProject = testProject;
+            filledProject.Builds = new HashSet<AzureDevOpsBuild> { testBuild };
+            mockHttpMessageHandler.Verify();
+            actual.Should().BeOfType<AzureDevOpsInstance>();
+            actual.Collections.Should().HaveCount(1);
+            actual.Collections[0].Projects.Should().HaveCount(1);
+            actual.Collections[0].Projects[0].Should().BeEquivalentTo(filledProject);
+            actual.Collections[0].Projects[0].Builds.Should().HaveCount(1);
+            actual.Collections[0].Projects[0].Builds.First().Should().BeEquivalentTo(testBuild);
+            actual.Collections[0].Projects[0].Builds.First().Artifacts.Should().BeNull();
+        }
+
+        [Fact]
+        public async Task ScanAsync_WhenBuildsWithArtifacts_ShouldReturnProperInstance()
+        {
+            // Arrange
+            HttpMockOneProject();
+            HttpMockOneBuild();
+            HttpMockOneArtifact();
+
+            var filledProject = testProject;
+            var filledBuild = testBuild;
+            filledBuild.Artifacts = new HashSet<AzureDevOpsBuildArtifact> { testArtifact };
+            filledProject.Builds = new HashSet<AzureDevOpsBuild> { filledBuild }; ;
+
+            var systemUnderTest = new Client(httpClient);
+
+            // Act
+            var actual = await systemUnderTest.ScanAsync(DataOptions.Build | DataOptions.BuildArtifacts, new string[] { testCollection }, testUrl);
+
+            // Assert
+            mockHttpMessageHandler.Verify();
+            actual.Should().BeOfType<AzureDevOpsInstance>();
+            actual.Collections.Should().HaveCount(1);
+            actual.Collections[0].Projects.Should().HaveCount(1);
+            actual.Collections[0].Projects[0].Should().BeEquivalentTo(filledProject);
+            actual.Collections[0].Projects[0].Builds.Should().HaveCount(1);
+            actual.Collections[0].Projects[0].Builds.First().Should().BeEquivalentTo(testBuild);
+            actual.Collections[0].Projects[0].Builds.First().Artifacts.Should().HaveCount(1);
+            actual.Collections[0].Projects[0].Builds.First().Artifacts.First().Should().BeEquivalentTo(testArtifact);
+        }
+
+        [Fact]
+        public async Task ScanAsync_WhenNoReleases_ShouldReturnProperInstance()
+        {
+            // Arrange
+            HttpMockOneProject();
+            mockHttpMessageHandler.Setup(
+                    mh => mh.Send(
+                        It.Is<HttpRequestMessage>(
+                            req => req.RequestUri.ToString() == $"{testUrl}/{testCollection}/{testProject.Id}/_apis/release/releases")))
+                .Returns(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent("{\"count\":0,\"value\":[]}")
+                });
+            var systemUnderTest = new Client(httpClient);
+
+            // Act
+            var actual = await systemUnderTest.ScanAsync(DataOptions.Release, new string[] { testCollection }, testUrl);
+
+            // Assert
+            mockHttpMessageHandler.Verify();
+            actual.Should().BeOfType<AzureDevOpsInstance>();
+            actual.Collections.Should().HaveCount(1);
+            actual.Collections[0].Projects.Should().HaveCount(1);
+            actual.Collections[0].Projects[0].Should().BeEquivalentTo(testProject);
+            actual.Collections[0].Projects[0].Releases.Should().BeEmpty();
+        }
+
+        [Fact]
+        public async Task ScanAsync_WhenRelease_ShouldReturnProperInstance()
+        {
+            // Arrange
+            HttpMockOneProject();
+            HttpMockOneRelease();
+
+            var filledProject = testProject;
+            filledProject.Releases = new HashSet<AzureDevOpsRelease> { testRelease };
+
+            var systemUnderTest = new Client(httpClient);
+
+            // Act
+            var actual = await systemUnderTest.ScanAsync(DataOptions.Release, new string[] { testCollection }, testUrl);
+
+            // Assert
+            mockHttpMessageHandler.Verify();
+            actual.Should().BeOfType<AzureDevOpsInstance>();
+            actual.Collections.Should().HaveCount(1);
+            actual.Collections[0].Projects.Should().HaveCount(1);
+            actual.Collections[0].Projects[0].Should().BeEquivalentTo(filledProject);
+        }
+
+        private void HttpMockOneProject()
+        {
+            mockHttpMessageHandler.Setup(
+                mh => mh.Send(
+                    It.Is<HttpRequestMessage>(
+                        req => req.RequestUri.ToString() == $"{testUrl}/{testCollection}/_apis/projects")))
+                .Returns(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent($"{{\"count\":1,\"value\":[{{\"id\":\"{testProject.Id}\",\"name\":\"{testProject.Name}\",\"description\":\"{testProject.Description}\",\"url\":\"{testProject.Url}\"}}]}}")
+                });
+        }
+
+        private void HttpMockOneBuild()
+        {
+            mockHttpMessageHandler.Setup(
+                                mh => mh.Send(
+                                    It.Is<HttpRequestMessage>(
+                                        req => req.RequestUri.ToString() == $"{testUrl}/{testCollection}/{testProject.Id}/_apis/build/builds")))
+                            .Returns(new HttpResponseMessage
+                            {
+                                StatusCode = HttpStatusCode.OK,
+                                Content = new StringContent($"{{\"count\":1,\"value\":[{{\"id\":{testBuild.Id},\"buildNumber\":\"{testBuild.BuildNumber}\",\"status\":\"{testBuild.Status}\",\"result\":\"{testBuild.Result}\",\"url\":\"{testBuild.Url}\"}}]}}")
+                            });
+        }
+
+        private void HttpMockOneArtifact()
+        {
+            mockHttpMessageHandler.Setup(
+                    mh => mh.Send(
+                        It.Is<HttpRequestMessage>(
+                            req => req.RequestUri.ToString() == $"{testBuild.Url}/artifacts?api-version=5.1")))
+                .Returns(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent($"{{\"count\":1,\"value\":[{{\"id\":{testArtifact.Id},\"name\":\"{testArtifact.Name}\",\"resource\":{{\"type\":\"{testArtifact.Resource.Type}\",\"downloadUrl\":\"{ testArtifact.Resource.DownloadUrl }\"}}}}]}}")
+                });
+        }
+
+        private void HttpMockOneRelease()
+        {
+            mockHttpMessageHandler.Setup(
+                                mh => mh.Send(
+                                    It.Is<HttpRequestMessage>(
+                                        req => req.RequestUri.ToString() == $"{testUrl}/{testCollection}/{testProject.Id}/_apis/release/releases")))
+                            .Returns(new HttpResponseMessage
+                            {
+                                StatusCode = HttpStatusCode.OK,
+                                Content = new StringContent($"{{\"count\":1,\"value\":[{{\"id\":{testRelease.Id},\"name\":\"{testRelease.Name}\",\"status\":\"{testRelease.Status}\",\"createdOn\":\"{testRelease.CreatedOn}\",\"createdBy\":{{\"displayName\":\"{testRelease.CreatedBy.DisplayName}\",\"id\":\"{testRelease.CreatedBy.Id}\",\"uniqueName\":\"{testRelease.CreatedBy.UniqueName}\"}},\"url\":\"{testRelease.Url}\"}}]}}")
+                            });
+        }
+
+        private void HttpMockOneReleaseDetails()
+        {
+            mockHttpMessageHandler.Setup(
+                                mh => mh.Send(
+                                    It.Is<HttpRequestMessage>(
+                                        req => req.RequestUri.ToString() == $"{testRelease.Url}")))
+                            .Returns(new HttpResponseMessage
+                            {
+                                StatusCode = HttpStatusCode.OK,
+                                Content = new StringContent($"{{\"count\":1,\"value\":[{{\"id\":{testRelease.Id},\"name\":\"{testRelease.Name}\",\"status\":\"{testRelease.Status}\",\"createdOn\":\"{testRelease.CreatedOn}\",\"createdBy\":{{\"displayName\":\"{testRelease.CreatedBy.DisplayName}\",\"id\":\"{testRelease.CreatedBy.Id}\",\"uniqueName\":\"{testRelease.CreatedBy.UniqueName}\"}},\"url\":\"{testRelease.Url}\"}}]}}")
+                            });
         }
     }
 }
