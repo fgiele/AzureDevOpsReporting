@@ -2,6 +2,7 @@
 using Moq;
 using System;
 using System.Collections.Generic;
+using FizzWare.NBuilder;
 
 namespace AzureDevOps.Scanner.Unittest
 {
@@ -9,120 +10,44 @@ namespace AzureDevOps.Scanner.Unittest
     {
         private const string testUrl = "https://example.com";
         private const string testCollection = "testcol";
-        private static readonly DateTime testDateTime = DateTime.Now;
-        private static readonly DateTime testDateTimeToSeconds = testDateTime.AddTicks(-(testDateTime.Ticks % TimeSpan.TicksPerSecond));
 
-        private readonly AzureDevOpsProject testProject = new AzureDevOpsProject
-        {
-            Description = "testDescription",
-            Id = Guid.NewGuid(),
-            Name = "testproj",
-            Url = $"{testUrl}/12345678",
-            Builds = Array.Empty<AzureDevOpsBuild>(),
-            Releases = Array.Empty<AzureDevOpsRelease>(),
-            Repositories = Array.Empty<AzureDevOpsRepository>()
-        };
+        private readonly AzureDevOpsProject testProject = Builder<AzureDevOpsProject>.CreateNew().Build();
 
-        private readonly AzureDevOpsBuild testBuild = new AzureDevOpsBuild
-        {
-            BuildNumber = "testBuildNumber",
-            Id = 12345,
-            Result = "testResult",
-            Status = "testStatus",
-            Url = $"{testUrl}/testUrl"
-        };
+        private readonly AzureDevOpsBuild testBuild = Builder<AzureDevOpsBuild>.CreateNew().Do(moq => moq.Url = $"{testUrl}/testbuild").Build();
 
-        private readonly AzureDevOpsBuildArtifact testArtifact = new AzureDevOpsBuildArtifact
-        {
-            Id = 54321,
-            Name = "testArtifact",
-            Resource = new AzureDevOpsArtifactResource
-            {
-                DownloadUrl = "testArtifactUrl",
-                Type = "testType"
-            }
-        };
+        private readonly AzureDevOpsBuildArtifact testArtifact = Builder<AzureDevOpsBuildArtifact>.CreateNew()
+            .Do(moq => moq.Resource = Builder<AzureDevOpsArtifactResource>.CreateNew().Build()).Build();
 
-        private static readonly AzureDevOpsIdentity testIdentity = new AzureDevOpsIdentity
-        {
-            DisplayName = "testDisplayName",
-            Id = Guid.NewGuid(),
-            UniqueName = "test Unique Name"
-        };
+        private readonly AzureDevOpsRelease testRelease = Builder<AzureDevOpsRelease>.CreateNew()
+            .Do(moq => moq.CreatedBy = Builder<AzureDevOpsIdentity>.CreateNew().Build())
+            .Do(moq => moq.Url = $"{testUrl}/testrelease")
+                .Build();
 
-        private readonly AzureDevOpsRelease testRelease = new AzureDevOpsRelease
-        {
-            CreatedBy = testIdentity,
-            CreatedOn = testDateTimeToSeconds,
-            Id = 10203,
-            Name = "testReleaseName",
-            Status = "testState",
-            Url = $"{testUrl}/testReleaseUrl"
-        };
+        private readonly AzureDevOpsEnvironment testEnvironment = Builder<AzureDevOpsEnvironment>.CreateNew()
+            .Do(moq => moq.PostApprovalsSnapshot = Builder<AzureDevOpsDeployApprovalsSnapshot>.CreateNew()
+                .Do(moq => moq.Approvals = new HashSet<AzureDevOpsApproval> { Builder<AzureDevOpsApproval>.CreateNew().Build() })
+                .Build())
+            .Do(moq => moq.PostDeployApprovals = new HashSet<AzureDevOpsDeployApproval> { Builder<AzureDevOpsDeployApproval>.CreateNew().Build() })
+            .Do(moq => moq.PreApprovalsSnapshot = Builder<AzureDevOpsDeployApprovalsSnapshot>.CreateNew()
+                .Do(moq => moq.Approvals = new HashSet<AzureDevOpsApproval> { Builder<AzureDevOpsApproval>.CreateNew().Build() })
+                .Build())
+            .Do(moq => moq.PreDeployApprovals = new HashSet<AzureDevOpsDeployApproval> { Builder<AzureDevOpsDeployApproval>.CreateNew().Build() })
+                .Build();
 
-        private readonly AzureDevOpsEnvironment testEnvironment = new AzureDevOpsEnvironment
-        {
-            CreatedOn = testDateTimeToSeconds,
-            Id = 30201,
-            Name = "testEnvironment",
-            PostApprovalsSnapshot = new AzureDevOpsDeployApprovalsSnapshot
-            {
-                Approvals = new HashSet<AzureDevOpsApproval> {
-                    new AzureDevOpsApproval {
-                        Approver = testIdentity,
-                        Id = 51243,
-                        IsAutomated = true,
-                        Rank = 2
-                    }
-                }
-            },
-            PostDeployApprovals = new HashSet<AzureDevOpsDeployApproval> {
-                new AzureDevOpsDeployApproval
-                {
-                    ApprovalType = "testApprovalTypePost",
-                    ApprovedBy = testIdentity,
-                    Approver = testIdentity,
-                    Attempt = 11,
-                    Comments = "testComments",
-                    CreatedOn = testDateTimeToSeconds,
-                    Id = 2222,
-                    IsAutomated = true,
-                    Revision = 8,
-                    Status="testStatusApp",
-                    Url = "testUrl"
-                }
-            },
-            PreApprovalsSnapshot = new AzureDevOpsDeployApprovalsSnapshot
-            {
-                Approvals = new HashSet<AzureDevOpsApproval> {
-                    new AzureDevOpsApproval {
-                        Approver = testIdentity,
-                        Id = 5143,
-                        IsAutomated = false,
-                        Rank = 3
-                    }
-                }
-            },
-            PreDeployApprovals = new HashSet<AzureDevOpsDeployApproval> {
-                new AzureDevOpsDeployApproval
-                {
-                    ApprovalType = "testApprovalTypePre",
-                    ApprovedBy = testIdentity,
-                    Approver = testIdentity,
-                    Attempt = 11,
-                    Comments = "testComment2",
-                    CreatedOn = testDateTimeToSeconds,
-                    Id = 222,
-                    IsAutomated = false,
-                    Revision = 7,
-                    Status="testStatusAppPre",
-                    Url = "testUrlPre"
-                }
-            },
-            Status = "testDeployStatus",
-            TriggerReason = "testTriggerReason"
-        };
-
-        private readonly AzureDevOpsReleaseArtifact testReleaseArtifact = Mock.Of<AzureDevOpsReleaseArtifact>();
+        private readonly AzureDevOpsReleaseArtifact testReleaseArtifact = Builder<AzureDevOpsReleaseArtifact>.CreateNew()
+            .Do(moq => moq.DefinitionReference = Builder<AzureDevOpsDefinitionReference>.CreateNew()
+                .Do(moq => moq.ArtifactSourceDefinitionUrl = Builder<AzureDevOpsReferenceField>.CreateNew().Build())
+                .Do(moq => moq.ArtifactSourceVersionUrl = Builder<AzureDevOpsReferenceField>.CreateNew().Build())
+                .Do(moq => moq.Branch = Builder<AzureDevOpsReferenceField>.CreateNew().Build())
+                .Do(moq => moq.BuildUri = Builder<AzureDevOpsReferenceField>.CreateNew().Build())
+                .Do(moq => moq.Definition = Builder<AzureDevOpsReferenceField>.CreateNew().Build())
+                .Do(moq => moq.Project = Builder<AzureDevOpsReferenceField>.CreateNew().Build())
+                .Do(moq => moq.PullRequestMergeCommitId = Builder<AzureDevOpsReferenceField>.CreateNew().Build())
+                .Do(moq => moq.Repository = Builder<AzureDevOpsReferenceField>.CreateNew().Build())
+                .Do(moq => moq.RequestedFor = Builder<AzureDevOpsReferenceField>.CreateNew().Build())
+                .Do(moq => moq.SourceVersion = Builder<AzureDevOpsReferenceField>.CreateNew().Build())
+                .Do(moq => moq.Version = Builder<AzureDevOpsReferenceField>.CreateNew().Build())
+                .Build())
+                .Build();
     }
 }

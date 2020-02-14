@@ -134,6 +134,8 @@ namespace AzureDevOps.Scanner.Unittest
         {
             // Arrange
             HttpMockOneProject();
+            var expectedProject = testProject;
+            expectedProject.Builds = Array.Empty<AzureDevOpsBuild>();
 
             mockHttpMessageHandler.Setup(
                     mh => mh.Send(
@@ -154,7 +156,7 @@ namespace AzureDevOps.Scanner.Unittest
             actual.Should().BeOfType<AzureDevOpsInstance>();
             actual.Collections.Should().HaveCount(1);
             actual.Collections[0].Projects.Should().HaveCount(1);
-            actual.Collections[0].Projects[0].Should().BeEquivalentTo(testProject);
+            actual.Collections[0].Projects[0].Should().BeEquivalentTo(expectedProject);
             actual.Collections[0].Projects[0].Builds.Should().BeEmpty();
         }
 
@@ -165,18 +167,18 @@ namespace AzureDevOps.Scanner.Unittest
             HttpMockOneProject();
             HttpMockOneBuild();
             var systemUnderTest = new Client(httpClient);
+            var expectedProject = testProject;
+            expectedProject.Builds = new HashSet<AzureDevOpsBuild> { testBuild };
 
             // Act
             var actual = await systemUnderTest.ScanAsync(DataOptions.Build, new string[] { testCollection }, testUrl);
 
             // Assert
-            var filledProject = testProject;
-            filledProject.Builds = new HashSet<AzureDevOpsBuild> { testBuild };
             mockHttpMessageHandler.Verify();
             actual.Should().BeOfType<AzureDevOpsInstance>();
             actual.Collections.Should().HaveCount(1);
             actual.Collections[0].Projects.Should().HaveCount(1);
-            actual.Collections[0].Projects[0].Should().BeEquivalentTo(filledProject);
+            actual.Collections[0].Projects[0].Should().BeEquivalentTo(expectedProject);
             actual.Collections[0].Projects[0].Builds.Should().HaveCount(1);
             actual.Collections[0].Projects[0].Builds.First().Should().BeEquivalentTo(testBuild);
             actual.Collections[0].Projects[0].Builds.First().Artifacts.Should().BeNull();
@@ -190,10 +192,10 @@ namespace AzureDevOps.Scanner.Unittest
             HttpMockOneBuild();
             HttpMockOneArtifact();
 
-            var filledProject = testProject;
-            var filledBuild = testBuild;
-            filledBuild.Artifacts = new HashSet<AzureDevOpsBuildArtifact> { testArtifact };
-            filledProject.Builds = new HashSet<AzureDevOpsBuild> { filledBuild }; ;
+            var expectedProject = testProject;
+            var expectedBuild = testBuild;
+            expectedBuild.Artifacts = new HashSet<AzureDevOpsBuildArtifact> { testArtifact };
+            expectedProject.Builds = new HashSet<AzureDevOpsBuild> { expectedBuild }; ;
 
             var systemUnderTest = new Client(httpClient);
 
@@ -205,7 +207,7 @@ namespace AzureDevOps.Scanner.Unittest
             actual.Should().BeOfType<AzureDevOpsInstance>();
             actual.Collections.Should().HaveCount(1);
             actual.Collections[0].Projects.Should().HaveCount(1);
-            actual.Collections[0].Projects[0].Should().BeEquivalentTo(filledProject);
+            actual.Collections[0].Projects[0].Should().BeEquivalentTo(expectedProject);
             actual.Collections[0].Projects[0].Builds.Should().HaveCount(1);
             actual.Collections[0].Projects[0].Builds.First().Should().BeEquivalentTo(testBuild);
             actual.Collections[0].Projects[0].Builds.First().Artifacts.Should().HaveCount(1);
@@ -217,6 +219,10 @@ namespace AzureDevOps.Scanner.Unittest
         {
             // Arrange
             HttpMockOneProject();
+
+            var expectedProject = testProject;
+            expectedProject.Releases = Array.Empty<AzureDevOpsRelease>();
+
             mockHttpMessageHandler.Setup(
                     mh => mh.Send(
                         It.Is<HttpRequestMessage>(
@@ -247,8 +253,8 @@ namespace AzureDevOps.Scanner.Unittest
             HttpMockOneProject();
             HttpMockOneRelease();
 
-            var filledProject = testProject;
-            filledProject.Releases = new HashSet<AzureDevOpsRelease> { testRelease };
+            var expectedProject = testProject;
+            expectedProject.Releases = new HashSet<AzureDevOpsRelease> { testRelease };
 
             var systemUnderTest = new Client(httpClient);
 
@@ -260,7 +266,7 @@ namespace AzureDevOps.Scanner.Unittest
             actual.Should().BeOfType<AzureDevOpsInstance>();
             actual.Collections.Should().HaveCount(1);
             actual.Collections[0].Projects.Should().HaveCount(1);
-            actual.Collections[0].Projects[0].Should().BeEquivalentTo(filledProject);
+            actual.Collections[0].Projects[0].Should().BeEquivalentTo(expectedProject);
         }
 
         private void HttpMockOneProject()
