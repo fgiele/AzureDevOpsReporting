@@ -1,5 +1,6 @@
 ﻿using AzureDevOps.Model;
 using System;
+using System.Linq;
 
 namespace AzureDevOps.Report
 {
@@ -14,15 +15,18 @@ namespace AzureDevOps.Report
             CreateHeaders("Collection",
                             "Project",
                             "Release name",
-                            "Release date", 
-                            "R. Status", 
-                            "Environment", 
-                            "E. Status", 
-                            "Attempt", 
-                            "Attempt date", 
-                            "Auto approve", 
-                            "Required approval", 
-                            "Approval given by");
+                            "Release date",
+                            "R. Status",
+                            "Environment",
+                            "E. Status",
+                            "Attempt",
+                            "Attempt date",
+                            "Auto approve",
+                            "Required approval",
+                            "Approval given by",
+                            "Nr. of Artifacts",
+                            "Artifact versions",
+                            "Source branches");
 
             foreach (var collection in instance.Collections)
             {
@@ -45,9 +49,10 @@ namespace AzureDevOps.Report
                                         preDeployApproval.CreatedOn,
                                         preDeployApproval.IsAutomated,
                                         preDeployApproval.IsAutomated ? string.Empty : $"{preDeployApproval.Approver?.DisplayName}",
-                                        preDeployApproval.IsAutomated ? string.Empty : $"{preDeployApproval.ApprovedBy?.DisplayName}"
-                                        );
-
+                                        preDeployApproval.IsAutomated ? string.Empty : $"{preDeployApproval.ApprovedBy?.DisplayName}",
+                                        release.Artifacts?.Count() ?? 0,
+                                        string.Join(" & ", release.Artifacts?.Select(art => art.DefinitionReference)?.Select(def => $"{def.Definition.Name} - {def.Version.Name}")),
+                                        string.Join(" & ", release.Artifacts?.Select(art => art.DefinitionReference)?.Select(def => $"{def.Branch.Name}")));
                             }
                         }
                     }
