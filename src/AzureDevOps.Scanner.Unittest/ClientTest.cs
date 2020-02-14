@@ -15,7 +15,7 @@ namespace AzureDevOps.Scanner.Unittest
     {
         private Mock<MockHttpMessageHandler> mockHttpMessageHandler;
         private HttpClient httpClient;
-        
+
         public ClientTest()
         {
             mockHttpMessageHandler = new Mock<MockHttpMessageHandler> { CallBase = true };
@@ -29,7 +29,7 @@ namespace AzureDevOps.Scanner.Unittest
             mockHttpMessageHandler.Setup(
                 mh => mh.Send(
                         It.Is<HttpRequestMessage>(
-                            req => req.RequestUri.ToString() == $"{testUrl}/{testCollection}/_apis/projects")))
+                            req => req.RequestUri.ToString() == $"{expectedUrl}/{expectedCollection}/_apis/projects")))
                 .Returns(new HttpResponseMessage
                 {
                     StatusCode = HttpStatusCode.OK,
@@ -38,7 +38,7 @@ namespace AzureDevOps.Scanner.Unittest
             var systemUnderTest = new Client(httpClient);
 
             // Act
-            var actual = await systemUnderTest.ScanAsync(DataOptions.Build, new string[] { testCollection }, testUrl);
+            var actual = await systemUnderTest.ScanAsync(DataOptions.Build, new string[] { expectedCollection }, expectedUrl);
 
             // Assert
             mockHttpMessageHandler.Verify();
@@ -51,13 +51,13 @@ namespace AzureDevOps.Scanner.Unittest
         public async Task ScanAsync_WhenMultipleCollectionsOnPrem_ShouldReturnProperInstance()
         {
             // Arrange
-            var testCollection1 = "testcol1";
-            var testCollection2 = "testcol2";
+            var expectedCollection1 = "testcol1";
+            var expectedCollection2 = "testcol2";
             mockHttpMessageHandler.Setup(
                     mh => mh.Send(
                         It.Is<HttpRequestMessage>(
-                            req => req.RequestUri.ToString() == $"{testUrl}/{testCollection1}/_apis/projects" ||
-                                    req.RequestUri.ToString() == $"{testUrl}/{testCollection2}/_apis/projects")))
+                            req => req.RequestUri.ToString() == $"{expectedUrl}/{expectedCollection1}/_apis/projects" ||
+                                    req.RequestUri.ToString() == $"{expectedUrl}/{expectedCollection2}/_apis/projects")))
                 .Returns(new HttpResponseMessage
                 {
                     StatusCode = HttpStatusCode.OK,
@@ -66,7 +66,7 @@ namespace AzureDevOps.Scanner.Unittest
             var systemUnderTest = new Client(httpClient);
 
             // Act
-            var actual = await systemUnderTest.ScanAsync(DataOptions.Build, new string[] { testCollection1, testCollection2 }, testUrl);
+            var actual = await systemUnderTest.ScanAsync(DataOptions.Build, new string[] { expectedCollection1, expectedCollection2 }, expectedUrl);
 
             // Assert
             mockHttpMessageHandler.Verify();
@@ -84,7 +84,7 @@ namespace AzureDevOps.Scanner.Unittest
             mockHttpMessageHandler.Setup(
                     mh => mh.Send(
                         It.Is<HttpRequestMessage>(
-                            req => req.RequestUri.ToString() == $"{azureUrl}/{testCollection}/_apis/projects")))
+                            req => req.RequestUri.ToString() == $"{azureUrl}/{expectedCollection}/_apis/projects")))
                 .Returns(new HttpResponseMessage
                 {
                     StatusCode = HttpStatusCode.OK,
@@ -93,7 +93,7 @@ namespace AzureDevOps.Scanner.Unittest
             var systemUnderTest = new Client(httpClient);
 
             // Act
-            var actual = await systemUnderTest.ScanAsync(DataOptions.Build, new string[] { testCollection }, azureUrl);
+            var actual = await systemUnderTest.ScanAsync(DataOptions.Build, new string[] { expectedCollection }, azureUrl);
 
             // Assert
             mockHttpMessageHandler.Verify();
@@ -107,13 +107,13 @@ namespace AzureDevOps.Scanner.Unittest
         {
             // Arrange
             var azureUrl = "https://dev.azure.com";
-            var testCollection1 = "testcol1";
-            var testCollection2 = "testcol2";
+            var expectedCollection1 = "testcol1";
+            var expectedCollection2 = "testcol2";
             mockHttpMessageHandler.Setup(
                     mh => mh.Send(
                         It.Is<HttpRequestMessage>(
-                            req => req.RequestUri.ToString() == $"{azureUrl}/{testCollection1}/_apis/projects" ||
-                                    req.RequestUri.ToString() == $"{azureUrl}/{testCollection2}/_apis/projects")))
+                            req => req.RequestUri.ToString() == $"{azureUrl}/{expectedCollection1}/_apis/projects" ||
+                                    req.RequestUri.ToString() == $"{azureUrl}/{expectedCollection2}/_apis/projects")))
                 .Returns(new HttpResponseMessage
                 {
                     StatusCode = HttpStatusCode.OK,
@@ -122,7 +122,7 @@ namespace AzureDevOps.Scanner.Unittest
             var systemUnderTest = new Client(httpClient);
 
             // Act
-            var actualException = Record.ExceptionAsync(async () => await systemUnderTest.ScanAsync(DataOptions.Build, new string[] { testCollection1, testCollection2 }, azureUrl));
+            var actualException = Record.ExceptionAsync(async () => await systemUnderTest.ScanAsync(DataOptions.Build, new string[] { expectedCollection1, expectedCollection2 }, azureUrl));
 
             // Assert
             actualException.Should().NotBeNull();
@@ -134,13 +134,12 @@ namespace AzureDevOps.Scanner.Unittest
         {
             // Arrange
             HttpMockOneProject();
-            var expectedProject = testProject;
             expectedProject.Builds = Array.Empty<AzureDevOpsBuild>();
 
             mockHttpMessageHandler.Setup(
                     mh => mh.Send(
                         It.Is<HttpRequestMessage>(
-                            req => req.RequestUri.ToString() == $"{testUrl}/{testCollection}/{testProject.Id}/_apis/build/builds")))
+                            req => req.RequestUri.ToString() == $"{expectedUrl}/{expectedCollection}/{expectedProject.Id}/_apis/build/builds")))
                 .Returns(new HttpResponseMessage
                 {
                     StatusCode = HttpStatusCode.OK,
@@ -149,7 +148,7 @@ namespace AzureDevOps.Scanner.Unittest
             var systemUnderTest = new Client(httpClient);
 
             // Act
-            var actual = await systemUnderTest.ScanAsync(DataOptions.Build, new string[] { testCollection }, testUrl);
+            var actual = await systemUnderTest.ScanAsync(DataOptions.Build, new string[] { expectedCollection }, expectedUrl);
 
             // Assert
             mockHttpMessageHandler.Verify();
@@ -157,7 +156,6 @@ namespace AzureDevOps.Scanner.Unittest
             actual.Collections.Should().HaveCount(1);
             actual.Collections[0].Projects.Should().HaveCount(1);
             actual.Collections[0].Projects[0].Should().BeEquivalentTo(expectedProject);
-            actual.Collections[0].Projects[0].Builds.Should().BeEmpty();
         }
 
         [Fact]
@@ -166,12 +164,13 @@ namespace AzureDevOps.Scanner.Unittest
             // Arrange
             HttpMockOneProject();
             HttpMockOneBuild();
+
+            expectedProject.Builds = new HashSet<AzureDevOpsBuild> { expectedBuild };
+
             var systemUnderTest = new Client(httpClient);
-            var expectedProject = testProject;
-            expectedProject.Builds = new HashSet<AzureDevOpsBuild> { testBuild };
 
             // Act
-            var actual = await systemUnderTest.ScanAsync(DataOptions.Build, new string[] { testCollection }, testUrl);
+            var actual = await systemUnderTest.ScanAsync(DataOptions.Build, new string[] { expectedCollection }, expectedUrl);
 
             // Assert
             mockHttpMessageHandler.Verify();
@@ -179,9 +178,6 @@ namespace AzureDevOps.Scanner.Unittest
             actual.Collections.Should().HaveCount(1);
             actual.Collections[0].Projects.Should().HaveCount(1);
             actual.Collections[0].Projects[0].Should().BeEquivalentTo(expectedProject);
-            actual.Collections[0].Projects[0].Builds.Should().HaveCount(1);
-            actual.Collections[0].Projects[0].Builds.First().Should().BeEquivalentTo(testBuild);
-            actual.Collections[0].Projects[0].Builds.First().Artifacts.Should().BeNull();
         }
 
         [Fact]
@@ -192,15 +188,13 @@ namespace AzureDevOps.Scanner.Unittest
             HttpMockOneBuild();
             HttpMockOneArtifact();
 
-            var expectedProject = testProject;
-            var expectedBuild = testBuild;
-            expectedBuild.Artifacts = new HashSet<AzureDevOpsBuildArtifact> { testArtifact };
+            expectedBuild.Artifacts = new HashSet<AzureDevOpsBuildArtifact> { expectedArtifact };
             expectedProject.Builds = new HashSet<AzureDevOpsBuild> { expectedBuild }; ;
 
             var systemUnderTest = new Client(httpClient);
 
             // Act
-            var actual = await systemUnderTest.ScanAsync(DataOptions.Build | DataOptions.BuildArtifacts, new string[] { testCollection }, testUrl);
+            var actual = await systemUnderTest.ScanAsync(DataOptions.Build | DataOptions.BuildArtifacts, new string[] { expectedCollection }, expectedUrl);
 
             // Assert
             mockHttpMessageHandler.Verify();
@@ -208,10 +202,6 @@ namespace AzureDevOps.Scanner.Unittest
             actual.Collections.Should().HaveCount(1);
             actual.Collections[0].Projects.Should().HaveCount(1);
             actual.Collections[0].Projects[0].Should().BeEquivalentTo(expectedProject);
-            actual.Collections[0].Projects[0].Builds.Should().HaveCount(1);
-            actual.Collections[0].Projects[0].Builds.First().Should().BeEquivalentTo(testBuild);
-            actual.Collections[0].Projects[0].Builds.First().Artifacts.Should().HaveCount(1);
-            actual.Collections[0].Projects[0].Builds.First().Artifacts.First().Should().BeEquivalentTo(testArtifact);
         }
 
         [Fact]
@@ -220,13 +210,12 @@ namespace AzureDevOps.Scanner.Unittest
             // Arrange
             HttpMockOneProject();
 
-            var expectedProject = testProject;
             expectedProject.Releases = Array.Empty<AzureDevOpsRelease>();
 
             mockHttpMessageHandler.Setup(
                     mh => mh.Send(
                         It.Is<HttpRequestMessage>(
-                            req => req.RequestUri.ToString() == $"{testUrl}/{testCollection}/{testProject.Id}/_apis/release/releases")))
+                            req => req.RequestUri.ToString() == $"{expectedUrl}/{expectedCollection}/{expectedProject.Id}/_apis/release/releases")))
                 .Returns(new HttpResponseMessage
                 {
                     StatusCode = HttpStatusCode.OK,
@@ -235,14 +224,14 @@ namespace AzureDevOps.Scanner.Unittest
             var systemUnderTest = new Client(httpClient);
 
             // Act
-            var actual = await systemUnderTest.ScanAsync(DataOptions.Release, new string[] { testCollection }, testUrl);
+            var actual = await systemUnderTest.ScanAsync(DataOptions.Release, new string[] { expectedCollection }, expectedUrl);
 
             // Assert
             mockHttpMessageHandler.Verify();
             actual.Should().BeOfType<AzureDevOpsInstance>();
             actual.Collections.Should().HaveCount(1);
             actual.Collections[0].Projects.Should().HaveCount(1);
-            actual.Collections[0].Projects[0].Should().BeEquivalentTo(testProject);
+            actual.Collections[0].Projects[0].Should().BeEquivalentTo(expectedProject);
             actual.Collections[0].Projects[0].Releases.Should().BeEmpty();
         }
 
@@ -253,13 +242,12 @@ namespace AzureDevOps.Scanner.Unittest
             HttpMockOneProject();
             HttpMockOneRelease();
 
-            var expectedProject = testProject;
-            expectedProject.Releases = new HashSet<AzureDevOpsRelease> { testRelease };
+            expectedProject.Releases = new HashSet<AzureDevOpsRelease> { expectedRelease };
 
             var systemUnderTest = new Client(httpClient);
 
             // Act
-            var actual = await systemUnderTest.ScanAsync(DataOptions.Release, new string[] { testCollection }, testUrl);
+            var actual = await systemUnderTest.ScanAsync(DataOptions.Release, new string[] { expectedCollection }, expectedUrl);
 
             // Assert
             mockHttpMessageHandler.Verify();
@@ -274,11 +262,11 @@ namespace AzureDevOps.Scanner.Unittest
             mockHttpMessageHandler.Setup(
                 mh => mh.Send(
                     It.Is<HttpRequestMessage>(
-                        req => req.RequestUri.ToString() == $"{testUrl}/{testCollection}/_apis/projects")))
+                        req => req.RequestUri.ToString() == $"{expectedUrl}/{expectedCollection}/_apis/projects")))
                 .Returns(new HttpResponseMessage
                 {
                     StatusCode = HttpStatusCode.OK,
-                    Content = new StringContent($"{{\"count\":1,\"value\":[{{\"id\":\"{testProject.Id}\",\"name\":\"{testProject.Name}\",\"description\":\"{testProject.Description}\",\"url\":\"{testProject.Url}\"}}]}}")
+                    Content = new StringContent($"{{\"count\":1,\"value\":[{{\"id\":\"{expectedProject.Id}\",\"name\":\"{expectedProject.Name}\",\"description\":\"{expectedProject.Description}\",\"url\":\"{expectedProject.Url}\"}}]}}")
                 });
         }
 
@@ -287,11 +275,11 @@ namespace AzureDevOps.Scanner.Unittest
             mockHttpMessageHandler.Setup(
                                 mh => mh.Send(
                                     It.Is<HttpRequestMessage>(
-                                        req => req.RequestUri.ToString() == $"{testUrl}/{testCollection}/{testProject.Id}/_apis/build/builds")))
+                                        req => req.RequestUri.ToString() == $"{expectedUrl}/{expectedCollection}/{expectedProject.Id}/_apis/build/builds")))
                             .Returns(new HttpResponseMessage
                             {
                                 StatusCode = HttpStatusCode.OK,
-                                Content = new StringContent($"{{\"count\":1,\"value\":[{{\"id\":{testBuild.Id},\"buildNumber\":\"{testBuild.BuildNumber}\",\"status\":\"{testBuild.Status}\",\"result\":\"{testBuild.Result}\",\"url\":\"{testBuild.Url}\"}}]}}")
+                                Content = new StringContent($"{{\"count\":1,\"value\":[{{\"id\":{expectedBuild.Id},\"buildNumber\":\"{expectedBuild.BuildNumber}\",\"status\":\"{expectedBuild.Status}\",\"result\":\"{expectedBuild.Result}\",\"url\":\"{expectedBuild.Url}\"}}]}}")
                             });
         }
 
@@ -300,11 +288,11 @@ namespace AzureDevOps.Scanner.Unittest
             mockHttpMessageHandler.Setup(
                     mh => mh.Send(
                         It.Is<HttpRequestMessage>(
-                            req => req.RequestUri.ToString() == $"{testBuild.Url}/artifacts?api-version=5.1")))
+                            req => req.RequestUri.ToString() == $"{expectedBuild.Url}/artifacts?api-version=5.1")))
                 .Returns(new HttpResponseMessage
                 {
                     StatusCode = HttpStatusCode.OK,
-                    Content = new StringContent($"{{\"count\":1,\"value\":[{{\"id\":{testArtifact.Id},\"name\":\"{testArtifact.Name}\",\"resource\":{{\"type\":\"{testArtifact.Resource.Type}\",\"downloadUrl\":\"{ testArtifact.Resource.DownloadUrl }\"}}}}]}}")
+                    Content = new StringContent($"{{\"count\":1,\"value\":[{{\"id\":{expectedArtifact.Id},\"name\":\"{expectedArtifact.Name}\",\"resource\":{{\"type\":\"{expectedArtifact.Resource.Type}\",\"downloadUrl\":\"{ expectedArtifact.Resource.DownloadUrl }\"}}}}]}}")
                 });
         }
 
@@ -313,11 +301,11 @@ namespace AzureDevOps.Scanner.Unittest
             mockHttpMessageHandler.Setup(
                                 mh => mh.Send(
                                     It.Is<HttpRequestMessage>(
-                                        req => req.RequestUri.ToString() == $"{testUrl}/{testCollection}/{testProject.Id}/_apis/release/releases")))
+                                        req => req.RequestUri.ToString() == $"{expectedUrl}/{expectedCollection}/{expectedProject.Id}/_apis/release/releases")))
                             .Returns(new HttpResponseMessage
                             {
                                 StatusCode = HttpStatusCode.OK,
-                                Content = new StringContent($"{{\"count\":1,\"value\":[{{\"id\":{testRelease.Id},\"name\":\"{testRelease.Name}\",\"status\":\"{testRelease.Status}\",\"createdOn\":\"{testRelease.CreatedOn}\",\"createdBy\":{{\"displayName\":\"{testRelease.CreatedBy.DisplayName}\",\"id\":\"{testRelease.CreatedBy.Id}\",\"uniqueName\":\"{testRelease.CreatedBy.UniqueName}\"}},\"url\":\"{testRelease.Url}\"}}]}}")
+                                Content = new StringContent($"{{\"count\":1,\"value\":[{{\"id\":{expectedRelease.Id},\"name\":\"{expectedRelease.Name}\",\"status\":\"{expectedRelease.Status}\",\"createdOn\":\"{expectedRelease.CreatedOn}\",\"createdBy\":{{\"displayName\":\"{expectedRelease.CreatedBy.DisplayName}\",\"id\":\"{expectedRelease.CreatedBy.Id}\",\"uniqueName\":\"{expectedRelease.CreatedBy.UniqueName}\"}},\"url\":\"{expectedRelease.Url}\"}}]}}")
                             });
         }
 
@@ -326,11 +314,11 @@ namespace AzureDevOps.Scanner.Unittest
             mockHttpMessageHandler.Setup(
                                 mh => mh.Send(
                                     It.Is<HttpRequestMessage>(
-                                        req => req.RequestUri.ToString() == $"{testRelease.Url}")))
+                                        req => req.RequestUri.ToString() == $"{expectedRelease.Url}")))
                             .Returns(new HttpResponseMessage
                             {
                                 StatusCode = HttpStatusCode.OK,
-                                Content = new StringContent($"{{\"count\":1,\"value\":[{{\"id\":{testRelease.Id},\"name\":\"{testRelease.Name}\",\"status\":\"{testRelease.Status}\",\"createdOn\":\"{testRelease.CreatedOn}\",\"createdBy\":{{\"displayName\":\"{testRelease.CreatedBy.DisplayName}\",\"id\":\"{testRelease.CreatedBy.Id}\",\"uniqueName\":\"{testRelease.CreatedBy.UniqueName}\"}},\"url\":\"{testRelease.Url}\"}}]}}")
+                                Content = new StringContent($"{{\"count\":1,\"value\":[{{\"id\":{expectedRelease.Id},\"name\":\"{expectedRelease.Name}\",\"status\":\"{expectedRelease.Status}\",\"createdOn\":\"{expectedRelease.CreatedOn}\",\"createdBy\":{{\"displayName\":\"{expectedRelease.CreatedBy.DisplayName}\",\"id\":\"{expectedRelease.CreatedBy.Id}\",\"uniqueName\":\"{expectedRelease.CreatedBy.UniqueName}\"}},\"url\":\"{expectedRelease.Url}\"}}]}}")
                             });
         }
     }

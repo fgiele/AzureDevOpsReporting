@@ -1,6 +1,4 @@
 ﻿using AzureDevOps.Model;
-using Moq;
-using System;
 using System.Collections.Generic;
 using FizzWare.NBuilder;
 
@@ -8,22 +6,22 @@ namespace AzureDevOps.Scanner.Unittest
 {
     public partial class ClientTest
     {
-        private const string testUrl = "https://example.com";
-        private const string testCollection = "testcol";
+        private const string expectedUrl = "https://example.com";
+        private const string expectedCollection = "expectedcol";
 
-        private readonly AzureDevOpsProject testProject = Builder<AzureDevOpsProject>.CreateNew().Build();
+        private readonly AzureDevOpsProject expectedProject = Builder<AzureDevOpsProject>.CreateNew().Build();
 
-        private readonly AzureDevOpsBuild testBuild = Builder<AzureDevOpsBuild>.CreateNew().Do(moq => moq.Url = $"{testUrl}/testbuild").Build();
+        private readonly AzureDevOpsBuild expectedBuild = Builder<AzureDevOpsBuild>.CreateNew().Do(moq => moq.Url = $"{expectedUrl}/expectedbuild").Build();
 
-        private readonly AzureDevOpsBuildArtifact testArtifact = Builder<AzureDevOpsBuildArtifact>.CreateNew()
+        private readonly AzureDevOpsBuildArtifact expectedArtifact = Builder<AzureDevOpsBuildArtifact>.CreateNew()
             .Do(moq => moq.Resource = Builder<AzureDevOpsArtifactResource>.CreateNew().Build()).Build();
 
-        private readonly AzureDevOpsRelease testRelease = Builder<AzureDevOpsRelease>.CreateNew()
+        private readonly AzureDevOpsRelease expectedRelease = Builder<AzureDevOpsRelease>.CreateNew()
             .Do(moq => moq.CreatedBy = Builder<AzureDevOpsIdentity>.CreateNew().Build())
-            .Do(moq => moq.Url = $"{testUrl}/testrelease")
+            .Do(moq => moq.Url = $"{expectedUrl}/expectedrelease")
                 .Build();
 
-        private readonly AzureDevOpsEnvironment testEnvironment = Builder<AzureDevOpsEnvironment>.CreateNew()
+        private readonly AzureDevOpsEnvironment expectedEnvironment = Builder<AzureDevOpsEnvironment>.CreateNew()
             .Do(moq => moq.PostApprovalsSnapshot = Builder<AzureDevOpsDeployApprovalsSnapshot>.CreateNew()
                 .Do(moq => moq.Approvals = new HashSet<AzureDevOpsApproval> { Builder<AzureDevOpsApproval>.CreateNew().Build() })
                 .Build())
@@ -34,7 +32,7 @@ namespace AzureDevOps.Scanner.Unittest
             .Do(moq => moq.PreDeployApprovals = new HashSet<AzureDevOpsDeployApproval> { Builder<AzureDevOpsDeployApproval>.CreateNew().Build() })
                 .Build();
 
-        private readonly AzureDevOpsReleaseArtifact testReleaseArtifact = Builder<AzureDevOpsReleaseArtifact>.CreateNew()
+        private readonly AzureDevOpsReleaseArtifact expectedReleaseArtifact = Builder<AzureDevOpsReleaseArtifact>.CreateNew()
             .Do(moq => moq.DefinitionReference = Builder<AzureDevOpsDefinitionReference>.CreateNew()
                 .Do(moq => moq.ArtifactSourceDefinitionUrl = Builder<AzureDevOpsReferenceField>.CreateNew().Build())
                 .Do(moq => moq.ArtifactSourceVersionUrl = Builder<AzureDevOpsReferenceField>.CreateNew().Build())
