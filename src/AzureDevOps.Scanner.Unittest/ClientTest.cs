@@ -3,7 +3,6 @@ using FluentAssertions;
 using Moq;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -232,7 +231,6 @@ namespace AzureDevOps.Scanner.Unittest
             actual.Collections.Should().HaveCount(1);
             actual.Collections[0].Projects.Should().HaveCount(1);
             actual.Collections[0].Projects[0].Should().BeEquivalentTo(expectedProject);
-            actual.Collections[0].Projects[0].Releases.Should().BeEmpty();
         }
 
         [Fact]
@@ -257,69 +255,102 @@ namespace AzureDevOps.Scanner.Unittest
             actual.Collections[0].Projects[0].Should().BeEquivalentTo(expectedProject);
         }
 
-        private void HttpMockOneProject()
+        [Fact]
+        public async Task ScanAsync_WhenReleaseDetails_ShouldReturnProperInstance()
         {
-            mockHttpMessageHandler.Setup(
-                mh => mh.Send(
-                    It.Is<HttpRequestMessage>(
-                        req => req.RequestUri.ToString() == $"{expectedUrl}/{expectedCollection}/_apis/projects")))
-                .Returns(new HttpResponseMessage
-                {
-                    StatusCode = HttpStatusCode.OK,
-                    Content = new StringContent($"{{\"count\":1,\"value\":[{{\"id\":\"{expectedProject.Id}\",\"name\":\"{expectedProject.Name}\",\"description\":\"{expectedProject.Description}\",\"url\":\"{expectedProject.Url}\"}}]}}")
-                });
+            // Arrange
+            HttpMockOneProject();
+            HttpMockOneRelease();
+            HttpMockOneReleaseDetails();
+
+            expectedProject.Releases = new HashSet<AzureDevOpsRelease> { expectedDetailRelease };
+
+            var systemUnderTest = new Client(httpClient);
+
+            // Act
+            var actual = await systemUnderTest.ScanAsync(DataOptions.Release | DataOptions.ReleaseDetails, new string[] { expectedCollection }, expectedUrl);
+
+            // Assert
+            mockHttpMessageHandler.Verify();
+            actual.Should().BeOfType<AzureDevOpsInstance>();
+            actual.Collections.Should().HaveCount(1);
+            actual.Collections[0].Projects.Should().HaveCount(1);
+            actual.Collections[0].Projects[0].Should().BeEquivalentTo(expectedProject);
         }
 
-        private void HttpMockOneBuild()
+        [Fact]
+        public async Task ScanAsync_WhenNoRepositories_ShouldReturnProperInstance()
         {
-            mockHttpMessageHandler.Setup(
-                                mh => mh.Send(
-                                    It.Is<HttpRequestMessage>(
-                                        req => req.RequestUri.ToString() == $"{expectedUrl}/{expectedCollection}/{expectedProject.Id}/_apis/build/builds")))
-                            .Returns(new HttpResponseMessage
-                            {
-                                StatusCode = HttpStatusCode.OK,
-                                Content = new StringContent($"{{\"count\":1,\"value\":[{{\"id\":{expectedBuild.Id},\"buildNumber\":\"{expectedBuild.BuildNumber}\",\"status\":\"{expectedBuild.Status}\",\"result\":\"{expectedBuild.Result}\",\"url\":\"{expectedBuild.Url}\"}}]}}")
-                            });
-        }
+            // Arrange
+            HttpMockOneProject();
 
-        private void HttpMockOneArtifact()
-        {
+            expectedProject.Repositories = Array.Empty<AzureDevOpsRepository>();
+
             mockHttpMessageHandler.Setup(
                     mh => mh.Send(
                         It.Is<HttpRequestMessage>(
-                            req => req.RequestUri.ToString() == $"{expectedBuild.Url}/artifacts?api-version=5.1")))
+                            req => req.RequestUri.ToString() == $"{expectedUrl}/{expectedCollection}/{expectedProject.Id}/_apis/git/repositories?api-version=5.0")))
                 .Returns(new HttpResponseMessage
                 {
                     StatusCode = HttpStatusCode.OK,
-                    Content = new StringContent($"{{\"count\":1,\"value\":[{{\"id\":{expectedArtifact.Id},\"name\":\"{expectedArtifact.Name}\",\"resource\":{{\"type\":\"{expectedArtifact.Resource.Type}\",\"downloadUrl\":\"{ expectedArtifact.Resource.DownloadUrl }\"}}}}]}}")
+                    Content = new StringContent("{\"count\":0,\"value\":[]}")
                 });
+            var systemUnderTest = new Client(httpClient);
+
+            // Act
+            var actual = await systemUnderTest.ScanAsync(DataOptions.Git, new string[] { expectedCollection }, expectedUrl);
+
+            // Assert
+            mockHttpMessageHandler.Verify();
+            actual.Should().BeOfType<AzureDevOpsInstance>();
+            actual.Collections.Should().HaveCount(1);
+            actual.Collections[0].Projects.Should().HaveCount(1);
+            actual.Collections[0].Projects[0].Should().BeEquivalentTo(expectedProject);
         }
 
-        private void HttpMockOneRelease()
-        {
-            mockHttpMessageHandler.Setup(
-                                mh => mh.Send(
-                                    It.Is<HttpRequestMessage>(
-                                        req => req.RequestUri.ToString() == $"{expectedUrl}/{expectedCollection}/{expectedProject.Id}/_apis/release/releases")))
-                            .Returns(new HttpResponseMessage
-                            {
-                                StatusCode = HttpStatusCode.OK,
-                                Content = new StringContent($"{{\"count\":1,\"value\":[{{\"id\":{expectedRelease.Id},\"name\":\"{expectedRelease.Name}\",\"status\":\"{expectedRelease.Status}\",\"createdOn\":\"{expectedRelease.CreatedOn}\",\"createdBy\":{{\"displayName\":\"{expectedRelease.CreatedBy.DisplayName}\",\"id\":\"{expectedRelease.CreatedBy.Id}\",\"uniqueName\":\"{expectedRelease.CreatedBy.UniqueName}\"}},\"url\":\"{expectedRelease.Url}\"}}]}}")
-                            });
-        }
+        //[Fact]
+        //public async Task ScanAsync_WhenRepositories_ShouldReturnProperInstance()
+        //{
+        //    // Arrange
+        //    HttpMockOneProject();
+        //    HttpMockOneRelease();
 
-        private void HttpMockOneReleaseDetails()
-        {
-            mockHttpMessageHandler.Setup(
-                                mh => mh.Send(
-                                    It.Is<HttpRequestMessage>(
-                                        req => req.RequestUri.ToString() == $"{expectedRelease.Url}")))
-                            .Returns(new HttpResponseMessage
-                            {
-                                StatusCode = HttpStatusCode.OK,
-                                Content = new StringContent($"{{\"count\":1,\"value\":[{{\"id\":{expectedRelease.Id},\"name\":\"{expectedRelease.Name}\",\"status\":\"{expectedRelease.Status}\",\"createdOn\":\"{expectedRelease.CreatedOn}\",\"createdBy\":{{\"displayName\":\"{expectedRelease.CreatedBy.DisplayName}\",\"id\":\"{expectedRelease.CreatedBy.Id}\",\"uniqueName\":\"{expectedRelease.CreatedBy.UniqueName}\"}},\"url\":\"{expectedRelease.Url}\"}}]}}")
-                            });
-        }
+        //    expectedProject.Releases = new HashSet<AzureDevOpsRelease> { expectedRelease };
+
+        //    var systemUnderTest = new Client(httpClient);
+
+        //    // Act
+        //    var actual = await systemUnderTest.ScanAsync(DataOptions.Release, new string[] { expectedCollection }, expectedUrl);
+
+        //    // Assert
+        //    mockHttpMessageHandler.Verify();
+        //    actual.Should().BeOfType<AzureDevOpsInstance>();
+        //    actual.Collections.Should().HaveCount(1);
+        //    actual.Collections[0].Projects.Should().HaveCount(1);
+        //    actual.Collections[0].Projects[0].Should().BeEquivalentTo(expectedProject);
+        //}
+
+        //[Fact]
+        //public async Task ScanAsync_WhenRepositoriesWithArtifacts_ShouldReturnProperInstance()
+        //{
+        //    // Arrange
+        //    HttpMockOneProject();
+        //    HttpMockOneRelease();
+        //    HttpMockOneReleaseDetails();
+
+        //    expectedProject.Releases = new HashSet<AzureDevOpsRelease> { expectedDetailRelease };
+
+        //    var systemUnderTest = new Client(httpClient);
+
+        //    // Act
+        //    var actual = await systemUnderTest.ScanAsync(DataOptions.Release | DataOptions.ReleaseDetails, new string[] { expectedCollection }, expectedUrl);
+
+        //    // Assert
+        //    mockHttpMessageHandler.Verify();
+        //    actual.Should().BeOfType<AzureDevOpsInstance>();
+        //    actual.Collections.Should().HaveCount(1);
+        //    actual.Collections[0].Projects.Should().HaveCount(1);
+        //    actual.Collections[0].Projects[0].Should().BeEquivalentTo(expectedProject);
+        //}
     }
 }
