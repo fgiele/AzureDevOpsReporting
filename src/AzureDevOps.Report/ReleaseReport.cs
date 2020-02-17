@@ -25,8 +25,7 @@ namespace AzureDevOps.Report
                             "Required approval",
                             "Approval given by",
                             "Nr. of Artifacts",
-                            "Artifact versions",
-                            "Source branches");
+                            "Artifact - version [branch]");
 
             foreach (var collection in instance.Collections)
             {
@@ -51,8 +50,7 @@ namespace AzureDevOps.Report
                                         preDeployApproval.IsAutomated ? string.Empty : $"{preDeployApproval.Approver?.DisplayName}",
                                         preDeployApproval.IsAutomated ? string.Empty : $"{preDeployApproval.ApprovedBy?.DisplayName}",
                                         release.Artifacts?.Count() ?? 0,
-                                        string.Join(" & ", release.Artifacts?.Select(art => art.DefinitionReference)?.Select(def => $"{def.Definition.Name} - {def.Version.Name}")),
-                                        string.Join(" & ", release.Artifacts?.Select(art => art.DefinitionReference)?.Select(def => $"{def.Branch.Name}")));
+                                        string.Join(" & ", release.Artifacts?.Select(art => art.DefinitionReference)?.Select(def => $"'{def.Definition.Name} - {def.Version.Name} [{def.Branch.Name}]'")));
                             }
                         }
                     }

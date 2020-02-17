@@ -2,6 +2,7 @@
 
 namespace AzureDevOps.Report
 {
+    // This report is only meant to trigger a complete scan. No output.
     public class ScanAllReport : ReportDefinition, IReport
     {
         public DataOptions DataOptions => DataOptions.Build | DataOptions.BuildArtifacts | DataOptions.Git | DataOptions.GitPolicies | DataOptions.Release | DataOptions.ReleaseDetails;

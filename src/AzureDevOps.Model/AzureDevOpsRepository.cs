@@ -14,7 +14,7 @@ namespace AzureDevOps.Model
 
         public string DefaultBranch { get; set; }
 
-        public int Size { get; set; }
+        public long Size { get; set; }
 
         public IEnumerable<AzureDevOpsPolicy> Policies { get; set; }
     }
