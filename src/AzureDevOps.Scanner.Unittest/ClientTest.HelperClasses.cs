@@ -136,7 +136,8 @@ namespace AzureDevOps.Scanner.Unittest
                             .Returns(new HttpResponseMessage
                             {
                                 StatusCode = HttpStatusCode.OK,
-                                Content = new StringContent($"{{\"count\":1,\"value\":[{{\"id\":{expectedRelease.Id},\"name\":\"{expectedRelease.Name}\",\"status\":\"{expectedRelease.Status}\",\"createdOn\":\"{expectedRelease.CreatedOn}\",\"createdBy\":{{\"displayName\":\"{expectedRelease.CreatedBy.DisplayName}\",\"id\":\"{expectedRelease.CreatedBy.Id}\",\"uniqueName\":\"{expectedRelease.CreatedBy.UniqueName}\"}},\"url\":\"{expectedRelease.Url}\"}}]}}")
+                                Content = new StringContent($"{{\"count\":1,\"value\":[{{\"id\":{expectedRelease.Id},\"name\":\"{expectedRelease.Name}\",\"status\":\"{expectedRelease.Status}\",\"createdOn\":\"{expectedRelease.CreatedOn}\"" +
+                                $",\"createdBy\":{{\"displayName\":\"{expectedRelease.CreatedBy.DisplayName}\",\"id\":\"{expectedRelease.CreatedBy.Id}\",\"uniqueName\":\"{expectedRelease.CreatedBy.UniqueName}\"}},\"url\":\"{expectedRelease.Url}\"}}]}}")
                             });
         }
 
@@ -163,7 +164,10 @@ namespace AzureDevOps.Scanner.Unittest
                 {
                     StatusCode = HttpStatusCode.OK,
                     Content = new StringContent($"{{\"count\":1,\"value\":[{{\"isEnabled\":\"{expectedPolicy.IsEnabled}\",\"isBlocking\":\"{expectedPolicy.IsBlocking}\",\"settings\":{{\"minimumApproverCount\":\"{expectedPolicy.Settings.MinimumApproverCount}\"" +
-                                $",\"creatorVoteCounts\":\"{expectedPolicy.Settings.CreatorVoteCounts}\",\"allowDownvotes\":\"{expectedPolicy.Settings.AllowDownvotes}\",\"builddefinitionid\":\"{expectedPolicy.Settings.BuildDefinitionId}\",\"displayname\":\"{expectedPolicy.Settings.DisplayName}\",\"validduration\":\"{expectedPolicy.Settings.ValidDuration}\",\"resetOnSourcePush\":\"{expectedPolicy.Settings.ResetOnSourcePush}\",\"scope\":[{{\"refName\":\"{expectedPolicy.Settings.Scope.First().RefName}\",\"matchKind\":\"{expectedPolicy.Settings.Scope.First().MatchKind}\"}}]}},\"type\":{{\"id\":\"{expectedPolicy.PolicyType.Id}\",\"url\":\"{expectedPolicy.PolicyType.Url}\",\"displayName\":\"{expectedPolicy.PolicyType.DisplayName}\"}}}}]}}")
+                                $",\"creatorVoteCounts\":\"{expectedPolicy.Settings.CreatorVoteCounts}\",\"allowDownvotes\":\"{expectedPolicy.Settings.AllowDownvotes}\",\"builddefinitionid\":\"{expectedPolicy.Settings.BuildDefinitionId}\"" +
+                                $",\"displayname\":\"{expectedPolicy.Settings.DisplayName}\",\"validduration\":\"{expectedPolicy.Settings.ValidDuration}\",\"resetOnSourcePush\":\"{expectedPolicy.Settings.ResetOnSourcePush}\"" +
+                                $",\"scope\":[{{\"refName\":\"{expectedPolicy.Settings.Scope.First().RefName}\",\"matchKind\":\"{expectedPolicy.Settings.Scope.First().MatchKind}\"}}]}}" +
+                                $",\"type\":{{\"id\":\"{expectedPolicy.PolicyType.Id}\",\"url\":\"{expectedPolicy.PolicyType.Url}\",\"displayName\":\"{expectedPolicy.PolicyType.DisplayName}\"}}}}]}}")
                 });
         }
 
@@ -180,6 +184,8 @@ namespace AzureDevOps.Scanner.Unittest
                 });
         }
 
+
+        // Since releaseDetail is very complex, this has been split over multiple property getters for readability
         private string releaseDetailJson =>
                                 $"{{\"id\":{expectedDetailRelease.Id}" +
                                 $",\"name\":\"{expectedDetailRelease.Name}\"" +
