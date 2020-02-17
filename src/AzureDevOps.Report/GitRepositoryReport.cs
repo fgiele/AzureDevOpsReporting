@@ -42,9 +42,9 @@ namespace AzureDevOps.Report
             return GetReport();
         }
 
-        private string SettingsValue(AzureDevOpsPolicy policy, PolicyType desiredType, object value)
+        private string SettingsValue(AzureDevOpsPolicy policy, string desiredType, object value)
         {
-            return policy.PolicyType.PolicyType == desiredType ? value.ToString() : string.Empty;
+            return policy.PolicyType.Id.ToString() == desiredType ? value.ToString() : string.Empty;
         }
     }
 }

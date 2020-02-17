@@ -23,7 +23,7 @@ namespace AzureDevOps.Scanner
         public async Task<AzureDevOpsInstance> ScanAsync(DataOptions dataOptions, IEnumerable<string> collections, string azureDevOpsUrl)
         {
             ProjectsDoneCount = 0;
-            
+
             var azureDevOpsInstance = new AzureDevOpsInstance();
 
             if (azureDevOpsUrl.ToLower().StartsWith("https://dev.azure.com"))
@@ -78,9 +78,19 @@ namespace AzureDevOps.Scanner
             var releaseScanTasks = ScanReleasesAsync(dataOptions, projectUrl);
             var repositoryScanTask = ScanRepositoriesAsync(dataOptions, projectUrl);
 
-            project.Builds = await buildScanTasks;
-            project.Releases = await releaseScanTasks;
-            project.Repositories = await repositoryScanTask;
+
+            if (buildScanTasks != null)
+            {
+                project.Builds = await buildScanTasks;
+            }
+            if (releaseScanTasks != null)
+            {
+                project.Releases = await releaseScanTasks;
+            }
+            if (repositoryScanTask != null)
+            {
+                project.Repositories = await repositoryScanTask;
+            }
 
             ProjectsDoneCount++;
             Console.Write(ProjectsDoneCount % 10 == 0 ? "*" : ".");
@@ -92,7 +102,7 @@ namespace AzureDevOps.Scanner
             if (!(dataOptions.HasFlag(DataOptions.Build) ||
                 dataOptions.HasFlag(DataOptions.BuildArtifacts)))
             {
-                return Array.Empty<AzureDevOpsBuild>();
+                return null;
             }
 
             HttpResponseMessage httpBuildResponse = await RestClient.GetAsync($"{projectUrl}/_apis/build/builds").ConfigureAwait(false);
@@ -129,7 +139,7 @@ namespace AzureDevOps.Scanner
             if (!(dataOptions.HasFlag(DataOptions.Release) ||
                 dataOptions.HasFlag(DataOptions.ReleaseDetails)))
             {
-                return Array.Empty<AzureDevOpsRelease>();
+                return null;
             }
 
             // Azure DevOps services uses a different host for release management Rest calls
@@ -167,7 +177,7 @@ namespace AzureDevOps.Scanner
             if (!(dataOptions.HasFlag(DataOptions.Git) ||
                 dataOptions.HasFlag(DataOptions.GitPolicies)))
             {
-                return Array.Empty<AzureDevOpsRepository>();
+                return null;
             }
 
             HttpResponseMessage httpRepositoriesResponse = await RestClient.GetAsync($"{projectUrl}/_apis/git/repositories?api-version=5.0").ConfigureAwait(false);
