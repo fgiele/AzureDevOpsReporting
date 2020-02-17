@@ -76,6 +76,18 @@ namespace AzureDevOps.Scanner.Unittest
             })
                 .Build();
 
+        private readonly AzureDevOpsRepository expectedRepository = Builder<AzureDevOpsRepository>.CreateNew().Build();
+
+
+        private readonly AzureDevOpsPolicy expectedPolicy = Builder<AzureDevOpsPolicy>.CreateNew()
+            .Do(moq => moq.PolicyType = Builder<AzureDevOpsPolicyType>.CreateNew()
+                .Do(moq => moq.Id = new System.Guid(PolicyType.MinimumNumberOfReviewers))
+                    .Build())
+            .Do(moq => moq.Settings = Builder<AzureDevOpsPolicySettings>.CreateNew()
+                .Do(moq => moq.Scope = new HashSet<AzureDevOpsPolicyScope> { Builder<AzureDevOpsPolicyScope>.CreateNew().Build() })
+                    .Build())
+                .Build();
+
         private void HttpMockOneProject()
         {
             mockHttpMessageHandler.Setup(
@@ -128,64 +140,152 @@ namespace AzureDevOps.Scanner.Unittest
                             });
         }
 
+        private void HttpMockOneRepository()
+        {
+            mockHttpMessageHandler.Setup(
+                mh => mh.Send(
+                    It.Is<HttpRequestMessage>(
+                        req => req.RequestUri.ToString() == $"{expectedUrl}/{expectedCollection}/{expectedProject.Id}/_apis/git/repositories?api-version=5.0")))
+                .Returns(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent($"{{\"count\":1,\"value\":[{{\"id\":\"{expectedRepository.Id}\",\"name\":\"{expectedRepository.Name}\",\"url\":\"{expectedRepository.Url}\",\"defaultBranch\":\"{expectedRepository.DefaultBranch}\",\"size\":{expectedRepository.Size}}}]}}")
+                });
+        }
+
+        private void HttpMockOneRolicy()
+        {
+            mockHttpMessageHandler.Setup(
+                mh => mh.Send(
+                    It.Is<HttpRequestMessage>(
+                        req => req.RequestUri.ToString() == $"{expectedUrl}/{expectedCollection}/{expectedProject.Id}/_apis/git/policy/configurations?repositoryId={expectedRepository.Id}&refName=refs/heads/master")))
+                .Returns(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent($"{{\"count\":1,\"value\":[{{\"isEnabled\":\"{expectedPolicy.IsEnabled}\",\"isBlocking\":\"{expectedPolicy.IsBlocking}\",\"settings\":{{\"minimumApproverCount\":\"{expectedPolicy.Settings.MinimumApproverCount}\"" +
+                                $",\"creatorVoteCounts\":\"{expectedPolicy.Settings.CreatorVoteCounts}\",\"allowDownvotes\":\"{expectedPolicy.Settings.AllowDownvotes}\",\"builddefinitionid\":\"{expectedPolicy.Settings.BuildDefinitionId}\",\"displayname\":\"{expectedPolicy.Settings.DisplayName}\",\"validduration\":\"{expectedPolicy.Settings.ValidDuration}\",\"resetOnSourcePush\":\"{expectedPolicy.Settings.ResetOnSourcePush}\",\"scope\":[{{\"refName\":\"{expectedPolicy.Settings.Scope.First().RefName}\",\"matchKind\":\"{expectedPolicy.Settings.Scope.First().MatchKind}\"}}]}},\"type\":{{\"id\":\"{expectedPolicy.PolicyType.Id}\",\"url\":\"{expectedPolicy.PolicyType.Url}\",\"displayName\":\"{expectedPolicy.PolicyType.DisplayName}\"}}}}]}}")
+                });
+        }
+
         private void HttpMockOneReleaseDetails()
         {
             mockHttpMessageHandler.Setup(
-                                mh => mh.Send(
-                                    It.Is<HttpRequestMessage>(
-                                        req => req.RequestUri.ToString() == $"{expectedRelease.Url}")))
-                            .Returns(new HttpResponseMessage
-                            {
-                                StatusCode = HttpStatusCode.OK,
-                                Content = new StringContent($"{{\"id\":{expectedDetailRelease.Id},\"name\":\"{expectedDetailRelease.Name}\",\"status\":\"{expectedDetailRelease.Status}\"" +
-                                $",\"createdOn\":\"{expectedDetailRelease.CreatedOn}\",\"createdBy\":{{\"displayName\":\"{expectedDetailRelease.CreatedBy.DisplayName}\"" +
-                                $",\"id\":\"{expectedDetailRelease.CreatedBy.Id}\",\"uniqueName\":\"{expectedDetailRelease.CreatedBy.UniqueName}\"}},\"environments\":" +
-                                $"[{{\"id\":{expectedDetailRelease.Environments.First().Id},\"name\":\"{expectedDetailRelease.Environments.First().Name}\"" +
-                                $",\"status\":\"{expectedDetailRelease.Environments.First().Status}\",\"preDeployApprovals\":[{{\"id\":{expectedDetailRelease.Environments.First().PreDeployApprovals.First().Id}" +
-                                $",\"revision\":{expectedDetailRelease.Environments.First().PreDeployApprovals.First().Revision},\"approvalType\":\"{expectedDetailRelease.Environments.First().PreDeployApprovals.First().ApprovalType}\"" +
-                                $",\"createdOn\":\"{expectedDetailRelease.Environments.First().PreDeployApprovals.First().CreatedOn}\",\"status\":\"{expectedDetailRelease.Environments.First().PreDeployApprovals.First().Status}\"" +
-                                $",\"approver\":{{\"displayName\":\"{expectedDetailRelease.Environments.First().PreDeployApprovals.First().Approver.DisplayName}\"" +
-                                $",\"id\":\"{expectedDetailRelease.Environments.First().PreDeployApprovals.First().Approver.Id}\",\"uniqueName\":\"{expectedDetailRelease.Environments.First().PreDeployApprovals.First().Approver.UniqueName}\"}}" +
-                                $",\"approvedBy\":{{\"displayName\":\"{expectedDetailRelease.Environments.First().PreDeployApprovals.First().ApprovedBy.DisplayName}\"" +
-                                $",\"id\":\"{expectedDetailRelease.Environments.First().PreDeployApprovals.First().ApprovedBy.Id}\",\"uniqueName\":\"{expectedDetailRelease.Environments.First().PreDeployApprovals.First().ApprovedBy.UniqueName}\"}}" +
-                                $",\"comments\":\"{expectedDetailRelease.Environments.First().PreDeployApprovals.First().Comments}\",\"isAutomated\":\"{expectedDetailRelease.Environments.First().PreDeployApprovals.First().IsAutomated}\"" +
-                                $",\"attempt\":{expectedDetailRelease.Environments.First().PreDeployApprovals.First().Attempt},\"url\":\"{expectedDetailRelease.Environments.First().PreDeployApprovals.First().Url}\"}}]" +
-                                $",\"postDeployApprovals\":[{{\"id\":{expectedDetailRelease.Environments.First().PostDeployApprovals.First().Id}" +
-                                $",\"revision\":{expectedDetailRelease.Environments.First().PostDeployApprovals.First().Revision},\"approvalType\":\"{expectedDetailRelease.Environments.First().PostDeployApprovals.First().ApprovalType}\"" +
-                                $",\"createdOn\":\"{expectedDetailRelease.Environments.First().PostDeployApprovals.First().CreatedOn}\"" +
-                                $",\"approver\":{{\"displayName\":\"{expectedDetailRelease.Environments.First().PreDeployApprovals.First().Approver.DisplayName}\"" +
-                                $",\"id\":\"{expectedDetailRelease.Environments.First().PreDeployApprovals.First().Approver.Id}\",\"uniqueName\":\"{expectedDetailRelease.Environments.First().PreDeployApprovals.First().Approver.UniqueName}\"}}" +
-                                $",\"approvedBy\":{{\"displayName\":\"{expectedDetailRelease.Environments.First().PreDeployApprovals.First().ApprovedBy.DisplayName}\"" +
-                                $",\"id\":\"{expectedDetailRelease.Environments.First().PreDeployApprovals.First().ApprovedBy.Id}\",\"uniqueName\":\"{expectedDetailRelease.Environments.First().PreDeployApprovals.First().ApprovedBy.UniqueName}\"}}" +
-                                $",\"status\":\"{expectedDetailRelease.Environments.First().PostDeployApprovals.First().Status}\",\"comments\":\"{expectedDetailRelease.Environments.First().PostDeployApprovals.First().Comments}\"" +
-                                $",\"isAutomated\":\"{expectedDetailRelease.Environments.First().PostDeployApprovals.First().IsAutomated}\"" +
-                                $",\"attempt\":{expectedDetailRelease.Environments.First().PostDeployApprovals.First().Attempt},\"url\":\"{expectedDetailRelease.Environments.First().PostDeployApprovals.First().Url}\"}}],\"preApprovalsSnapshot\":{{\"approvals\":[{{" +
-                                $"\"approver\":{{\"displayName\":\"{expectedDetailRelease.Environments.First().PreDeployApprovals.First().Approver.DisplayName}\"" +
-                                $",\"id\":\"{expectedDetailRelease.Environments.First().PreDeployApprovals.First().Approver.Id}\",\"uniqueName\":\"{expectedDetailRelease.Environments.First().PreDeployApprovals.First().Approver.UniqueName}\"}}" +
-                                $",\"rank\":{expectedDetailRelease.Environments.First().PreApprovalsSnapshot.Approvals.First().Rank},\"isAutomated\":\"{expectedDetailRelease.Environments.First().PreApprovalsSnapshot.Approvals.First().IsAutomated}\"" +
-                                $",\"id\":{expectedDetailRelease.Environments.First().PreApprovalsSnapshot.Approvals.First().Id}}}]}}" +
-                                $",\"postApprovalsSnapshot\":{{\"approvals\":[{{\"rank\":{expectedDetailRelease.Environments.First().PostApprovalsSnapshot.Approvals.First().Rank}" +
-                                $",\"approver\":{{\"displayName\":\"{expectedDetailRelease.Environments.First().PreDeployApprovals.First().Approver.DisplayName}\"" +
-                                $",\"id\":\"{expectedDetailRelease.Environments.First().PreDeployApprovals.First().Approver.Id}\",\"uniqueName\":\"{expectedDetailRelease.Environments.First().PreDeployApprovals.First().Approver.UniqueName}\"}}" +
-                                $",\"isAutomated\":\"{expectedDetailRelease.Environments.First().PostApprovalsSnapshot.Approvals.First().IsAutomated}\"" +
-                                $",\"id\":{expectedDetailRelease.Environments.First().PostApprovalsSnapshot.Approvals.First().Id}}}]}},\"createdOn\":\"{expectedDetailRelease.Environments.First().CreatedOn}\",\"triggerReason\":\"{expectedDetailRelease.Environments.First().TriggerReason}\"}}]" +
-                                $",\"artifacts\":[{{\"sourceId\":\"{expectedDetailRelease.Artifacts.First().SourceId}\",\"type\":\"{expectedDetailRelease.Artifacts.First().Type}\"" +
-                                $",\"definitionReference\":{{\"buildUri\":{{\"id\":\"{expectedDetailRelease.Artifacts.First().DefinitionReference.BuildUri.Id}\",\"name\":\"{expectedDetailRelease.Artifacts.First().DefinitionReference.BuildUri.Name}\"}}" +
-                                $",\"definition\":{{\"id\":\"{expectedDetailRelease.Artifacts.First().DefinitionReference.Definition.Id}\"" +
-                                $",\"name\":\"{expectedDetailRelease.Artifacts.First().DefinitionReference.Definition.Name}\"}},\"pullRequestMergeCommitId\":{{\"id\":\"{expectedDetailRelease.Artifacts.First().DefinitionReference.PullRequestMergeCommitId.Id}\"" +
-                                $",\"name\":\"{expectedDetailRelease.Artifacts.First().DefinitionReference.PullRequestMergeCommitId.Name}\"}},\"project\":{{\"id\":\"{expectedDetailRelease.Artifacts.First().DefinitionReference.Project.Id}\"" +
-                                $",\"name\":\"{expectedDetailRelease.Artifacts.First().DefinitionReference.Project.Name}\"}}" +
-                                $",\"repository\":{{\"id\":\"{expectedDetailRelease.Artifacts.First().DefinitionReference.Repository.Id}\",\"name\":\"{expectedDetailRelease.Artifacts.First().DefinitionReference.Repository.Name}\"}}" +
-                                $",\"requestedFor\":{{\"id\":\"{expectedDetailRelease.Artifacts.First().DefinitionReference.RequestedFor.Id}\"" +
-                                $",\"name\":\"{expectedDetailRelease.Artifacts.First().DefinitionReference.RequestedFor.Name}\"}},\"sourceVersion\":{{\"id\":\"{expectedDetailRelease.Artifacts.First().DefinitionReference.SourceVersion.Id}\"" +
-                                $",\"name\":\"{expectedDetailRelease.Artifacts.First().DefinitionReference.SourceVersion.Name}\"}}" +
-                                $",\"version\":{{\"id\":\"{expectedDetailRelease.Artifacts.First().DefinitionReference.Version.Id}\",\"name\":\"{expectedDetailRelease.Artifacts.First().DefinitionReference.Version.Name}\"}}" +
-                                $",\"artifactSourceVersionUrl\":{{\"id\":\"{expectedDetailRelease.Artifacts.First().DefinitionReference.ArtifactSourceVersionUrl.Id}\"" +
-                                $",\"name\":\"{expectedDetailRelease.Artifacts.First().DefinitionReference.ArtifactSourceVersionUrl.Name}\"}},\"artifactSourceDefinitionUrl\":{{\"id\":\"{expectedDetailRelease.Artifacts.First().DefinitionReference.ArtifactSourceDefinitionUrl.Id}\"" +
-                                $",\"name\":\"{expectedDetailRelease.Artifacts.First().DefinitionReference.ArtifactSourceDefinitionUrl.Name}\"}},\"branch\":{{\"id\":\"{expectedDetailRelease.Artifacts.First().DefinitionReference.Branch.Id}\"" +
-                                $",\"name\":\"{expectedDetailRelease.Artifacts.First().DefinitionReference.Branch.Name}\"}}}}" +
-                                $",\"isPrimary\":\"{expectedDetailRelease.Artifacts.First().IsPrimary}\",\"isRetained\":\"{expectedDetailRelease.Artifacts.First().IsRetained}\"}}],\"url\":\"{expectedDetailRelease.Url}\"}}")
-                            });
+                mh => mh.Send(
+                    It.Is<HttpRequestMessage>(
+                        req => req.RequestUri.ToString() == $"{expectedRelease.Url}")))
+                .Returns(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent(releaseDetailJson)
+                });
         }
+
+        private string releaseDetailJson =>
+                                $"{{\"id\":{expectedDetailRelease.Id}" +
+                                $",\"name\":\"{expectedDetailRelease.Name}\"" +
+                                $",\"status\":\"{expectedDetailRelease.Status}\"" +
+                                $",\"createdOn\":\"{expectedDetailRelease.CreatedOn}\"" +
+                                $",\"createdBy\":{{{releaseDetailCreatedIdentityJson}}}" +
+                                $",\"environments\":[{releaseDetailEnvironmentJson}]" +
+                                $",\"artifacts\":[{releaseDetailArtifactJson}],\"url\":\"{expectedDetailRelease.Url}\"}}";
+
+        private string releaseDetailCreatedIdentityJson => 
+                                $"\"displayName\":\"{expectedDetailRelease.CreatedBy.DisplayName}\"" +
+                                $",\"id\":\"{expectedDetailRelease.CreatedBy.Id}\"" +
+                                $",\"uniqueName\":\"{expectedDetailRelease.CreatedBy.UniqueName}\"";
+
+        private string releaseDetailEnvironmentJson => 
+                                $"{{\"id\":{expectedDetailRelease.Environments.First().Id}" +
+                                $",\"name\":\"{expectedDetailRelease.Environments.First().Name}\"" +
+                                $",\"status\":\"{expectedDetailRelease.Environments.First().Status}\"" +
+                                $",\"preDeployApprovals\":[{releaseDetailPreDeployApprovalsJson}]" +
+                                $",\"postDeployApprovals\":[{releaseDetailPostDeployApprovalsJson}]" +
+                                $",\"preApprovalsSnapshot\":{releaseDetailPreApprovalSnapshotJson}" +
+                                $",\"postApprovalsSnapshot\":{releaseDetailPostApprovalSnapshotJson}" +
+                                $",\"createdOn\":\"{expectedDetailRelease.Environments.First().CreatedOn}\"" +
+                                $",\"triggerReason\":\"{expectedDetailRelease.Environments.First().TriggerReason}\"}}";
+       
+        private string releaseDetailPreDeployApprovalsJson =>
+                                $"{{\"id\":{expectedDetailRelease.Environments.First().PreDeployApprovals.First().Id}" +
+                                $",\"revision\":{expectedDetailRelease.Environments.First().PreDeployApprovals.First().Revision}" +
+                                $",\"approvalType\":\"{expectedDetailRelease.Environments.First().PreDeployApprovals.First().ApprovalType}\"" +
+                                $",\"createdOn\":\"{expectedDetailRelease.Environments.First().PreDeployApprovals.First().CreatedOn}\"" +
+                                $",\"status\":\"{expectedDetailRelease.Environments.First().PreDeployApprovals.First().Status}\"" +
+                                $",\"approver\":{{\"displayName\":\"{expectedDetailRelease.Environments.First().PreDeployApprovals.First().Approver.DisplayName}\"" +
+                                $",\"id\":\"{expectedDetailRelease.Environments.First().PreDeployApprovals.First().Approver.Id}\"" +
+                                $",\"uniqueName\":\"{expectedDetailRelease.Environments.First().PreDeployApprovals.First().Approver.UniqueName}\"}}" +
+                                $",\"approvedBy\":{{\"displayName\":\"{expectedDetailRelease.Environments.First().PreDeployApprovals.First().ApprovedBy.DisplayName}\"" +
+                                $",\"id\":\"{expectedDetailRelease.Environments.First().PreDeployApprovals.First().ApprovedBy.Id}\"" +
+                                $",\"uniqueName\":\"{expectedDetailRelease.Environments.First().PreDeployApprovals.First().ApprovedBy.UniqueName}\"}}" +
+                                $",\"comments\":\"{expectedDetailRelease.Environments.First().PreDeployApprovals.First().Comments}\"" +
+                                $",\"isAutomated\":\"{expectedDetailRelease.Environments.First().PreDeployApprovals.First().IsAutomated}\"" +
+                                $",\"attempt\":{expectedDetailRelease.Environments.First().PreDeployApprovals.First().Attempt}" +
+                                $",\"url\":\"{expectedDetailRelease.Environments.First().PreDeployApprovals.First().Url}\"}}";
+
+        private string releaseDetailPostDeployApprovalsJson =>
+                                $"{{\"id\":{expectedDetailRelease.Environments.First().PostDeployApprovals.First().Id}" +
+                                $",\"revision\":{expectedDetailRelease.Environments.First().PostDeployApprovals.First().Revision}" +
+                                $",\"approvalType\":\"{expectedDetailRelease.Environments.First().PostDeployApprovals.First().ApprovalType}\"" +
+                                $",\"createdOn\":\"{expectedDetailRelease.Environments.First().PostDeployApprovals.First().CreatedOn}\"" +
+                                $",\"approver\":{{\"displayName\":\"{expectedDetailRelease.Environments.First().PostDeployApprovals.First().Approver.DisplayName}\"" +
+                                $",\"id\":\"{expectedDetailRelease.Environments.First().PostDeployApprovals.First().Approver.Id}\"" +
+                                $",\"uniqueName\":\"{expectedDetailRelease.Environments.First().PostDeployApprovals.First().Approver.UniqueName}\"}}" +
+                                $",\"approvedBy\":{{\"displayName\":\"{expectedDetailRelease.Environments.First().PostDeployApprovals.First().ApprovedBy.DisplayName}\"" +
+                                $",\"id\":\"{expectedDetailRelease.Environments.First().PostDeployApprovals.First().ApprovedBy.Id}\"" +
+                                $",\"uniqueName\":\"{expectedDetailRelease.Environments.First().PostDeployApprovals.First().ApprovedBy.UniqueName}\"}}" +
+                                $",\"status\":\"{expectedDetailRelease.Environments.First().PostDeployApprovals.First().Status}\"" +
+                                $",\"comments\":\"{expectedDetailRelease.Environments.First().PostDeployApprovals.First().Comments}\"" +
+                                $",\"isAutomated\":\"{expectedDetailRelease.Environments.First().PostDeployApprovals.First().IsAutomated}\"" +
+                                $",\"attempt\":{expectedDetailRelease.Environments.First().PostDeployApprovals.First().Attempt}" +
+                                $",\"url\":\"{expectedDetailRelease.Environments.First().PostDeployApprovals.First().Url}\"}}";
+
+        private string releaseDetailPreApprovalSnapshotJson => 
+                                $"{{\"approvals\":[{{" +
+                                $"\"approver\":{{\"displayName\":\"{expectedDetailRelease.Environments.First().PreApprovalsSnapshot.Approvals.First().Approver.DisplayName}\"" +
+                                $",\"id\":\"{expectedDetailRelease.Environments.First().PreApprovalsSnapshot.Approvals.First().Approver.Id}\"" +
+                                $",\"uniqueName\":\"{expectedDetailRelease.Environments.First().PreApprovalsSnapshot.Approvals.First().Approver.UniqueName}\"}}" +
+                                $",\"rank\":{expectedDetailRelease.Environments.First().PreApprovalsSnapshot.Approvals.First().Rank}" +
+                                $",\"isAutomated\":\"{expectedDetailRelease.Environments.First().PreApprovalsSnapshot.Approvals.First().IsAutomated}\"" +
+                                $",\"id\":{expectedDetailRelease.Environments.First().PreApprovalsSnapshot.Approvals.First().Id}}}]}}";
+
+        private string releaseDetailPostApprovalSnapshotJson =>
+                                $"{{\"approvals\":[{{\"rank\":{expectedDetailRelease.Environments.First().PostApprovalsSnapshot.Approvals.First().Rank}" +
+                                $",\"approver\":{{\"displayName\":\"{expectedDetailRelease.Environments.First().PostApprovalsSnapshot.Approvals.First().Approver.DisplayName}\"" +
+                                $",\"id\":\"{expectedDetailRelease.Environments.First().PostApprovalsSnapshot.Approvals.First().Approver.Id}\"" +
+                                $",\"uniqueName\":\"{expectedDetailRelease.Environments.First().PostApprovalsSnapshot.Approvals.First().Approver.UniqueName}\"}}" +
+                                $",\"rank\":{expectedDetailRelease.Environments.First().PostApprovalsSnapshot.Approvals.First().Rank}" +
+                                $",\"isAutomated\":\"{expectedDetailRelease.Environments.First().PostApprovalsSnapshot.Approvals.First().IsAutomated}\"" +
+                                $",\"id\":{expectedDetailRelease.Environments.First().PostApprovalsSnapshot.Approvals.First().Id}}}]}}";
+
+        private string releaseDetailArtifactJson =>
+                                $"{{\"sourceId\":\"{expectedDetailRelease.Artifacts.First().SourceId}\"" +
+                                $",\"type\":\"{expectedDetailRelease.Artifacts.First().Type}\"" +
+                                $",\"definitionReference\":{releaseDetailArtifactDefinitionReferenceJson}" +
+                                $",\"isPrimary\":\"{expectedDetailRelease.Artifacts.First().IsPrimary}\"" +
+                                $",\"isRetained\":\"{expectedDetailRelease.Artifacts.First().IsRetained}\"}}";
+
+        private string releaseDetailArtifactDefinitionReferenceJson =>
+                                $"{{\"buildUri\":{{\"id\":\"{expectedDetailRelease.Artifacts.First().DefinitionReference.BuildUri.Id}\"" +
+                                $",\"name\":\"{expectedDetailRelease.Artifacts.First().DefinitionReference.BuildUri.Name}\"}}" +
+                                $",\"definition\":{{\"id\":\"{expectedDetailRelease.Artifacts.First().DefinitionReference.Definition.Id}\"" +
+                                $",\"name\":\"{expectedDetailRelease.Artifacts.First().DefinitionReference.Definition.Name}\"}}" +
+                                $",\"pullRequestMergeCommitId\":{{\"id\":\"{expectedDetailRelease.Artifacts.First().DefinitionReference.PullRequestMergeCommitId.Id}\"" +
+                                $",\"name\":\"{expectedDetailRelease.Artifacts.First().DefinitionReference.PullRequestMergeCommitId.Name}\"}}" +
+                                $",\"project\":{{\"id\":\"{expectedDetailRelease.Artifacts.First().DefinitionReference.Project.Id}\"" +
+                                $",\"name\":\"{expectedDetailRelease.Artifacts.First().DefinitionReference.Project.Name}\"}}" +
+                                $",\"repository\":{{\"id\":\"{expectedDetailRelease.Artifacts.First().DefinitionReference.Repository.Id}\"" +
+                                $",\"name\":\"{expectedDetailRelease.Artifacts.First().DefinitionReference.Repository.Name}\"}}" +
+                                $",\"requestedFor\":{{\"id\":\"{expectedDetailRelease.Artifacts.First().DefinitionReference.RequestedFor.Id}\"" +
+                                $",\"name\":\"{expectedDetailRelease.Artifacts.First().DefinitionReference.RequestedFor.Name}\"}}" +
+                                $",\"sourceVersion\":{{\"id\":\"{expectedDetailRelease.Artifacts.First().DefinitionReference.SourceVersion.Id}\"" +
+                                $",\"name\":\"{expectedDetailRelease.Artifacts.First().DefinitionReference.SourceVersion.Name}\"}}" +
+                                $",\"version\":{{\"id\":\"{expectedDetailRelease.Artifacts.First().DefinitionReference.Version.Id}\"" +
+                                $",\"name\":\"{expectedDetailRelease.Artifacts.First().DefinitionReference.Version.Name}\"}}" +
+                                $",\"artifactSourceVersionUrl\":{{\"id\":\"{expectedDetailRelease.Artifacts.First().DefinitionReference.ArtifactSourceVersionUrl.Id}\"" +
+                                $",\"name\":\"{expectedDetailRelease.Artifacts.First().DefinitionReference.ArtifactSourceVersionUrl.Name}\"}}" +
+                                $",\"artifactSourceDefinitionUrl\":{{\"id\":\"{expectedDetailRelease.Artifacts.First().DefinitionReference.ArtifactSourceDefinitionUrl.Id}\"" +
+                                $",\"name\":\"{expectedDetailRelease.Artifacts.First().DefinitionReference.ArtifactSourceDefinitionUrl.Name}\"}}" +
+                                $",\"branch\":{{\"id\":\"{expectedDetailRelease.Artifacts.First().DefinitionReference.Branch.Id}\"" +
+                                $",\"name\":\"{expectedDetailRelease.Artifacts.First().DefinitionReference.Branch.Name}\"}}}}";
     }
 }

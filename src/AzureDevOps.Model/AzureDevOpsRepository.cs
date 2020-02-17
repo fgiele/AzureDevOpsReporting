@@ -12,7 +12,9 @@ namespace AzureDevOps.Model
 
         public string Url { get; set; }
 
-        private string DefaultBranch { get; set; }
+        public string DefaultBranch { get; set; }
+
+        public int Size { get; set; }
 
         public IEnumerable<AzureDevOpsPolicy> Policies { get; set; }
     }

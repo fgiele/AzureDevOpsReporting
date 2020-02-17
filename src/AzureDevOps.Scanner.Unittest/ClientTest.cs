@@ -308,49 +308,50 @@ namespace AzureDevOps.Scanner.Unittest
             actual.Collections[0].Projects[0].Should().BeEquivalentTo(expectedProject);
         }
 
-        //[Fact]
-        //public async Task ScanAsync_WhenRepositories_ShouldReturnProperInstance()
-        //{
-        //    // Arrange
-        //    HttpMockOneProject();
-        //    HttpMockOneRelease();
+        [Fact]
+        public async Task ScanAsync_WhenRepositories_ShouldReturnProperInstance()
+        {
+            // Arrange
+            HttpMockOneProject();
+            HttpMockOneRepository();
 
-        //    expectedProject.Releases = new HashSet<AzureDevOpsRelease> { expectedRelease };
+            expectedProject.Repositories = new HashSet<AzureDevOpsRepository> { expectedRepository };
 
-        //    var systemUnderTest = new Client(httpClient);
+            var systemUnderTest = new Client(httpClient);
 
-        //    // Act
-        //    var actual = await systemUnderTest.ScanAsync(DataOptions.Release, new string[] { expectedCollection }, expectedUrl);
+            // Act
+            var actual = await systemUnderTest.ScanAsync(DataOptions.Git, new string[] { expectedCollection }, expectedUrl);
 
-        //    // Assert
-        //    mockHttpMessageHandler.Verify();
-        //    actual.Should().BeOfType<AzureDevOpsInstance>();
-        //    actual.Collections.Should().HaveCount(1);
-        //    actual.Collections[0].Projects.Should().HaveCount(1);
-        //    actual.Collections[0].Projects[0].Should().BeEquivalentTo(expectedProject);
-        //}
+            // Assert
+            mockHttpMessageHandler.Verify();
+            actual.Should().BeOfType<AzureDevOpsInstance>();
+            actual.Collections.Should().HaveCount(1);
+            actual.Collections[0].Projects.Should().HaveCount(1);
+            actual.Collections[0].Projects[0].Should().BeEquivalentTo(expectedProject);
+        }
 
-        //[Fact]
-        //public async Task ScanAsync_WhenRepositoriesWithArtifacts_ShouldReturnProperInstance()
-        //{
-        //    // Arrange
-        //    HttpMockOneProject();
-        //    HttpMockOneRelease();
-        //    HttpMockOneReleaseDetails();
+        [Fact]
+        public async Task ScanAsync_WhenRepositoriesWithMinReviewPolicy_ShouldReturnProperInstance()
+        {
+            // Arrange
+            HttpMockOneProject();
+            HttpMockOneRepository();
+            HttpMockOneRolicy();
 
-        //    expectedProject.Releases = new HashSet<AzureDevOpsRelease> { expectedDetailRelease };
+            expectedRepository.Policies = new HashSet<AzureDevOpsPolicy> { expectedPolicy };
+            expectedProject.Repositories = new HashSet<AzureDevOpsRepository> { expectedRepository };
 
-        //    var systemUnderTest = new Client(httpClient);
+            var systemUnderTest = new Client(httpClient);
 
-        //    // Act
-        //    var actual = await systemUnderTest.ScanAsync(DataOptions.Release | DataOptions.ReleaseDetails, new string[] { expectedCollection }, expectedUrl);
+            // Act
+            var actual = await systemUnderTest.ScanAsync(DataOptions.Git | DataOptions.GitPolicies, new string[] { expectedCollection }, expectedUrl);
 
-        //    // Assert
-        //    mockHttpMessageHandler.Verify();
-        //    actual.Should().BeOfType<AzureDevOpsInstance>();
-        //    actual.Collections.Should().HaveCount(1);
-        //    actual.Collections[0].Projects.Should().HaveCount(1);
-        //    actual.Collections[0].Projects[0].Should().BeEquivalentTo(expectedProject);
-        //}
+            // Assert
+            mockHttpMessageHandler.Verify();
+            actual.Should().BeOfType<AzureDevOpsInstance>();
+            actual.Collections.Should().HaveCount(1);
+            actual.Collections[0].Projects.Should().HaveCount(1);
+            actual.Collections[0].Projects[0].Should().BeEquivalentTo(expectedProject);
+        }
     }
 }
