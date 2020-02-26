@@ -9,7 +9,7 @@ namespace AzureDevOps.Model
         public Guid Id { get; set; }
 
         public string Name { get; set; }
-
+        
         public string Url { get; set; }
 
         public string DefaultBranch { get; set; }

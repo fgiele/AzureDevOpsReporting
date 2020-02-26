@@ -110,7 +110,7 @@ namespace AzureDevOps.Scanner.Unittest
                             .Returns(new HttpResponseMessage
                             {
                                 StatusCode = HttpStatusCode.OK,
-                                Content = new StringContent($"{{\"count\":1,\"value\":[{{\"id\":{expectedBuild.Id},\"buildNumber\":\"{expectedBuild.BuildNumber}\",\"status\":\"{expectedBuild.Status}\",\"result\":\"{expectedBuild.Result}\",\"url\":\"{expectedBuild.Url}\"}}]}}")
+                                Content = new StringContent($"{{\"count\":1,\"value\":[{{\"id\":{expectedBuild.Id},\"buildNumber\":\"{expectedBuild.BuildNumber}\",\"status\":\"{expectedBuild.Status}\",\"result\":\"{expectedBuild.Result}\",\"sourceBranch\":\"{expectedBuild.SourceBranch}\",\"url\":\"{expectedBuild.Url}\"}}]}}")
                             });
         }
 

@@ -13,6 +13,8 @@ namespace AzureDevOps.Report
         {
             CreateHeaders("Collection",
                 "Project",
+                "Repistory",
+                "Branch",
                 "Build nr",
                 "Build status",
                 "Build result",
@@ -30,6 +32,8 @@ namespace AzureDevOps.Report
                         {
                             AddLine(collection.Name,
                                     project.Name,
+                                    build.Repository.Name,
+                                    build.SourceBranch,
                                     build.BuildNumber,
                                     build.Status,
                                     build.Result,
