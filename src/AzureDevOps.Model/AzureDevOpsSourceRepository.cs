@@ -4,7 +4,7 @@ namespace AzureDevOps.Model
 {
     public class AzureDevOpsSourceRepository
     {
-        public Guid Id { get; set; }
+        public string Id { get; set; }
 
         public string Type { get; set; }
 
