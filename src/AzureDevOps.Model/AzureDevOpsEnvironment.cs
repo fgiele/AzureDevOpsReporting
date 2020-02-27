@@ -19,6 +19,8 @@ namespace AzureDevOps.Model
 
         public AzureDevOpsDeployApprovalsSnapshot PostApprovalsSnapshot { get; set; }
 
+        public IEnumerable<AzureDevOpsDeployStep> DeploySteps { get; set; }
+
         public DateTime CreatedOn { get; set; }
 
         public string TriggerReason { get; set; }

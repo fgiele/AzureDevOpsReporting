@@ -15,6 +15,10 @@ namespace AzureDevOps.Model
 
         public string Url { get; set; }
 
+        public AzureDevOpsSourceRepository Repository { get; set; }
+
+        public string SourceBranch { get; set; }
+
         public IEnumerable<AzureDevOpsBuildArtifact> Artifacts { get; set; }
     }
 

@@ -18,14 +18,17 @@ namespace AzureDevOps.ReportingTool
 
         private class Options
         {
-            [Option('r', "release", Required = false, HelpText = "Generate the Release report.")]
-            public bool Release { set { Reports.Add(new ReleaseReport()); } }
+            [Option('a', "all", Required = false, HelpText = "Debug: Run all scans.")]
+            public bool ScanAll { set { Reports.Add(new ScanAllReport()); } }
+
+            [Option('b', "build", Required = false, HelpText = "Generate the Build report.")]
+            public bool ScanBuild { set { Reports.Add(new BuildReport()); } }
 
             [Option('g', "git", Required = false, HelpText = "Generate the Git Repository report.")]
             public bool GitRepositories { set { Reports.Add(new GitRepositoryReport()); } }
 
-            [Option('a', "all", Required = false, HelpText = "Debug: Run all scans.")]
-            public bool ScanAll { set { Reports.Add(new ScanAllReport()); } }
+            [Option('r', "release", Required = false, HelpText = "Generate the Release report.")]
+            public bool Release { set { Reports.Add(new ReleaseReport()); } }
         }
 
         static async Task Main(string[] args)

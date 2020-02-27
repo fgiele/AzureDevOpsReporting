@@ -1,10 +1,9 @@
-﻿using AzureDevOps.Model.Policies;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace AzureDevOps.Model
 {
-    public class AzureDevOpsPolicySettings : IAzureDevOpsPolicySettings
+    public class AzureDevOpsPolicySettings
     {
         public int MinimumApproverCount { get; set; }
 

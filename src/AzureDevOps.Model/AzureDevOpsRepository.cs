@@ -9,12 +9,12 @@ namespace AzureDevOps.Model
         public Guid Id { get; set; }
 
         public string Name { get; set; }
-
+        
         public string Url { get; set; }
 
         public string DefaultBranch { get; set; }
 
-        public int Size { get; set; }
+        public long Size { get; set; }
 
         public IEnumerable<AzureDevOpsPolicy> Policies { get; set; }
     }
