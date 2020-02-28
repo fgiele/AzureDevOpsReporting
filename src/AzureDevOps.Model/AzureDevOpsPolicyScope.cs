@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace AzureDevOps.Model
+﻿namespace AzureDevOps.Model
 {
     public class AzureDevOpsPolicyScope
     {
