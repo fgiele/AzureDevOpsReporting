@@ -38,8 +38,7 @@ steps:
         sonar.exclusions=**/obj/**,**/*.dll
         sonar.branch.name=$(Build.SourceBranchName)
         sonar.msbuild.testProjectPattern=.*test\.csproj$
-        sonar.cs.opencover.reportsPaths=$(Agent.TempDirectory)/**/coverage.cobertura.xml
-        sonar.cs.vstest.reportsPaths=$(Agent.TempDirectory)/*.trx
+        sonar.cobertura.reportPath=$(Agent.TempDirectory)/**/coverage.cobertura.xml
   - task: DotNetCoreCLI@2
     displayName: "Build application"
     inputs:
