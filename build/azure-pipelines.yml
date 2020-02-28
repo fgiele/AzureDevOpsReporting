@@ -18,10 +18,21 @@ variables:
 
 steps:
   - task: UseDotNet@2
+    inputs:
+      packageType: 'runtime'
+      version: '2.0.0'
+  - task: UseDotNet@2
     displayName: "Install .Net Core 3.x"
     inputs:
       packageType: 'sdk'
       version: '3.x'
+  - task: SonarCloudPrepare@1
+    inputs:
+      SonarCloud: 'SonarCloud'
+      organization: 'fgi'
+      scannerMode: 'MSBuild'
+      projectKey: 'ComplianceReporting'
+      projectName: 'ComplianceReporting'
   - task: DotNetCoreCLI@2
     displayName: "Build application"
     inputs:
@@ -33,13 +44,16 @@ steps:
       command: 'test'
       projects: '**/*.Unittest.csproj'
       arguments: -c $(BuildConfiguration) --collect:"XPlat Code Coverage" -- RunConfiguration.DisableAppDomain=true
+  - task: SonarCloudAnalyze@1
+  - task: SonarCloudPublish@1
+    inputs:
+      pollingTimeoutSec: '300'
   - task: DotNetCoreCLI@2
     displayName: Install ReportGenerator tool
     inputs:
       command: custom
       custom: tool
       arguments: install --tool-path . dotnet-reportgenerator-globaltool
-      
   - task: reportgenerator@4
     displayName: Generate Code Coverage Report
     inputs:
