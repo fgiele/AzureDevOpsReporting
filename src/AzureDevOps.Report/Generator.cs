@@ -15,6 +15,11 @@ namespace AzureDevOps.Report
                 throw new ArgumentException("Report folder does not exist", nameof(reportFolder));
             }
 
+            await ProcessReports(reports, azureDevOpsInstance, reportFolder);
+        }
+
+        private async Task ProcessReports(IEnumerable<IReport> reports, AzureDevOpsInstance azureDevOpsInstance, string reportFolder)
+        {
             var reportTasks = new HashSet<Task>();
             foreach (var report in reports)
             {

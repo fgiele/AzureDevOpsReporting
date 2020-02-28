@@ -68,7 +68,7 @@ namespace AzureDevOps.Report
                 ReleaseDeployPhases.Any(rdp =>
                     rdp.DeploymentJobs.Any(dj =>
                         dj.Tasks.Where(tsk => tsk.Task?.Id != null).Any(tsk =>
-                            tsk.Task.Id.Equals(ReplaceTokenTaskId))));
+                            tsk.Task.Id.Equals(taskId))));
         }
     }
 }
