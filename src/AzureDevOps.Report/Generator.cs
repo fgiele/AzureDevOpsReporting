@@ -8,14 +8,14 @@ namespace AzureDevOps.Report
 {
     public class Generator
     {
-        public async Task CreateReportsAsync(IEnumerable<IReport> reports, AzureDevOpsInstance azureDevOpsInstance, string reportFolder)
+        public Task CreateReportsAsync(IEnumerable<IReport> reports, AzureDevOpsInstance azureDevOpsInstance, string reportFolder)
         {
             if (!Directory.Exists(reportFolder))
             {
                 throw new ArgumentException("Report folder does not exist", nameof(reportFolder));
             }
 
-            await ProcessReports(reports, azureDevOpsInstance, reportFolder);
+            return ProcessReports(reports, azureDevOpsInstance, reportFolder);
         }
 
         private async Task ProcessReports(IEnumerable<IReport> reports, AzureDevOpsInstance azureDevOpsInstance, string reportFolder)
