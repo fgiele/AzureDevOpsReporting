@@ -21,11 +21,19 @@ namespace AzureDevOps.ReportingTool
     using AzureDevOps.Scanner;
     using CommandLine;
 
+    /// <summary>
+    /// Main entry point for application.
+    /// </summary>
     public static class Program
     {
         private static readonly HashSet<IReport> Reports = new HashSet<IReport>();
         private static readonly HttpClient HttpClient = new HttpClient();
 
+        /// <summary>
+        /// Main entry point for application.
+        /// </summary>
+        /// <param name="args">Program arguments.</param>
+        /// <returns>Async call, task.</returns>
         public static async Task Main(string[] args)
         {
             Parser.Default.ParseArguments<Options>(args);

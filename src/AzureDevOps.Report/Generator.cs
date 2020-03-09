@@ -16,8 +16,18 @@ namespace AzureDevOps.Report
     using System.Threading.Tasks;
     using AzureDevOps.Model;
 
+    /// <summary>
+    /// Generates the reports based on collected information and report definitions.
+    /// </summary>
     public static class Generator
     {
+        /// <summary>
+        /// Parses the data from Azure DevOps and based on the requested reports produces files.
+        /// </summary>
+        /// <param name="reports">Reports to be created.</param>
+        /// <param name="azureDevOpsInstance">Instance object holding the Azure DevOps scanned data.</param>
+        /// <param name="reportFolder">Location to write the reports to.</param>
+        /// <returns>Task object/ async function.</returns>
         public static Task CreateReportsAsync(IEnumerable<IReport> reports, AzureDevOpsInstance azureDevOpsInstance, string reportFolder)
         {
             if (reports == null)

@@ -20,6 +20,9 @@ namespace AzureDevOps.Scanner.Unittest
     using Moq;
     using Xunit;
 
+    /// <summary>
+    /// Contains the actual tests being run against the client.
+    /// </summary>
     public partial class ClientTest : IDisposable
     {
         private readonly Mock<MockHttpMessageHandler> mockHttpMessageHandler;

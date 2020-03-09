@@ -13,12 +13,26 @@ namespace AzureDevOps.Report
     using System;
     using AzureDevOps.Model;
 
+    /// <summary>
+    /// Git compliance report definition.
+    /// </summary>
     public class GitRepositoryReport : ReportDefinition, IReport
     {
+        /// <summary>
+        /// Gets data-options in use with the git report.
+        /// </summary>
         public DataOptions DataOptions => DataOptions.Git | DataOptions.GitPolicies;
 
+        /// <summary>
+        /// Gets title of the git report.
+        /// </summary>
         public string Title => $"GitReport-{DateTime.Now:yyyyMMdd-HHmmss}.csv";
 
+        /// <summary>
+        /// Parses the collected data and generates a CSV report.
+        /// </summary>
+        /// <param name="instance">Instance object containing the data collected from Azure DevOps.</param>
+        /// <returns>CSV string.</returns>
         public string Generate(AzureDevOpsInstance instance)
         {
             if (instance == null)

@@ -19,6 +19,9 @@ namespace AzureDevOps.Scanner.Unittest
     using FizzWare.NBuilder;
     using Moq;
 
+    /// <summary>
+    /// Contains the helper functions and variables to run the unit tests.
+    /// </summary>
     public partial class ClientTest
     {
         private const string ExpectedUrl = "https://example.com";

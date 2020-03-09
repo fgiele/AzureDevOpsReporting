@@ -14,14 +14,28 @@ namespace AzureDevOps.Report
     using System.Linq;
     using AzureDevOps.Model;
 
+    /// <summary>
+    /// Release report definition.
+    /// </summary>
     public class ReleaseReport : ReportDefinition, IReport
     {
         private readonly Guid replaceTokenTaskId = new Guid("a8515ec8-7254-4ffd-912c-86772e2b5962");
 
+        /// <summary>
+        /// Gets data-options in use with the release report.
+        /// </summary>
         public DataOptions DataOptions => DataOptions.Release | DataOptions.ReleaseDetails;
 
+        /// <summary>
+        /// Gets title of the release report.
+        /// </summary>
         public string Title => $"ReleaseReport-{DateTime.Now:yyyyMMdd-HHmmss}.csv";
 
+        /// <summary>
+        /// Parses the collected data and generates a CSV report.
+        /// </summary>
+        /// <param name="instance">Instance object containing the data collected from Azure DevOps.</param>
+        /// <returns>CSV string.</returns>
         public string Generate(AzureDevOpsInstance instance)
         {
             if (instance == null)

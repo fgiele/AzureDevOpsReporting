@@ -18,17 +18,31 @@ namespace AzureDevOps.Scanner
     using AzureDevOps.Model;
     using Newtonsoft.Json;
 
+    /// <summary>
+    /// Scanning client for AzureDevOps instance. Handles collection of data.
+    /// </summary>
     public class Client
     {
         private readonly HttpClient restClient;
 
         private int projectsDoneCount = 0;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Client"/> class.
+        /// </summary>
+        /// <param name="httpClient">HttpClient static reference.</param>
         public Client(HttpClient httpClient)
         {
             this.restClient = httpClient;
         }
 
+        /// <summary>
+        /// Starts the scanning process of the Azure DevOps instance.
+        /// </summary>
+        /// <param name="dataOptions">Scanning options, determines the level and subjects of scanning.</param>
+        /// <param name="collections">List of collections to be scanned.</param>
+        /// <param name="azureDevOpsUrl">Uri of the Azure DevOps instance to be scanned.</param>
+        /// <returns>Instance object holding all collected data.</returns>
         public async Task<AzureDevOpsInstance> ScanAsync(DataOptions dataOptions, IEnumerable<string> collections, Uri azureDevOpsUrl)
         {
             if (collections == null)
