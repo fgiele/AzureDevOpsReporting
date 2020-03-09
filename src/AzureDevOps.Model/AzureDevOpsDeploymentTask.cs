@@ -10,12 +10,24 @@
 
 namespace AzureDevOps.Model
 {
+    /// <summary>
+    /// DTO for task executed during deployment.
+    /// </summary>
     public class AzureDevOpsDeploymentTask
     {
+        /// <summary>
+        /// Gets or sets id.
+        /// </summary>
         public int Id { get; set; }
 
+        /// <summary>
+        /// Gets or sets name.
+        /// </summary>
         public string Name { get; set; }
 
+        /// <summary>
+        /// Gets or sets task.
+        /// </summary>
         public AzureDevOpsTask Task { get; set; }
     }
 }

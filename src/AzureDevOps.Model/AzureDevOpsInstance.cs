@@ -12,13 +12,22 @@ namespace AzureDevOps.Model
 {
     using System.Collections.Generic;
 
+    /// <summary>
+    /// DTO for Azure DevOps data.
+    /// </summary>
     public class AzureDevOpsInstance
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AzureDevOpsInstance"/> class.
+        /// </summary>
         public AzureDevOpsInstance()
         {
             this.Collections = new List<AzureDevOpsCollection>();
         }
 
+        /// <summary>
+        /// Gets collections in this Azure DevOps instance.
+        /// </summary>
         public List<AzureDevOpsCollection> Collections { get; private set; }
     }
 }

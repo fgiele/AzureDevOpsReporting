@@ -10,10 +10,19 @@
 
 namespace AzureDevOps.Model
 {
+    /// <summary>
+    /// DTO for artifact resource.
+    /// </summary>
     public class AzureDevOpsArtifactResource
     {
+        /// <summary>
+        /// Gets or sets type.
+        /// </summary>
         public string Type { get; set; }
 
+        /// <summary>
+        /// Gets or sets download url.
+        /// </summary>
         public System.Uri DownloadUrl { get; set; }
     }
 }

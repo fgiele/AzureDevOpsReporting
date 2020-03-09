@@ -43,7 +43,7 @@ namespace AzureDevOps.Scanner
         /// <param name="collections">List of collections to be scanned.</param>
         /// <param name="azureDevOpsUrl">Uri of the Azure DevOps instance to be scanned.</param>
         /// <returns>Instance object holding all collected data.</returns>
-        public async Task<AzureDevOpsInstance> ScanAsync(DataOptions dataOptions, IEnumerable<string> collections, Uri azureDevOpsUrl)
+        public Task<AzureDevOpsInstance> ScanAsync(DataOptions dataOptions, IEnumerable<string> collections, Uri azureDevOpsUrl)
         {
             if (collections == null)
             {
@@ -55,6 +55,11 @@ namespace AzureDevOps.Scanner
                 throw new ArgumentNullException(nameof(azureDevOpsUrl));
             }
 
+            return this.ScanAzDOAsync(dataOptions, collections, azureDevOpsUrl);
+        }
+
+        private async Task<AzureDevOpsInstance> ScanAzDOAsync(DataOptions dataOptions, IEnumerable<string> collections, Uri azureDevOpsUrl)
+        {
             this.projectsDoneCount = 0;
 
             var azureDevOpsInstance = new AzureDevOpsInstance();

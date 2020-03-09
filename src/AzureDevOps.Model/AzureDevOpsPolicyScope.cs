@@ -10,10 +10,19 @@
 
 namespace AzureDevOps.Model
 {
+    /// <summary>
+    /// DTO for policy scope.
+    /// </summary>
     public class AzureDevOpsPolicyScope
     {
+        /// <summary>
+        /// Gets or sets reference name.
+        /// </summary>
         public string RefName { get; set; }
 
+        /// <summary>
+        /// Gets or sets type of match.
+        /// </summary>
         public string MatchKind { get; set; }
     }
 }

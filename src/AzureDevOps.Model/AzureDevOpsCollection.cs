@@ -13,17 +13,32 @@ namespace AzureDevOps.Model
     using System;
     using System.Collections.Generic;
 
+    /// <summary>
+    /// DTO for collection.
+    /// </summary>
     public class AzureDevOpsCollection
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AzureDevOpsCollection"/> class.
+        /// </summary>
         public AzureDevOpsCollection()
         {
             this.Projects = new List<AzureDevOpsProject>();
         }
 
+        /// <summary>
+        /// Gets or sets name.
+        /// </summary>
         public string Name { get; set; }
 
+        /// <summary>
+        /// Gets or sets id.
+        /// </summary>
         public Guid Id { get; set; }
 
+        /// <summary>
+        /// Gets propjects.
+        /// </summary>
         public List<AzureDevOpsProject> Projects { get; private set; }
     }
 }

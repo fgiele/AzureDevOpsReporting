@@ -13,10 +13,19 @@ namespace AzureDevOps.Model
     using System.Collections.Generic;
     using Newtonsoft.Json;
 
+    /// <summary>
+    /// DTO for policies
+    /// </summary>
     public class AzureDevOpsPolicies
     {
+        /// <summary>
+        /// Gets or sets number of found policies.
+        /// </summary>
         public int Count { get; set; }
 
+        /// <summary>
+        /// Gets or sets list of policies.
+        /// </summary>
         [JsonProperty("value")]
         public IEnumerable<AzureDevOpsPolicy> Policies { get; set; }
     }

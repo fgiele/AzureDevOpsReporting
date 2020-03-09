@@ -12,15 +12,30 @@ namespace AzureDevOps.Model
 {
     using Newtonsoft.Json;
 
+    /// <summary>
+    /// DTO for Policy.
+    /// </summary>
     public class AzureDevOpsPolicy
     {
+        /// <summary>
+        /// Gets or sets a value indicating whether is active.
+        /// </summary>
         public bool IsEnabled { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether blocks completion of merge.
+        /// </summary>
         public bool IsBlocking { get; set; }
 
+        /// <summary>
+        /// Gets or sets type of policy.
+        /// </summary>
         [JsonProperty("type")]
         public AzureDevOpsPolicyType PolicyType { get; set; }
 
+        /// <summary>
+        /// Gets or sets settings of the policy.
+        /// </summary>
         public AzureDevOpsPolicySettings Settings { get; set; }
     }
 }

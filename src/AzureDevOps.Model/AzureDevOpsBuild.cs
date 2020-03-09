@@ -12,22 +12,49 @@ namespace AzureDevOps.Model
 {
     using System.Collections.Generic;
 
+    /// <summary>
+    /// DTO for build.
+    /// </summary>
     public class AzureDevOpsBuild
     {
+        /// <summary>
+        /// Gets or sets id.
+        /// </summary>
         public int Id { get; set; }
 
+        /// <summary>
+        /// Gets or sets build number.
+        /// </summary>
         public string BuildNumber { get; set; }
 
+        /// <summary>
+        /// Gets or sets status.
+        /// </summary>
         public string Status { get; set; }
 
+        /// <summary>
+        /// Gets or sets result.
+        /// </summary>
         public string Result { get; set; }
 
+        /// <summary>
+        /// Gets or sets url.
+        /// </summary>
         public System.Uri Url { get; set; }
 
+        /// <summary>
+        /// Gets or sets repository.
+        /// </summary>
         public AzureDevOpsSourceRepository Repository { get; set; }
 
+        /// <summary>
+        /// Gets or sets source branch.
+        /// </summary>
         public string SourceBranch { get; set; }
 
+        /// <summary>
+        /// Gets or sets artifacts.
+        /// </summary>
         public IEnumerable<AzureDevOpsBuildArtifact> Artifacts { get; set; }
     }
 }

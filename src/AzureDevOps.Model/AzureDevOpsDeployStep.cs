@@ -12,10 +12,19 @@ namespace AzureDevOps.Model
 {
     using System.Collections.Generic;
 
+    /// <summary>
+    /// DTO for deployment step.
+    /// </summary>
     public class AzureDevOpsDeployStep
     {
+        /// <summary>
+        /// Gets or sets number of deployment attempt.
+        /// </summary>
         public int Attempt { get; set; }
 
+        /// <summary>
+        /// Gets or sets release deployment phases in attempt.
+        /// </summary>
         public IEnumerable<AzureDevOpsReleaseDeployPhase> ReleaseDeployPhases { get; set; }
     }
 }

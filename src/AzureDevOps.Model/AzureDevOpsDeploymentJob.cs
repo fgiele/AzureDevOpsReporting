@@ -12,8 +12,14 @@ namespace AzureDevOps.Model
 {
     using System.Collections.Generic;
 
+    /// <summary>
+    /// DTO for deployment job.
+    /// </summary>
     public class AzureDevOpsDeploymentJob
     {
+        /// <summary>
+        /// Gets or sets tasks within the job.
+        /// </summary>
         public IEnumerable<AzureDevOpsDeploymentTask> Tasks { get; set; }
     }
 }

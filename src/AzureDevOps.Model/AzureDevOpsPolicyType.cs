@@ -12,12 +12,24 @@ namespace AzureDevOps.Model
 {
     using System;
 
+    /// <summary>
+    /// DTO for policy type.
+    /// </summary>
     public class AzureDevOpsPolicyType
     {
+        /// <summary>
+        /// Gets or sets id.
+        /// </summary>
         public Guid Id { get; set; }
 
+        /// <summary>
+        /// Gets or sets url.
+        /// </summary>
         public System.Uri Url { get; set; }
 
+        /// <summary>
+        /// Gets or sets display name.
+        /// </summary>
         public string DisplayName { get; set; }
     }
 }

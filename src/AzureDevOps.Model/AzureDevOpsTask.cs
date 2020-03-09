@@ -12,12 +12,24 @@ namespace AzureDevOps.Model
 {
     using System;
 
+    /// <summary>
+    /// DTO for Pipeline Task.
+    /// </summary>
     public class AzureDevOpsTask
     {
+        /// <summary>
+        /// Gets or sets task ID.
+        /// </summary>
         public Guid Id { get; set; }
 
+        /// <summary>
+        /// Gets or sets task name.
+        /// </summary>
         public string Name { get; set; }
 
+        /// <summary>
+        /// Gets or sets task version.
+        /// </summary>
         public string Version { get; set; }
     }
 }

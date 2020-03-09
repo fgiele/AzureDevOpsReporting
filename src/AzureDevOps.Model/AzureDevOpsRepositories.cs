@@ -13,10 +13,19 @@ namespace AzureDevOps.Model
     using System.Collections.Generic;
     using Newtonsoft.Json;
 
+    /// <summary>
+    /// DTO for repositories.
+    /// </summary>
     public class AzureDevOpsRepositories
     {
+        /// <summary>
+        /// Gets or sets number of found repositories.
+        /// </summary>
         public int Count { get; set; }
 
+        /// <summary>
+        /// Gets or sets list of repositories.
+        /// </summary>
         [JsonProperty("value")]
         public IEnumerable<AzureDevOpsRepository> Repositories { get; set; }
     }

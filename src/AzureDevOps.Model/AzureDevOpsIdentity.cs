@@ -12,12 +12,24 @@ namespace AzureDevOps.Model
 {
     using System;
 
+    /// <summary>
+    /// DTO for identity.
+    /// </summary>
     public class AzureDevOpsIdentity
     {
+        /// <summary>
+        /// Gets or sets id.
+        /// </summary>
         public Guid Id { get; set; }
 
+        /// <summary>
+        /// Gets or sets displayname.
+        /// </summary>
         public string DisplayName { get; set; }
 
+        /// <summary>
+        /// Gets or sets unique identifying name.
+        /// </summary>
         public string UniqueName { get; set; }
     }
 }

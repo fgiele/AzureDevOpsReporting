@@ -12,14 +12,29 @@ namespace AzureDevOps.Model
 {
     using System.Collections.Generic;
 
+    /// <summary>
+    /// DTO for Release deployment phase
+    /// </summary>
     public class AzureDevOpsReleaseDeployPhase
     {
+        /// <summary>
+        /// Gets or sets id.
+        /// </summary>
         public int Id { get; set; }
 
+        /// <summary>
+        /// Gets or sets name.
+        /// </summary>
         public string Name { get; set; }
 
+        /// <summary>
+        /// Gets or sets status.
+        /// </summary>
         public string Status { get; set; }
 
+        /// <summary>
+        /// Gets or sets deployment jobs.
+        /// </summary>
         public IEnumerable<AzureDevOpsDeploymentJob> DeploymentJobs { get; set; }
     }
 }

@@ -12,8 +12,14 @@ namespace AzureDevOps.Model
 {
     using System.Collections.Generic;
 
+    /// <summary>
+    /// DTO for deployment approval snapshot.
+    /// </summary>
     public class AzureDevOpsDeployApprovalsSnapshot
     {
+        /// <summary>
+        /// Gets or sets approvals.
+        /// </summary>
         public IEnumerable<AzureDevOpsApproval> Approvals { get; set; }
     }
 }

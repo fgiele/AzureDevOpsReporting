@@ -13,10 +13,19 @@ namespace AzureDevOps.Model
     using System.Collections.Generic;
     using Newtonsoft.Json;
 
+    /// <summary>
+    /// DTO for Azure DevOps projects.
+    /// </summary>
     public class AzureDevOpsProjects
     {
+        /// <summary>
+        /// Gets or sets number of found projects.
+        /// </summary>
         public int Count { get; set; }
 
+        /// <summary>
+        /// Gets or sets list of projects.
+        /// </summary>
         [JsonProperty("value")]
         public IEnumerable<AzureDevOpsProject> Projects { get; set; }
     }

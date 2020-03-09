@@ -10,10 +10,19 @@
 
 namespace AzureDevOps.Model
 {
+    /// <summary>
+    /// DTO for reference field in artifact definitions.
+    /// </summary>
     public class AzureDevOpsReferenceField
     {
+        /// <summary>
+        /// Gets or sets id.
+        /// </summary>
         public string Id { get; set; }
 
+        /// <summary>
+        /// Gets or sets name.
+        /// </summary>
         public string Name { get; set; }
     }
 }

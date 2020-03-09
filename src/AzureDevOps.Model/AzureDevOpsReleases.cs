@@ -13,10 +13,19 @@ namespace AzureDevOps.Model
     using System.Collections.Generic;
     using Newtonsoft.Json;
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class AzureDevOpsReleases
     {
+        /// <summary>
+        /// Gets or sets number of found releases.
+        /// </summary>
         public int Count { get; set; }
 
+        /// <summary>
+        /// Gets or sets list of releases.
+        /// </summary>
         [JsonProperty("value")]
         public IEnumerable<AzureDevOpsRelease> Releases { get; set; }
     }

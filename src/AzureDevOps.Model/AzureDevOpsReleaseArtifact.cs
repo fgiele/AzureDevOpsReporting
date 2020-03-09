@@ -10,16 +10,34 @@
 
 namespace AzureDevOps.Model
 {
+    /// <summary>
+    /// DTO for artifacts uses during a release.
+    /// </summary>
     public class AzureDevOpsReleaseArtifact
     {
+        /// <summary>
+        /// Gets or sets source Id.
+        /// </summary>
         public string SourceId { get; set; }
 
+        /// <summary>
+        /// Gets or sets type.
+        /// </summary>
         public string Type { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether primary artifact (trigger).
+        /// </summary>
         public bool IsPrimary { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether artifact is retained.
+        /// </summary>
         public bool IsRetained { get; set; }
 
+        /// <summary>
+        /// Gets or sets definition of the artifact (build).
+        /// </summary>
         public AzureDevOpsDefinitionReference DefinitionReference { get; set; }
     }
 }
