@@ -1,19 +1,36 @@
-﻿using AzureDevOps.Model;
-using System;
-using System.Linq;
+﻿// -----------------------------------------------------------------------
+// <copyright file="ReleaseReport.cs" company="Freek Giele">
+//    This code is licensed under the CC BY License.
+//    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+//    ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+//    TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR
+//    A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace AzureDevOps.Report
 {
+    using System;
+    using System.Linq;
+    using AzureDevOps.Model;
+
     public class ReleaseReport : ReportDefinition, IReport
     {
-        private readonly Guid ReplaceTokenTaskId = new Guid("a8515ec8-7254-4ffd-912c-86772e2b5962");
+        private readonly Guid replaceTokenTaskId = new Guid("a8515ec8-7254-4ffd-912c-86772e2b5962");
+
         public DataOptions DataOptions => DataOptions.Release | DataOptions.ReleaseDetails;
 
         public string Title => $"ReleaseReport-{DateTime.Now:yyyyMMdd-HHmmss}.csv";
 
         public string Generate(AzureDevOpsInstance instance)
         {
-            CreateHeaders("Collection",
+            if (instance == null)
+            {
+                throw new ArgumentNullException(nameof(instance));
+            }
+
+            this.CreateHeaders(
+                            "Collection",
                             "Project",
                             "Release name",
                             "Release date",
@@ -39,7 +56,8 @@ namespace AzureDevOps.Report
                         {
                             foreach (var preDeployApproval in environment.PreDeployApprovals)
                             {
-                                AddLine(collection.Name,
+                                this.AddLine(
+                                        collection.Name,
                                         project.Name,
                                         release.Name,
                                         release.CreatedOn,
@@ -51,7 +69,7 @@ namespace AzureDevOps.Report
                                         preDeployApproval.IsAutomated,
                                         preDeployApproval.IsAutomated ? string.Empty : $"{preDeployApproval.Approver?.DisplayName}",
                                         preDeployApproval.IsAutomated ? string.Empty : $"{preDeployApproval.ApprovedBy?.DisplayName}",
-                                        DeploystepHasTask(environment.DeploySteps.Single(ds => ds.Attempt == preDeployApproval.Attempt), ReplaceTokenTaskId),
+                                        this.DeploystepHasTask(environment.DeploySteps.Single(ds => ds.Attempt == preDeployApproval.Attempt), this.replaceTokenTaskId),
                                         release.Artifacts?.Count() ?? 0,
                                         string.Join(" & ", release.Artifacts?.Select(art => art.DefinitionReference)?.Select(def => $"'{def.Definition.Name} - {def.Version.Name} [{def.Branch.Name}]'")));
                             }
@@ -59,7 +77,8 @@ namespace AzureDevOps.Report
                     }
                 }
             }
-            return GetReport();
+
+            return this.GetReport();
         }
 
         private bool DeploystepHasTask(AzureDevOpsDeployStep deployStep, Guid taskId)

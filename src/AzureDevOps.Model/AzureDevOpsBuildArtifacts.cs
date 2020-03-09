@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="AzureDevOpsPolicy.cs" company="Freek Giele">
+// <copyright file="AzureDevOpsBuildArtifacts.cs" company="Freek Giele">
 //    This code is licensed under the CC BY License.
 //    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
 //    ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
@@ -10,17 +10,14 @@
 
 namespace AzureDevOps.Model
 {
+    using System.Collections.Generic;
     using Newtonsoft.Json;
 
-    public class AzureDevOpsPolicy
+    public class AzureDevOpsBuildArtifacts
     {
-        public bool IsEnabled { get; set; }
+        public int Count { get; set; }
 
-        public bool IsBlocking { get; set; }
-
-        [JsonProperty("type")]
-        public AzureDevOpsPolicyType PolicyType { get; set; }
-
-        public AzureDevOpsPolicySettings Settings { get; set; }
+        [JsonProperty("value")]
+        public IEnumerable<AzureDevOpsBuildArtifact> Artifacts { get; set; }
     }
 }

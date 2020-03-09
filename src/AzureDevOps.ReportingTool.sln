@@ -13,6 +13,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureDevOps.Report", "Azure
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureDevOps.Scanner.Unittest", "AzureDevOps.Scanner.Unittest\AzureDevOps.Scanner.Unittest.csproj", "{71037CEE-4E1B-4833-85DE-A06482E2576B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{2E4EFDA5-5BB0-40C9-9BAA-0C8EF3B256B7}"
+	ProjectSection(SolutionItems) = preProject
+		stylecop.json = stylecop.json
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

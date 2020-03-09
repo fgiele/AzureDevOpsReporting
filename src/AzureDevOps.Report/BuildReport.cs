@@ -1,8 +1,18 @@
-﻿using AzureDevOps.Model;
-using System;
+﻿// -----------------------------------------------------------------------
+// <copyright file="BuildReport.cs" company="Freek Giele">
+//    This code is licensed under the CC BY License.
+//    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+//    ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+//    TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR
+//    A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace AzureDevOps.Report
 {
+    using System;
+    using AzureDevOps.Model;
+
     public class BuildReport : ReportDefinition, IReport
     {
         public DataOptions DataOptions => DataOptions.Build | DataOptions.BuildArtifacts;
@@ -11,7 +21,13 @@ namespace AzureDevOps.Report
 
         public string Generate(AzureDevOpsInstance instance)
         {
-            CreateHeaders("Collection",
+            if (instance == null)
+            {
+                throw new ArgumentNullException(nameof(instance));
+            }
+
+            this.CreateHeaders(
+                "Collection",
                 "Project",
                 "Repistory",
                 "Branch",
@@ -30,7 +46,8 @@ namespace AzureDevOps.Report
                     {
                         foreach (var artifact in build.Artifacts)
                         {
-                            AddLine(collection.Name,
+                            this.AddLine(
+                                    collection.Name,
                                     project.Name,
                                     build.Repository.Name,
                                     build.SourceBranch,
@@ -44,7 +61,8 @@ namespace AzureDevOps.Report
                     }
                 }
             }
-            return GetReport();
+
+            return this.GetReport();
         }
     }
 }

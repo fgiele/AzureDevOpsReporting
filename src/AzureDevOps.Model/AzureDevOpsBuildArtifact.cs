@@ -1,5 +1,12 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿// -----------------------------------------------------------------------
+// <copyright file="AzureDevOpsBuildArtifact.cs" company="Freek Giele">
+//    This code is licensed under the CC BY License.
+//    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+//    ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+//    TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR
+//    A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace AzureDevOps.Model
 {
@@ -10,13 +17,5 @@ namespace AzureDevOps.Model
         public string Name { get; set; }
 
         public AzureDevOpsArtifactResource Resource { get; set; }
-    }
-
-    public class AzureDevOpsBuildArtifacts
-    {
-        public int Count { get; set; }
-
-        [JsonProperty("value")]
-        public IEnumerable<AzureDevOpsBuildArtifact> Artifacts { get; set; }
     }
 }
