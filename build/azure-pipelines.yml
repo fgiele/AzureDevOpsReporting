@@ -38,39 +38,44 @@ steps:
         sonar.exclusions=**/obj/**,**/*.dll
         sonar.branch.name=$(Build.SourceBranchName)
         sonar.msbuild.testProjectPattern=.*test\.csproj$
-        sonar.cobertura.reportPath=$(Agent.TempDirectory)/**/coverage.cobertura.xml
-  - task: DotNetCoreCLI@2
-    displayName: "Build application"
-    inputs:
-      command: 'build'
-      projects: '**/*.sln'
-  - task: DotNetCoreCLI@2
-    displayName: "Unit-test application"
-    inputs:
-      command: 'test'
-      projects: '**/*.Unittest.csproj'
-      arguments: -c $(BuildConfiguration) --collect:"XPlat Code Coverage" -- RunConfiguration.DisableAppDomain=true
+        sonar.cs.opencover.reportsPaths=$(Build.SourcesDirectory)/coverage/coverage.opencover.xml
+
+  - script: dotnet build **/*.sln --configuration "Debug"
+    displayName: 'dotnet build Debug'
+
+  - script: |
+      dotnet test --logger trx --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=$(Build.SourcesDirectory)/coverage/ /p:exclude=\"[Microsoft*]*,[xunit*]*\" **/*.Unittest
+    displayName: 'dotnet test'
+
+  - script: |
+      dotnet tool install dotnet-reportgenerator-globaltool --tool-path . 
+      ./reportgenerator "-reports:$(Build.SourcesDirectory)/coverage/coverage.opencover.xml" "-targetdir:coverage/Cobertura" "-reporttypes:Cobertura;HTMLInline;HTMLChart"
+    condition: eq( variables['Agent.OS'], 'Linux' )
+    displayName: Run Reportgenerator on Linux
+
   - task: SonarCloudAnalyze@1
+
   - task: SonarCloudPublish@1
+    displayName: 'Publish Quality Gate Results'
+
+  - task: PublishTestResults@2
     inputs:
-      pollingTimeoutSec: '300'
-  - task: DotNetCoreCLI@2
-    displayName: Install ReportGenerator tool
-    inputs:
-      command: custom
-      custom: tool
-      arguments: install --tool-path . dotnet-reportgenerator-globaltool
-  - task: reportgenerator@4
-    displayName: Generate Code Coverage Report
-    inputs:
-      reports: $(Agent.TempDirectory)/**/coverage.cobertura.xml
-      targetdir: $(build.artifactstagingdirectory)/TestResults/
-      reporttypes: 'HtmlInline_AzurePipelines;Cobertura'
+      testRunner: VSTest
+      testResultsFiles: '**/*.trx'
+
   - task: PublishCodeCoverageResults@1
-    displayName: 'Publish code coverage'
     inputs:
-      codeCoverageTool: cobertura
-      summaryFileLocation: $(build.artifactstagingdirectory)/TestResults/Cobertura.xml
-      # To make the task not regenerate the report an environment variable was added to the pipeline in Azure DevOps; "disable.coverage.autogenerate: 'true'"
-      # see: https://github.com/danielpalme/ReportGenerator/wiki/Integration#attention
-      reportDirectory: '$(build.artifactstagingdirectory)/TestResults'
+      summaryFileLocation: $(Build.SourcesDirectory)/coverage/Cobertura/Cobertura.xml
+      reportDirectory: $(Build.SourcesDirectory)/coverage/Cobertura
+      codecoverageTool: cobertura
+
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: publish
+      arguments: '--configuration Debug --output $(Build.ArtifactStagingDirectory)'
+      projects: '**/*.sln'
+      publishWebProjects: false
+      modifyOutputPath: true
+      zipAfterPublish: true
+  
+  - task: PublishBuildArtifacts@1
