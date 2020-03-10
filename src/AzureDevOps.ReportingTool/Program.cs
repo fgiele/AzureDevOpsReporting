@@ -19,7 +19,6 @@ namespace AzureDevOps.ReportingTool
     using System.Threading.Tasks;
     using AzureDevOps.Report;
     using AzureDevOps.Scanner;
-    using CommandLine;
 
     /// <summary>
     /// Main entry point for application.
@@ -34,9 +33,23 @@ namespace AzureDevOps.ReportingTool
         /// <param name="args">Program arguments.</param>
         public static void Main(string[] args)
         {
-            Parser.Default.ParseArguments<CommandlineOptions>(args)
-                .WithParsed(async opts =>
-                    await Run(opts.SelectedReports).ConfigureAwait(false));
+            if (args == null)
+            {
+                WriteHelptext();
+            }
+            else
+            {
+                var selectedReports = ParseArguments(args);
+
+                if (selectedReports.Count == 0)
+                {
+                    WriteHelptext();
+                }
+                else
+                {
+                    Run(selectedReports).Wait();
+                }
+            }
         }
 
         private static async Task Run(HashSet<IReport> reports)
@@ -58,49 +71,48 @@ namespace AzureDevOps.ReportingTool
             await Generator.CreateReportsAsync(reports, azureDevOpsInstance, "C:\\Temp\\ComplianceReports").ConfigureAwait(false);
         }
 
-        private class CommandlineOptions
+        private static void WriteHelptext()
         {
-            public HashSet<IReport> SelectedReports { get; } = new HashSet<IReport>();
+            var helptext = $"The following reports are available:" + Environment.NewLine +
+                            $"-a / -all: {nameof(ScanAllReport)}" + Environment.NewLine +
+                            $"-b / -build: {nameof(BuildReport)}" + Environment.NewLine +
+                            $"-g / -git: {nameof(GitRepositoryReport)}" + Environment.NewLine +
+                            $"-r / -release: {nameof(ReleaseReport)}" + Environment.NewLine;
 
-            [Option('a', "all", Required = false, HelpText = "Debug: Run all scans.")]
-            public bool ScanAll
+            Console.WriteLine(helptext);
+        }
+
+        private static HashSet<IReport> ParseArguments(string[] args)
+        {
+            var selectedReports = new HashSet<IReport>();
+
+            foreach (var argument in args)
             {
-                set
+                switch (argument.TrimStart('-').ToUpperInvariant())
                 {
-                    Console.WriteLine($"Option scan-all: {value}");
-                    this.SelectedReports.Add(new ScanAllReport());
+                    case "A":
+                    case "ALL":
+                        selectedReports.Add(new ScanAllReport());
+                        break;
+                    case "B":
+                    case "BUILD":
+                        selectedReports.Add(new BuildReport());
+                        break;
+                    case "G":
+                    case "GIT":
+                        selectedReports.Add(new GitRepositoryReport());
+                        break;
+                    case "R":
+                    case "RELEASE":
+                        selectedReports.Add(new ReleaseReport());
+                        break;
+                    default:
+                        Console.WriteLine($"Unknown option: {argument}");
+                        break;
                 }
             }
 
-            [Option('b', "build", Required = false, HelpText = "Generate the Build report.")]
-            public bool ScanBuild
-            {
-                set
-                {
-                    Console.WriteLine($"Option scan-build: {value}");
-                    this.SelectedReports.Add(new BuildReport());
-                }
-            }
-
-            [Option('g', "git", Required = false, HelpText = "Generate the Git Repository report.")]
-            public bool GitRepositories
-            {
-                set
-                {
-                    Console.WriteLine($"Option git-repositories: {value}");
-                    this.SelectedReports.Add(new GitRepositoryReport());
-                }
-            }
-
-            [Option('r', "release", Required = false, HelpText = "Generate the Release report.")]
-            public bool Release
-            {
-                set
-                {
-                    Console.WriteLine($"Option release: {value}");
-                    this.SelectedReports.Add(new ReleaseReport());
-                }
-            }
+            return selectedReports;
         }
     }
 }
