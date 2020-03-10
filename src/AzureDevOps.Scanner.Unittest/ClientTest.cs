@@ -34,12 +34,6 @@ namespace AzureDevOps.Scanner.Unittest
             this.httpClient = new HttpClient(this.mockHttpMessageHandler.Object);
         }
 
-        private HttpResponseMessage EmptyResponse => new HttpResponseMessage
-        {
-            StatusCode = HttpStatusCode.OK,
-            Content = new StringContent("{\"count\":0,\"value\":[]}"),
-        };
-
         [Fact]
         public async Task ScanAsync_WhenNoProjects_ShouldReturnProperInstance()
         {
@@ -48,7 +42,7 @@ namespace AzureDevOps.Scanner.Unittest
                 mh => mh.Send(
                         It.Is<HttpRequestMessage>(
                             req => req.RequestUri.ToString() == $"{ExpectedUrl}/{ExpectedCollection}/_apis/projects")))
-                .Returns(this.EmptyResponse);
+                .Returns(EmptyResponse);
             var systemUnderTest = new Client(this.httpClient);
 
             // Act
@@ -72,7 +66,7 @@ namespace AzureDevOps.Scanner.Unittest
                         It.Is<HttpRequestMessage>(
                             req => req.RequestUri.ToString() == $"{ExpectedUrl}/{expectedCollection1}/_apis/projects" ||
                                     req.RequestUri.ToString() == $"{ExpectedUrl}/{expectedCollection2}/_apis/projects")))
-                .Returns(this.EmptyResponse);
+                .Returns(EmptyResponse);
             var systemUnderTest = new Client(this.httpClient);
 
             // Act
@@ -94,7 +88,7 @@ namespace AzureDevOps.Scanner.Unittest
                     mh => mh.Send(
                         It.Is<HttpRequestMessage>(
                             req => req.RequestUri.ToString() == $"{azureUrl}/{ExpectedCollection}/_apis/projects")))
-                .Returns(this.EmptyResponse);
+                .Returns(EmptyResponse);
             var systemUnderTest = new Client(this.httpClient);
 
             // Act
@@ -119,7 +113,7 @@ namespace AzureDevOps.Scanner.Unittest
                         It.Is<HttpRequestMessage>(
                             req => req.RequestUri.ToString() == $"{azureUrl}/{expectedCollection1}/_apis/projects" ||
                                     req.RequestUri.ToString() == $"{azureUrl}/{expectedCollection2}/_apis/projects")))
-                .Returns(this.EmptyResponse);
+                .Returns(EmptyResponse);
             var systemUnderTest = new Client(this.httpClient);
 
             // Act
@@ -141,7 +135,7 @@ namespace AzureDevOps.Scanner.Unittest
                     mh => mh.Send(
                         It.Is<HttpRequestMessage>(
                             req => req.RequestUri.ToString() == $"{ExpectedUrl}/{ExpectedCollection}/{this.expectedProject.Id}/_apis/build/builds")))
-                .Returns(this.EmptyResponse);
+                .Returns(EmptyResponse);
             var systemUnderTest = new Client(this.httpClient);
 
             // Act
@@ -213,7 +207,7 @@ namespace AzureDevOps.Scanner.Unittest
                     mh => mh.Send(
                         It.Is<HttpRequestMessage>(
                             req => req.RequestUri.ToString() == $"{ExpectedUrl}/{ExpectedCollection}/{this.expectedProject.Id}/_apis/release/releases")))
-                .Returns(this.EmptyResponse);
+                .Returns(EmptyResponse);
             var systemUnderTest = new Client(this.httpClient);
 
             // Act
@@ -284,7 +278,7 @@ namespace AzureDevOps.Scanner.Unittest
                     mh => mh.Send(
                         It.Is<HttpRequestMessage>(
                             req => req.RequestUri.ToString() == $"{ExpectedUrl}/{ExpectedCollection}/{this.expectedProject.Id}/_apis/git/repositories?api-version=5.0")))
-                .Returns(this.EmptyResponse);
+                .Returns(EmptyResponse);
 
             var systemUnderTest = new Client(this.httpClient);
 

@@ -26,21 +26,20 @@ namespace AzureDevOps.ReportingTool
     /// </summary>
     public static class Program
     {
-        private static readonly HashSet<IReport> Reports = new HashSet<IReport>();
         private static readonly HttpClient HttpClient = new HttpClient();
 
         /// <summary>
         /// Main entry point for application.
         /// </summary>
         /// <param name="args">Program arguments.</param>
-        /// <returns>Async call, task.</returns>
-        public static async Task Main(string[] args)
+        public static void Main(string[] args)
         {
-            Parser.Default.ParseArguments<Options>(args);
-            await Run().ConfigureAwait(false);
+            Parser.Default.ParseArguments<CommandlineOptions>(args)
+                .WithParsed(async opts =>
+                    await Run(opts.SelectedReports).ConfigureAwait(false));
         }
 
-        private static async Task Run()
+        private static async Task Run(HashSet<IReport> reports)
         {
             var azDOUrl = new Uri(ConfigurationManager.AppSettings.Get("AzureDevOps.URL"));
             var pat = ConfigurationManager.AppSettings.Get("AzureDevOps.PAT");
@@ -53,21 +52,23 @@ namespace AzureDevOps.ReportingTool
 
             var scanClient = new Client(HttpClient);
 
-            var dataOptions = Reports.Select(rep => rep.DataOptions).Aggregate((x, y) => x | y);
+            var dataOptions = reports.Select(rep => rep.DataOptions).Aggregate((x, y) => x | y);
 
             var azureDevOpsInstance = await scanClient.ScanAsync(dataOptions, ConfigurationManager.AppSettings.Get("AzureDevOps.Collections").Split(';'), azDOUrl).ConfigureAwait(false);
-            await Generator.CreateReportsAsync(Reports, azureDevOpsInstance, "C:\\Temp\\ComplianceReports").ConfigureAwait(false);
+            await Generator.CreateReportsAsync(reports, azureDevOpsInstance, "C:\\Temp\\ComplianceReports").ConfigureAwait(false);
         }
 
-        private class Options
+        private class CommandlineOptions
         {
+            public HashSet<IReport> SelectedReports { get; } = new HashSet<IReport>();
+
             [Option('a', "all", Required = false, HelpText = "Debug: Run all scans.")]
             public bool ScanAll
             {
                 set
                 {
-                    Console.WriteLine($"Option: {value}");
-                    Reports.Add(new ScanAllReport());
+                    Console.WriteLine($"Option scan-all: {value}");
+                    this.SelectedReports.Add(new ScanAllReport());
                 }
             }
 
@@ -76,8 +77,8 @@ namespace AzureDevOps.ReportingTool
             {
                 set
                 {
-                    Console.WriteLine($"Option: {value}");
-                    Reports.Add(new BuildReport());
+                    Console.WriteLine($"Option scan-build: {value}");
+                    this.SelectedReports.Add(new BuildReport());
                 }
             }
 
@@ -86,8 +87,8 @@ namespace AzureDevOps.ReportingTool
             {
                 set
                 {
-                    Console.WriteLine($"Option: {value}");
-                    Reports.Add(new GitRepositoryReport());
+                    Console.WriteLine($"Option git-repositories: {value}");
+                    this.SelectedReports.Add(new GitRepositoryReport());
                 }
             }
 
@@ -96,8 +97,8 @@ namespace AzureDevOps.ReportingTool
             {
                 set
                 {
-                    Console.WriteLine($"Option: {value}");
-                    Reports.Add(new ReleaseReport());
+                    Console.WriteLine($"Option release: {value}");
+                    this.SelectedReports.Add(new ReleaseReport());
                 }
             }
         }

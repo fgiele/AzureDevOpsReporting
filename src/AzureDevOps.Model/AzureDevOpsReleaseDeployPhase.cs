@@ -13,7 +13,7 @@ namespace AzureDevOps.Model
     using System.Collections.Generic;
 
     /// <summary>
-    /// DTO for Release deployment phase
+    /// DTO for Release deployment phase.
     /// </summary>
     public class AzureDevOpsReleaseDeployPhase
     {

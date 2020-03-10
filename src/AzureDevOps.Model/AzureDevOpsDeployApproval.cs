@@ -13,7 +13,7 @@ namespace AzureDevOps.Model
     using System;
 
     /// <summary>
-    /// DTO for deployment approval
+    /// DTO for deployment approval.
     /// </summary>
     public class AzureDevOpsDeployApproval
     {

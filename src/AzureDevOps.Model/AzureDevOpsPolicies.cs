@@ -14,7 +14,7 @@ namespace AzureDevOps.Model
     using Newtonsoft.Json;
 
     /// <summary>
-    /// DTO for policies
+    /// DTO for policies.
     /// </summary>
     public class AzureDevOpsPolicies
     {

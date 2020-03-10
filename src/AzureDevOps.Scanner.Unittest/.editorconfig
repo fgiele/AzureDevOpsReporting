@@ -1,10 +1,10 @@
 ﻿[*.cs]
 
-# CA1707: Identifiers should not contain underscores
+# CA1707: Identifiers should not contain underscores => Invalid because these are testcases: Action_conditions_expectedResponse
 dotnet_diagnostic.CA1707.severity = none
 
-# SA1600: Elements should be documented
+# SA1600: Elements should be documented => Suppressed for test project
 dotnet_diagnostic.SA1600.severity = none
 
-#SA1601 : Partial elements should be documented
+#SA1601 : Partial elements should be documented => Suppressed for test project
 dotnet_diagnostic.SA1601.severity = none

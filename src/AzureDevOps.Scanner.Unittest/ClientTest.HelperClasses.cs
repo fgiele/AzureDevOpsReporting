@@ -106,6 +106,12 @@ namespace AzureDevOps.Scanner.Unittest
                     .Build())
                 .Build();
 
+        private static HttpResponseMessage EmptyResponse => new HttpResponseMessage
+        {
+            StatusCode = HttpStatusCode.OK,
+            Content = new StringContent("{\"count\":0,\"value\":[]}"),
+        };
+
         private HttpResponseMessage OneProjectResponse => new HttpResponseMessage
         {
             StatusCode = HttpStatusCode.OK,

@@ -14,7 +14,7 @@ namespace AzureDevOps.Model
     using Newtonsoft.Json;
 
     /// <summary>
-    /// DTO for builds
+    /// DTO for builds.
     /// </summary>
     public class AzureDevOpsBuilds
     {
