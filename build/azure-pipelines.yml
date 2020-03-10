@@ -44,7 +44,7 @@ steps:
     displayName: 'dotnet build Debug'
 
   - script: |
-      dotnet test --logger trx --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=$(Build.SourcesDirectory)/coverage/ **/*.Unittest
+      dotnet test --logger trx /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=$(Build.SourcesDirectory)/coverage/ **/*.Unittest
     displayName: 'dotnet test'
 
   - script: |
