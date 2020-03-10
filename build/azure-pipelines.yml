@@ -18,6 +18,7 @@ variables:
 
 steps:
   - task: UseDotNet@2
+    displayName: "Install .Net Core 2 for SonarQube"
     inputs:
       packageType: 'runtime'
       version: '2.0.0'
@@ -33,6 +34,11 @@ steps:
       scannerMode: 'MSBuild'
       projectKey: 'ComplianceReporting'
       projectName: 'ComplianceReporting'
+      extraProperties: |
+        sonar.exclusions=**/obj/**,**/*.dll
+        sonar.branch.name=$(Build.SourceBranchName)
+        sonar.msbuild.testProjectPattern=.*test\.csproj$
+        sonar.cobertura.reportPath=$(Agent.TempDirectory)/**/coverage.cobertura.xml
   - task: DotNetCoreCLI@2
     displayName: "Build application"
     inputs:

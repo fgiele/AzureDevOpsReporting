@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="AzureDevOpsDeployStep.cs" company="Freek Giele">
+// <copyright file="AzureDevOpsBuildArtifacts.cs" company="Freek Giele">
 //    This code is licensed under the CC BY License.
 //    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
 //    ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
@@ -11,20 +11,22 @@
 namespace AzureDevOps.Model
 {
     using System.Collections.Generic;
+    using Newtonsoft.Json;
 
     /// <summary>
-    /// DTO for deployment step.
+    /// DTO for build artifacts.
     /// </summary>
-    public class AzureDevOpsDeployStep
+    public class AzureDevOpsBuildArtifacts
     {
         /// <summary>
-        /// Gets or sets number of deployment attempt.
+        /// Gets or sets number of found build artifacts.
         /// </summary>
-        public int Attempt { get; set; }
+        public int Count { get; set; }
 
         /// <summary>
-        /// Gets or sets release deployment phases in attempt.
+        /// Gets or sets list of build artifacts.
         /// </summary>
-        public IEnumerable<AzureDevOpsReleaseDeployPhase> ReleaseDeployPhases { get; set; }
+        [JsonProperty("value")]
+        public IEnumerable<AzureDevOpsBuildArtifact> Artifacts { get; set; }
     }
 }
