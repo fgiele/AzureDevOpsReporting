@@ -78,8 +78,8 @@ steps:
   - task: DotNetCoreCLI@2
     inputs:
       command: publish
-      arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
-      projects: $(solution)
+      arguments: '--configuration Debug --output $(Build.ArtifactStagingDirectory)'
+      projects: '**/*.sln'
       publishWebProjects: false
       modifyOutputPath: true
       zipAfterPublish: true
