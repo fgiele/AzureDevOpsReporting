@@ -22,6 +22,7 @@ namespace AzureDevOps.ReportingTool.Unittest
     public class ReportToolTest
     {
         private const string NoReportsFile = "NoReportsSettings.json";
+        private const string InvalidReportsFile = "InvalidReportsSettings.json";
         private const string AllReportsFile = "AllReportsSettings.json";
 
         [Fact]
@@ -83,6 +84,22 @@ namespace AzureDevOps.ReportingTool.Unittest
 
             // Act
             systemUnderTest.Main(NoReportsFile);
+
+            // Assert
+            clientMock.Verify(cli => cli.ScanAsync(It.IsAny<DataOptions>(), It.IsAny<IEnumerable<string>>(), It.IsAny<Uri>()), Times.Never);
+            generatorMock.Verify(gen => gen.CreateReportsAsync(It.IsAny<IEnumerable<IReport>>(), It.IsAny<AzureDevOpsInstance>(), It.IsAny<string>()), Times.Never);
+        }
+
+        [Fact]
+        public void Main_WhenInvalidReport_ShouldNotStartProcessing()
+        {
+            // Arrange
+            var clientMock = new Mock<IClient>();
+            var generatorMock = new Mock<IGenerator>();
+            var systemUnderTest = new ReportTool(clientMock.Object, generatorMock.Object);
+
+            // Act
+            systemUnderTest.Main(InvalidReportsFile);
 
             // Assert
             clientMock.Verify(cli => cli.ScanAsync(It.IsAny<DataOptions>(), It.IsAny<IEnumerable<string>>(), It.IsAny<Uri>()), Times.Never);

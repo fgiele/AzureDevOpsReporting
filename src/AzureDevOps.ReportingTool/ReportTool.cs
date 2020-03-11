@@ -61,10 +61,10 @@ namespace AzureDevOps.ReportingTool
 
             var config = configBuilder.Build();
             ReportConfiguration appConfiguration = ConfigurationBinder.Get<ReportConfiguration>(config);
+            var selectedReports = ParseReports(appConfiguration.Reports ?? Array.Empty<string>());
 
-            if ((appConfiguration.Reports ?? Array.Empty<string>()).Any())
+            if (selectedReports.Any())
             {
-                var selectedReports = ParseReports(appConfiguration.Reports);
                 this.Run(selectedReports, appConfiguration.AzureDevOps).Wait();
             }
             else
