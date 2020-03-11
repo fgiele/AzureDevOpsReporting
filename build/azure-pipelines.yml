@@ -40,11 +40,11 @@ steps:
         sonar.msbuild.testProjectPattern=.*test\.csproj$
         sonar.cs.opencover.reportsPaths=$(Build.SourcesDirectory)/coverage/coverage.opencover.xml
 
-  - script: dotnet build **/*.sln --configuration "Debug"
+  - script: dotnet build AzureDevOps.ReportingTool.sln --configuration "Debug"
     displayName: 'dotnet build Debug'
 
   - script: |
-      dotnet test --logger trx --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=$(Build.SourcesDirectory)/coverage/ /p:exclude=\"[Microsoft*]*,[xunit*]*\" **/*.Unittest
+      dotnet test --logger trx --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=$(Build.SourcesDirectory)/coverage/ /p:exclude=\"[Microsoft*]*,[xunit*]*\" test/**/*.Unittest
     displayName: 'dotnet test'
 
   - script: |
