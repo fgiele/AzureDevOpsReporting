@@ -49,7 +49,7 @@ steps:
 
   - script: |
       dotnet tool install dotnet-reportgenerator-globaltool --tool-path . 
-      ./reportgenerator "-reports:$(Build.SourcesDirectory)/coverage/coverage.json" "-targetdir:coverage/Cobertura" "-reporttypes:Cobertura;HTMLInline;HTMLChart"
+      ./reportgenerator "-reports:$(Build.SourcesDirectory)/coverage/coverage.opencover.xml" "-targetdir:coverage/Cobertura" "-reporttypes:Cobertura;HTMLInline;HTMLChart"
     condition: eq( variables['Agent.OS'], 'Linux' )
     displayName: Run Reportgenerator on Linux
 
@@ -66,7 +66,7 @@ steps:
   - task: PublishCodeCoverageResults@1
     inputs:
       summaryFileLocation: $(Build.SourcesDirectory)/coverage/Cobertura/Cobertura.xml
-      reportDirectory: $(Build.SourcesDirectory)/coverage/Cobertura
+      reportDirectory: $(Build.SourcesDirectory)/coverage/coverage.opencover.xml
       codecoverageTool: cobertura
 
   - task: DotNetCoreCLI@2

@@ -11,7 +11,10 @@
 namespace AzureDevOps.ReportingTool
 {
     using System;
+    using System.Globalization;
     using System.Net.Http;
+    using System.Reflection;
+    using System.Resources;
     using AzureDevOps.Report;
     using AzureDevOps.Scanner;
     using Microsoft.Extensions.Configuration;
@@ -31,9 +34,12 @@ namespace AzureDevOps.ReportingTool
         /// <param name="args">Program arguments.</param>
         public static void Main(string[] args)
         {
+            ResourceManager rm = new ResourceManager("AzureDevOps.ReportingTool.ErrorResource", Assembly.GetExecutingAssembly());
+            var errorMessage = rm.GetString("InvalidOrMissingConfig", CultureInfo.InvariantCulture);
+
             if (args == null)
             {
-                Console.WriteLine($"Please provide configuration filepath with --{ConfigKey} <ConfigFile>.");
+                Console.WriteLine(errorMessage);
             }
             else
             {
@@ -45,7 +51,7 @@ namespace AzureDevOps.ReportingTool
 
                 if (string.IsNullOrWhiteSpace(configFile))
                 {
-                    Console.WriteLine($"Please provide configuration filepath with --{ConfigKey} <ConfigFile>.");
+                    Console.WriteLine(errorMessage);
                 }
                 else
                 {
