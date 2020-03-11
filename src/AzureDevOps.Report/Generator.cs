@@ -35,6 +35,11 @@ namespace AzureDevOps.Report
                 throw new ArgumentNullException(nameof(reports));
             }
 
+            if (azureDevOpsInstance == null)
+            {
+                throw new ArgumentNullException(nameof(azureDevOpsInstance));
+            }
+
             if (!Directory.Exists(reportFolder))
             {
                 throw new DirectoryNotFoundException(reportFolder);

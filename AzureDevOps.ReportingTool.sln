@@ -20,6 +20,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureDevOps.Scanner.Unittes
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureDevOps.ReportingTool.Unittest", "test\AzureDevOps.ReportingTool.Unittest\AzureDevOps.ReportingTool.Unittest.csproj", "{379D0C39-C0B9-4779-8820-4E3D0AC728F9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureDevOps.Report.Unittest", "test\AzureDevOps.Report.Unittest\AzureDevOps.Report.Unittest.csproj", "{D7915B6D-DF73-482A-973E-621C6AE6AC01}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -50,6 +52,10 @@ Global
 		{379D0C39-C0B9-4779-8820-4E3D0AC728F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{379D0C39-C0B9-4779-8820-4E3D0AC728F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{379D0C39-C0B9-4779-8820-4E3D0AC728F9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D7915B6D-DF73-482A-973E-621C6AE6AC01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7915B6D-DF73-482A-973E-621C6AE6AC01}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7915B6D-DF73-482A-973E-621C6AE6AC01}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7915B6D-DF73-482A-973E-621C6AE6AC01}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
