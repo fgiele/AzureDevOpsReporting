@@ -21,10 +21,8 @@ namespace AzureDevOps.Scanner
     /// <summary>
     /// Scanning client for AzureDevOps instance. Handles collection of data.
     /// </summary>
-    public class Client
+    public class Client : IClient
     {
-        private readonly HttpClient restClient;
-
         private int projectsDoneCount = 0;
 
         /// <summary>
@@ -33,8 +31,13 @@ namespace AzureDevOps.Scanner
         /// <param name="httpClient">HttpClient static reference.</param>
         public Client(HttpClient httpClient)
         {
-            this.restClient = httpClient;
+            this.RestClient = httpClient;
         }
+
+        /// <summary>
+        /// Gets httpClient used for rest calls.
+        /// </summary>
+        public HttpClient RestClient { get; private set; }
 
         /// <summary>
         /// Starts the scanning process of the Azure DevOps instance.
@@ -90,7 +93,7 @@ namespace AzureDevOps.Scanner
 
         private async Task<AzureDevOpsCollection> ScanCollectionAsync(DataOptions dataOptions, string collection, string azureDevOpsUrl)
         {
-            HttpResponseMessage httpProjectResponse = await this.restClient.GetAsync(new Uri($"{azureDevOpsUrl}{collection}/_apis/projects")).ConfigureAwait(false);
+            HttpResponseMessage httpProjectResponse = await this.RestClient.GetAsync(new Uri($"{azureDevOpsUrl}{collection}/_apis/projects")).ConfigureAwait(false);
             var responseProjectContent = await httpProjectResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
             var projectResult = JsonConvert.DeserializeObject<AzureDevOpsProjects>(responseProjectContent);
 
@@ -148,7 +151,7 @@ namespace AzureDevOps.Scanner
                 return null;
             }
 
-            HttpResponseMessage httpBuildResponse = await this.restClient.GetAsync(new Uri($"{projectUrl}/_apis/build/builds")).ConfigureAwait(false);
+            HttpResponseMessage httpBuildResponse = await this.RestClient.GetAsync(new Uri($"{projectUrl}/_apis/build/builds")).ConfigureAwait(false);
             var responseBuildContent = await httpBuildResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
             var buildresult = JsonConvert.DeserializeObject<AzureDevOpsBuilds>(responseBuildContent);
 
@@ -173,7 +176,7 @@ namespace AzureDevOps.Scanner
 
         private async Task<AzureDevOpsBuild> ScanBuildAsync(AzureDevOpsBuild build)
         {
-            HttpResponseMessage httpArtifactResponse = await this.restClient.GetAsync(new Uri($"{build.Url}/artifacts?api-version=5.1")).ConfigureAwait(false);
+            HttpResponseMessage httpArtifactResponse = await this.RestClient.GetAsync(new Uri($"{build.Url}/artifacts?api-version=5.1")).ConfigureAwait(false);
             var artifactResponseContent = await httpArtifactResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
             build.Artifacts = JsonConvert.DeserializeObject<AzureDevOpsBuildArtifacts>(artifactResponseContent).Artifacts;
             return build;
@@ -189,7 +192,7 @@ namespace AzureDevOps.Scanner
 
             // Azure DevOps services uses a different host for release management Rest calls
             projectUrl = projectUrl.Replace("https://dev.azure.com", "https://vsrm.dev.azure.com", StringComparison.OrdinalIgnoreCase);
-            HttpResponseMessage httpReleaseResponse = await this.restClient.GetAsync(new Uri($"{projectUrl}/_apis/release/releases")).ConfigureAwait(false);
+            HttpResponseMessage httpReleaseResponse = await this.RestClient.GetAsync(new Uri($"{projectUrl}/_apis/release/releases")).ConfigureAwait(false);
             var responseReleaseContent = await httpReleaseResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
             var releaseresult = JsonConvert.DeserializeObject<AzureDevOpsReleases>(responseReleaseContent);
 
@@ -214,7 +217,7 @@ namespace AzureDevOps.Scanner
 
         private async Task<AzureDevOpsRelease> ScanReleaseDetailAsync(AzureDevOpsRelease release)
         {
-            HttpResponseMessage httpReleaseDetailResponse = await this.restClient.GetAsync(new Uri($"{release.Url}")).ConfigureAwait(false);
+            HttpResponseMessage httpReleaseDetailResponse = await this.RestClient.GetAsync(new Uri($"{release.Url}")).ConfigureAwait(false);
             var releaseDetailResponseContent = await httpReleaseDetailResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
             return JsonConvert.DeserializeObject<AzureDevOpsRelease>(releaseDetailResponseContent);
         }
@@ -227,7 +230,7 @@ namespace AzureDevOps.Scanner
                 return null;
             }
 
-            HttpResponseMessage httpRepositoriesResponse = await this.restClient.GetAsync(new Uri($"{projectUrl}/_apis/git/repositories?api-version=5.0")).ConfigureAwait(false);
+            HttpResponseMessage httpRepositoriesResponse = await this.RestClient.GetAsync(new Uri($"{projectUrl}/_apis/git/repositories?api-version=5.0")).ConfigureAwait(false);
             var policiesResponseContent = await httpRepositoriesResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
             var repositoryResult = JsonConvert.DeserializeObject<AzureDevOpsRepositories>(policiesResponseContent);
 
@@ -252,7 +255,7 @@ namespace AzureDevOps.Scanner
 
         private async Task<AzureDevOpsRepository> ScanBranchPoliciesAsync(string projectUrl, AzureDevOpsRepository repository, string branchName = "refs/heads/master")
         {
-            HttpResponseMessage httpPoliciesResponse = await this.restClient.GetAsync(new Uri($"{projectUrl}/_apis/git/policy/configurations?repositoryId={repository.Id}&refName={branchName}")).ConfigureAwait(false);
+            HttpResponseMessage httpPoliciesResponse = await this.RestClient.GetAsync(new Uri($"{projectUrl}/_apis/git/policy/configurations?repositoryId={repository.Id}&refName={branchName}")).ConfigureAwait(false);
             var policiesResponseContent = await httpPoliciesResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
             repository.Policies = JsonConvert.DeserializeObject<AzureDevOpsPolicies>(policiesResponseContent).Policies;
             return repository;

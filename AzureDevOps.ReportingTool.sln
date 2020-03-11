@@ -3,20 +3,22 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29728.190
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureDevOps.ReportingTool", "AzureDevOps.ReportingTool\AzureDevOps.ReportingTool.csproj", "{B02BD7AA-A34D-4B60-AE83-C297BABC6C6F}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureDevOps.Model", "AzureDevOps.Model\AzureDevOps.Model.csproj", "{AB99ABA1-4D41-4446-BE5E-FB24C2B23200}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureDevOps.Scanner", "AzureDevOps.Scanner\AzureDevOps.Scanner.csproj", "{6E96CE9B-8655-49B6-A6A8-EB9B7C83E8EB}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureDevOps.Report", "AzureDevOps.Report\AzureDevOps.Report.csproj", "{7B23EFE8-0530-434C-940B-ADFB58E5C8EF}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureDevOps.Scanner.Unittest", "AzureDevOps.Scanner.Unittest\AzureDevOps.Scanner.Unittest.csproj", "{71037CEE-4E1B-4833-85DE-A06482E2576B}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{2E4EFDA5-5BB0-40C9-9BAA-0C8EF3B256B7}"
 	ProjectSection(SolutionItems) = preProject
-		stylecop.json = stylecop.json
+		src\stylecop.json = src\stylecop.json
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureDevOps.ReportingTool", "src\AzureDevOps.ReportingTool\AzureDevOps.ReportingTool.csproj", "{B02BD7AA-A34D-4B60-AE83-C297BABC6C6F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureDevOps.Model", "src\AzureDevOps.Model\AzureDevOps.Model.csproj", "{AB99ABA1-4D41-4446-BE5E-FB24C2B23200}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureDevOps.Scanner", "src\AzureDevOps.Scanner\AzureDevOps.Scanner.csproj", "{6E96CE9B-8655-49B6-A6A8-EB9B7C83E8EB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureDevOps.Report", "src\AzureDevOps.Report\AzureDevOps.Report.csproj", "{7B23EFE8-0530-434C-940B-ADFB58E5C8EF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureDevOps.Scanner.Unittest", "test\AzureDevOps.Scanner.Unittest\AzureDevOps.Scanner.Unittest.csproj", "{71037CEE-4E1B-4833-85DE-A06482E2576B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureDevOps.ReportingTool.Unittest", "test\AzureDevOps.ReportingTool.Unittest\AzureDevOps.ReportingTool.Unittest.csproj", "{379D0C39-C0B9-4779-8820-4E3D0AC728F9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,6 +46,10 @@ Global
 		{71037CEE-4E1B-4833-85DE-A06482E2576B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{71037CEE-4E1B-4833-85DE-A06482E2576B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{71037CEE-4E1B-4833-85DE-A06482E2576B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{379D0C39-C0B9-4779-8820-4E3D0AC728F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{379D0C39-C0B9-4779-8820-4E3D0AC728F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{379D0C39-C0B9-4779-8820-4E3D0AC728F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{379D0C39-C0B9-4779-8820-4E3D0AC728F9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
