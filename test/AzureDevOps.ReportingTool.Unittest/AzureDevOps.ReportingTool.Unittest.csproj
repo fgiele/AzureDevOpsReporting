@@ -43,4 +43,13 @@
     <ProjectReference Include="..\..\src\AzureDevOps.ReportingTool\AzureDevOps.ReportingTool.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="AllReportsSettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="NoReportsSettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

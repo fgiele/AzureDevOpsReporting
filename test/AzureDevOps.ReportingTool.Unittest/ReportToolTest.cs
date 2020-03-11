@@ -21,8 +21,8 @@ namespace AzureDevOps.ReportingTool.Unittest
 
     public class ReportToolTest
     {
-        private const string NoReportsFile = "..\\..\\..\\NoReportsSettings.json";
-        private const string AllReportsFile = "..\\..\\..\\AllReportsSettings.json";
+        private const string NoReportsFile = "NoReportsSettings.json";
+        private const string AllReportsFile = "AllReportsSettings.json";
 
         [Fact]
         public void Main_WhenArgumentNull_ThrowsArgumentNullException()
