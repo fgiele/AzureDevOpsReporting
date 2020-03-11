@@ -66,7 +66,6 @@ steps:
   - task: PublishCodeCoverageResults@1
     inputs:
       summaryFileLocation: $(Build.SourcesDirectory)/coverage/Cobertura/Cobertura.xml
-      reportDirectory: $(Build.SourcesDirectory)/coverage/coverage.opencover.xml
       codecoverageTool: cobertura
 
   - task: DotNetCoreCLI@2
