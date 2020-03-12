@@ -44,14 +44,22 @@ steps:
     displayName: 'dotnet build Debug'
 
   - script: |
-      dotnet test --logger trx --no-build /p:CollectCoverage=true  /p:CoverletOutputFormat='json%2copencover' /p:CoverletOutput=$(Build.SourcesDirectory)/coverage/ /p:MergeWith=$(Build.SourcesDirectory)/coverage/coverage.json /p:exclude=\"[Microsoft*]*,[xunit*]*\" AzureDevOps.ReportingTool.sln
-    displayName: 'dotnet test'
+      dotnet test --logger trx --no-build /p:CollectCoverage=true  /p:CoverletOutputFormat='opencover' /p:CoverletOutput=$(Build.SourcesDirectory)/coverage/reports/ /p:exclude=\"[Microsoft*]*,[xunit*]*\" test/AzureDevOps.Report.Unittest/AzureDevOps.Report.Unittest.csproj
+    displayName: 'dotnet test Reports'
+
+  - script: |
+      dotnet test --logger trx --no-build /p:CollectCoverage=true  /p:CoverletOutputFormat='opencover' /p:CoverletOutput=$(Build.SourcesDirectory)/coverage/reportingtool/ /p:exclude=\"[Microsoft*]*,[xunit*]*\" test/AzureDevOps.ReportingTool.Unittest/AzureDevOps.ReportingTool.Unittest.csproj
+    displayName: 'dotnet test ReportTool'
+
+  - script: |
+      dotnet test --logger trx --no-build /p:CollectCoverage=true  /p:CoverletOutputFormat='opencover' /p:CoverletOutput=$(Build.SourcesDirectory)/coverage/scanner/ /p:exclude=\"[Microsoft*]*,[xunit*]*\" test/AzureDevOps.Scanner.Unittest/AzureDevOps.Scanner.Unittest.csproj
+    displayName: 'dotnet test Scanner'
 
   - script: |
       dotnet tool install dotnet-reportgenerator-globaltool --tool-path . 
-      ./reportgenerator "-reports:$(Build.SourcesDirectory)/coverage/coverage.opencover.xml" "-targetdir:coverage/Cobertura" "-reporttypes:Cobertura;HTMLInline;HTMLChart"
+      ./reportgenerator "-reports:$(Build.SourcesDirectory)/coverage/*/coverage.opencover.xml" "-targetdir:coverage/Cobertura" "-reporttypes:Cobertura;HTMLInline;HTMLChart"
     condition: eq( variables['Agent.OS'], 'Linux' )
-    displayName: Run Reportgenerator on Linux
+    displayName: 'Run Reportgenerator on Linux, join reports'
 
   - task: SonarCloudAnalyze@1
 
@@ -70,6 +78,7 @@ steps:
       codecoverageTool: cobertura
 
   - task: DotNetCoreCLI@2
+    displayName: 'Publish dotnet output'
     inputs:
       command: publish
       arguments: '--configuration Debug --output $(Build.ArtifactStagingDirectory)'
