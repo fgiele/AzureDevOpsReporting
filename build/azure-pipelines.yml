@@ -78,6 +78,7 @@ steps:
       codecoverageTool: cobertura
 
   - task: DotNetCoreCLI@2
+    displayName: 'Publish dotnet output'
     inputs:
       command: publish
       arguments: '--configuration Debug --output $(Build.ArtifactStagingDirectory)'
