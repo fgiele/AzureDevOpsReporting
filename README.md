@@ -9,4 +9,5 @@ Since a process is only as useful as compliance to the workflow, this software e
 The code is build in .NET Core, using the REST API of Azure DevOps to enable connectivity to both on-premise and cloud services. All information is collected in an in-memory model, after which a report is generated. The only dependencies this software has is an operating system capable of running .NET Core and network connectivity to the environment to be monitored.
 
 [![Build Status](https://dev.azure.com/fgi/AzureDevOps/_apis/build/status/fgiele.AzureDevOpsReporting?branchName=master)](https://dev.azure.com/fgi/AzureDevOps/_build/latest?definitionId=5&branchName=master)
+
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=ComplianceReporting&metric=alert_status)](https://sonarcloud.io/dashboard?id=ComplianceReporting)
