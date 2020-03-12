@@ -1,0 +1,10 @@
+{
+  "AzureDevOps": {
+    "PAT": "123456789",
+    "URL": "https://www.example.com/",
+    "Collections": [
+      "DefaultCollection"
+    ]
+  },
+  "Reports": ["NOSUCHREPORT"]
+}

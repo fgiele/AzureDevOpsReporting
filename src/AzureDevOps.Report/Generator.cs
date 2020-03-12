@@ -19,7 +19,7 @@ namespace AzureDevOps.Report
     /// <summary>
     /// Generates the reports based on collected information and report definitions.
     /// </summary>
-    public static class Generator
+    public class Generator : IGenerator
     {
         /// <summary>
         /// Parses the data from Azure DevOps and based on the requested reports produces files.
@@ -28,11 +28,16 @@ namespace AzureDevOps.Report
         /// <param name="azureDevOpsInstance">Instance object holding the Azure DevOps scanned data.</param>
         /// <param name="reportFolder">Location to write the reports to.</param>
         /// <returns>Task object/ async function.</returns>
-        public static Task CreateReportsAsync(IEnumerable<IReport> reports, AzureDevOpsInstance azureDevOpsInstance, string reportFolder)
+        public Task CreateReportsAsync(IEnumerable<IReport> reports, AzureDevOpsInstance azureDevOpsInstance, string reportFolder)
         {
             if (reports == null)
             {
                 throw new ArgumentNullException(nameof(reports));
+            }
+
+            if (azureDevOpsInstance == null)
+            {
+                throw new ArgumentNullException(nameof(azureDevOpsInstance));
             }
 
             if (!Directory.Exists(reportFolder))
@@ -40,7 +45,7 @@ namespace AzureDevOps.Report
                 throw new DirectoryNotFoundException(reportFolder);
             }
 
-            return ProcessReports(reports, azureDevOpsInstance, reportFolder);
+            return this.ProcessReports(reports, azureDevOpsInstance, reportFolder);
         }
 
         private static async Task WriteReportAsync(string reportFilePath, string report)
@@ -49,7 +54,7 @@ namespace AzureDevOps.Report
             Console.WriteLine($"Report generated: {reportFilePath}");
         }
 
-        private static async Task ProcessReports(IEnumerable<IReport> reports, AzureDevOpsInstance azureDevOpsInstance, string reportFolder)
+        private async Task ProcessReports(IEnumerable<IReport> reports, AzureDevOpsInstance azureDevOpsInstance, string reportFolder)
         {
             var reportTasks = new HashSet<Task>();
             foreach (var report in reports)

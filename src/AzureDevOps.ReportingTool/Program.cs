@@ -11,20 +11,21 @@
 namespace AzureDevOps.ReportingTool
 {
     using System;
-    using System.Collections.Generic;
-    using System.Configuration;
-    using System.Linq;
+    using System.Globalization;
     using System.Net.Http;
-    using System.Net.Http.Headers;
-    using System.Threading.Tasks;
+    using System.Reflection;
+    using System.Resources;
     using AzureDevOps.Report;
     using AzureDevOps.Scanner;
+    using Microsoft.Extensions.Configuration;
 
     /// <summary>
     /// Main entry point for application.
     /// </summary>
     public static class Program
     {
+        private const string ConfigKey = "config";
+
         private static readonly HttpClient HttpClient = new HttpClient();
 
         /// <summary>
@@ -33,86 +34,38 @@ namespace AzureDevOps.ReportingTool
         /// <param name="args">Program arguments.</param>
         public static void Main(string[] args)
         {
+            ResourceManager rm = new ResourceManager("AzureDevOps.ReportingTool.ErrorResource", Assembly.GetExecutingAssembly());
+            var errorMessage = rm.GetString("InvalidOrMissingConfig", CultureInfo.InvariantCulture);
+
             if (args == null)
             {
-                WriteHelptext();
+                Console.WriteLine(errorMessage);
             }
             else
             {
-                var selectedReports = ParseArguments(args);
+                var configBuilder = new ConfigurationBuilder();
+                configBuilder.AddCommandLine(args);
 
-                if (selectedReports.Count == 0)
+                var config = configBuilder.Build();
+                var configFile = config[ConfigKey];
+
+                if (string.IsNullOrWhiteSpace(configFile))
                 {
-                    WriteHelptext();
+                    Console.WriteLine(errorMessage);
                 }
                 else
                 {
-                    Run(selectedReports).Wait();
+                    if (System.IO.File.Exists(configFile))
+                    {
+                        var reportTool = new ReportTool(new Client(HttpClient), new Generator());
+                        reportTool.Main(configFile);
+                    }
+                    else
+                    {
+                        Console.WriteLine($"{configFile} not found.");
+                    }
                 }
             }
-        }
-
-        private static async Task Run(HashSet<IReport> reports)
-        {
-            var azDOUrl = new Uri(ConfigurationManager.AppSettings.Get("AzureDevOps.URL"));
-            var pat = ConfigurationManager.AppSettings.Get("AzureDevOps.PAT");
-
-            HttpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
-                "Basic",
-                Convert.ToBase64String(
-                    System.Text.Encoding.ASCII.GetBytes($":{pat}")));
-
-            var scanClient = new Client(HttpClient);
-
-            var dataOptions = reports.Select(rep => rep.DataOptions).Aggregate((x, y) => x | y);
-
-            var azureDevOpsInstance = await scanClient.ScanAsync(dataOptions, ConfigurationManager.AppSettings.Get("AzureDevOps.Collections").Split(';'), azDOUrl).ConfigureAwait(false);
-            await Generator.CreateReportsAsync(reports, azureDevOpsInstance, "C:\\Temp\\ComplianceReports").ConfigureAwait(false);
-        }
-
-        private static void WriteHelptext()
-        {
-            var helptext = $"The following reports are available:" + Environment.NewLine +
-                            $"-a / -all: {nameof(ScanAllReport)}" + Environment.NewLine +
-                            $"-b / -build: {nameof(BuildReport)}" + Environment.NewLine +
-                            $"-g / -git: {nameof(GitRepositoryReport)}" + Environment.NewLine +
-                            $"-r / -release: {nameof(ReleaseReport)}" + Environment.NewLine;
-
-            Console.WriteLine(helptext);
-        }
-
-        private static HashSet<IReport> ParseArguments(string[] args)
-        {
-            var selectedReports = new HashSet<IReport>();
-
-            foreach (var argument in args)
-            {
-                switch (argument.TrimStart('-').ToUpperInvariant())
-                {
-                    case "A":
-                    case "ALL":
-                        selectedReports.Add(new ScanAllReport());
-                        break;
-                    case "B":
-                    case "BUILD":
-                        selectedReports.Add(new BuildReport());
-                        break;
-                    case "G":
-                    case "GIT":
-                        selectedReports.Add(new GitRepositoryReport());
-                        break;
-                    case "R":
-                    case "RELEASE":
-                        selectedReports.Add(new ReleaseReport());
-                        break;
-                    default:
-                        Console.WriteLine($"Unknown option: {argument}");
-                        break;
-                }
-            }
-
-            return selectedReports;
         }
     }
 }
