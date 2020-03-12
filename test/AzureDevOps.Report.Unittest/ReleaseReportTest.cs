@@ -70,14 +70,12 @@ namespace AzureDevOps.Report.Unittest
         public void Generate_WithInstance_GeneratesReport()
         {
             // Arrange
-            var expected = "SEP=;\r\nCollection;Project;Release name;Release date;R. Status;Environment;E. Status;Attempt;Attempt date;Auto approve;Required approval;Approval given by;ReplacedToken?;Nr. of Artifacts;Artifact - version [branch];\r\ntestValue;testValue;testValue;3/11/2020 15:29:49;testValue;testValue;testValue;1;3/11/2020 15:29:49;False;testIdentity;testIdentity;True;0;;\r\ntestValue;testValue;testValue;3/11/2020 15:29:49;testValue;testValue;testValue;1;3/11/2020 15:29:49;True;;;False;1;'testValue - testValue [testValue]';\r\n";
+            var testDate = DateTime.Now;
+            var expected = $"SEP=;\r\nCollection;Project;Release name;Release date;R. Status;Environment;E. Status;Attempt;Attempt date;Auto approve;Required approval;Approval given by;ReplacedToken?;Nr. of Artifacts;Artifact - version [branch];\r\ntestValue;testValue;testValue;{testDate};testValue;testValue;testValue;1;{testDate};False;testIdentity;testIdentity;True;0;;\r\ntestValue;testValue;testValue;{testDate};testValue;testValue;testValue;1;{testDate};True;;;False;1;'testValue - testValue [testValue]';\r\n";
             var testSearchedTaskId = new Guid("a8515ec8-7254-4ffd-912c-86772e2b5962");
             var testString = "testValue";
             var testGuid = Guid.NewGuid();
             var testInt = 1;
-#pragma warning disable CA1305 // Specify IFormatProvider
-            var testDate = DateTime.Parse("3/11/2020 15:29:49");
-#pragma warning restore CA1305 // Specify IFormatProvider
             var testIdentity = new AzureDevOpsIdentity { DisplayName = "testIdentity" };
             var testProject = new AzureDevOpsProject
             {
