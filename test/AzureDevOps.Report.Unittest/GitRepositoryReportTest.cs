@@ -70,7 +70,7 @@ namespace AzureDevOps.Report.Unittest
         public void Generate_WithInstance_GeneratesReport()
         {
             // Arrange
-            var expected = "SEP=;\r\nCollection;Project;Repository;Branch;Policy;Enabled;Enforced;Minimum Approvers;CreatorCounts;Reset on push;\r\ntestValue;testValue;testValue;testValue;testValue;True;True;1;True;True;\r\ntestValue;testValue;testValue;testValue;testValue;True;True;;;;\r\n";
+            var expected = $"SEP=;{Environment.NewLine}Collection;Project;Repository;Branch;Policy;Enabled;Enforced;Minimum Approvers;CreatorCounts;Reset on push;{Environment.NewLine}testValue;testValue;testValue;testValue;testValue;True;True;1;True;True;{Environment.NewLine}testValue;testValue;testValue;testValue;testValue;True;True;;;;{Environment.NewLine}";
             var testString = "testValue";
             var testInt = 1;
             var testBool = true;

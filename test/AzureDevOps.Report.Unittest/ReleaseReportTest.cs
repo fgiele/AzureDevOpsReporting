@@ -71,7 +71,7 @@ namespace AzureDevOps.Report.Unittest
         {
             // Arrange
             var testDate = DateTime.Now;
-            var expected = $"SEP=;\r\nCollection;Project;Release name;Release date;R. Status;Environment;E. Status;Attempt;Attempt date;Auto approve;Required approval;Approval given by;ReplacedToken?;Nr. of Artifacts;Artifact - version [branch];\r\ntestValue;testValue;testValue;{testDate};testValue;testValue;testValue;1;{testDate};False;testIdentity;testIdentity;True;0;;\r\ntestValue;testValue;testValue;{testDate};testValue;testValue;testValue;1;{testDate};True;;;False;1;'testValue - testValue [testValue]';\r\n";
+            var expected = $"SEP=;{Environment.NewLine}Collection;Project;Release name;Release date;R. Status;Environment;E. Status;Attempt;Attempt date;Auto approve;Required approval;Approval given by;ReplacedToken?;Nr. of Artifacts;Artifact - version [branch];{Environment.NewLine}testValue;testValue;testValue;{testDate};testValue;testValue;testValue;1;{testDate};False;testIdentity;testIdentity;True;0;;{Environment.NewLine}testValue;testValue;testValue;{testDate};testValue;testValue;testValue;1;{testDate};True;;;False;1;'testValue - testValue [testValue]';{Environment.NewLine}";
             var testSearchedTaskId = new Guid("a8515ec8-7254-4ffd-912c-86772e2b5962");
             var testString = "testValue";
             var testGuid = Guid.NewGuid();

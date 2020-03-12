@@ -70,7 +70,7 @@ namespace AzureDevOps.Report.Unittest
         public void Generate_WithInstance_GeneratesReport()
         {
             // Arrange
-            var expected = "SEP=;\r\nCollection;Project;Repistory;Branch;Build nr;Build status;Build result;Artifact name;Artifact type;Artifact download;\r\ntestValue;testValue;testValue;testValue;testValue;testValue;testValue;testValue;testValue;https://www.example.com/;\r\n";
+            var expected = $"SEP=;{Environment.NewLine}Collection;Project;Repistory;Branch;Build nr;Build status;Build result;Artifact name;Artifact type;Artifact download;{Environment.NewLine}testValue;testValue;testValue;testValue;testValue;testValue;testValue;testValue;testValue;https://www.example.com/;{Environment.NewLine}";
             var testUri = new Uri("https://www.example.com/");
             var testString = "testValue";
             var testInt = 1;
@@ -124,7 +124,7 @@ namespace AzureDevOps.Report.Unittest
         public void Generate_WithInstanceWithTrickString_GeneratesReport()
         {
             // Arrange
-            var expected = "SEP=;\r\nCollection;Project;Repistory;Branch;Build nr;Build status;Build result;Artifact name;Artifact type;Artifact download;\r\ntestValue \"\";testValue \"\";testValue \"\";testValue \"\";testValue \"\";testValue \"\";testValue \"\";testValue \"\";testValue \"\";https://www.example.com/;\r\n";
+            var expected = $"SEP=;{Environment.NewLine}Collection;Project;Repistory;Branch;Build nr;Build status;Build result;Artifact name;Artifact type;Artifact download;{Environment.NewLine}testValue \"\";testValue \"\";testValue \"\";testValue \"\";testValue \"\";testValue \"\";testValue \"\";testValue \"\";testValue \"\";https://www.example.com/;{Environment.NewLine}";
             var testUri = new Uri("https://www.example.com/");
             var testString = "testValue\n\r\t\"";
             var testInt = 1;
