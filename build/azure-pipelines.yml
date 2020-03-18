@@ -44,15 +44,15 @@ steps:
     displayName: 'dotnet build Debug'
 
   - script: |
-      dotnet test --logger trx /p:CollectCoverage=true  /p:CoverletOutputFormat='opencover' /p:CoverletOutput=$(Build.SourcesDirectory)/coverage/reports/ /p:exclude=\"[Microsoft*]*,[xunit*]*\" test/AzureDevOps.Report.Unittest/AzureDevOps.Report.Unittest.csproj
+      dotnet test --logger trx --no-build /p:CollectCoverage=true  /p:CoverletOutputFormat='opencover' /p:CoverletOutput=$(Build.SourcesDirectory)/coverage/reports/ /p:exclude=\"[Microsoft*]*,[xunit*]*\" test/AzureDevOps.Report.Unittest/AzureDevOps.Report.Unittest.csproj
     displayName: 'dotnet test Reports'
 
   - script: |
-      dotnet test --logger trx /p:CollectCoverage=true  /p:CoverletOutputFormat='opencover' /p:CoverletOutput=$(Build.SourcesDirectory)/coverage/reportingtool/ /p:exclude=\"[Microsoft*]*,[xunit*]*\" test/AzureDevOps.ReportingTool.Unittest/AzureDevOps.ReportingTool.Unittest.csproj
+      dotnet test --logger trx --no-build /p:CollectCoverage=true  /p:CoverletOutputFormat='opencover' /p:CoverletOutput=$(Build.SourcesDirectory)/coverage/reportingtool/ /p:exclude=\"[Microsoft*]*,[xunit*]*\" test/AzureDevOps.ReportingTool.Unittest/AzureDevOps.ReportingTool.Unittest.csproj
     displayName: 'dotnet test ReportTool'
 
   - script: |
-      dotnet test --logger trx /p:CollectCoverage=true  /p:CoverletOutputFormat='opencover' /p:CoverletOutput=$(Build.SourcesDirectory)/coverage/scanner/ /p:exclude=\"[Microsoft*]*,[xunit*]*\" test/AzureDevOps.Scanner.Unittest/AzureDevOps.Scanner.Unittest.csproj
+      dotnet test --logger trx --no-build /p:CollectCoverage=true  /p:CoverletOutputFormat='opencover' /p:CoverletOutput=$(Build.SourcesDirectory)/coverage/scanner/ /p:exclude=\"[Microsoft*]*,[xunit*]*\" test/AzureDevOps.Scanner.Unittest/AzureDevOps.Scanner.Unittest.csproj
     displayName: 'dotnet test Scanner'
 
   - script: |
