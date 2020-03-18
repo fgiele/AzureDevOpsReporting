@@ -32,11 +32,6 @@ namespace AzureDevOps.Model
         public string Name { get; set; }
 
         /// <summary>
-        /// Gets or sets id.
-        /// </summary>
-        public Guid Id { get; set; }
-
-        /// <summary>
         /// Gets propjects.
         /// </summary>
         public List<AzureDevOpsProject> Projects { get; private set; }

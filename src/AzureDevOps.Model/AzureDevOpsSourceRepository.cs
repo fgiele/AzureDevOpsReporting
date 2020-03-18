@@ -16,23 +16,8 @@ namespace AzureDevOps.Model
     public class AzureDevOpsSourceRepository
     {
         /// <summary>
-        /// Gets or sets id.
-        /// </summary>
-        public string Id { get; set; }
-
-        /// <summary>
-        /// Gets or sets type.
-        /// </summary>
-        public string Type { get; set; }
-
-        /// <summary>
         /// Gets or sets name.
         /// </summary>
         public string Name { get; set; }
-
-        /// <summary>
-        /// Gets or sets url.
-        /// </summary>
-        public System.Uri Url { get; set; }
     }
 }

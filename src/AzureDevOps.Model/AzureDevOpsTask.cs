@@ -23,11 +23,6 @@ namespace AzureDevOps.Model
         public Guid Id { get; set; }
 
         /// <summary>
-        /// Gets or sets task name.
-        /// </summary>
-        public string Name { get; set; }
-
-        /// <summary>
         /// Gets or sets task version.
         /// </summary>
         public string Version { get; set; }
