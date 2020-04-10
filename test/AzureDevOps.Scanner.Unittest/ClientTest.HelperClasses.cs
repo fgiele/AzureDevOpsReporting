@@ -121,7 +121,7 @@ namespace AzureDevOps.Scanner.Unittest
         private HttpResponseMessage OneBuildResponse => new HttpResponseMessage
         {
             StatusCode = HttpStatusCode.OK,
-            Content = new StringContent($"{{\"count\":1,\"value\":[{{\"id\":{this.expectedBuild.Id},\"buildNumber\":\"{this.expectedBuild.BuildNumber}\",\"status\":\"{this.expectedBuild.Status}\",\"result\":\"{this.expectedBuild.Result}\",\"sourceBranch\":\"{this.expectedBuild.SourceBranch}\",\"url\":\"{this.expectedBuild.Url}\"}}]}}"),
+            Content = new StringContent($"{{\"count\":1,\"value\":[{{\"id\":{this.expectedBuild.Id},\"buildNumber\":\"{this.expectedBuild.BuildNumber}\",\"status\":\"{this.expectedBuild.Status}\",\"result\":\"{this.expectedBuild.Result}\",\"sourceBranch\":\"{this.expectedBuild.SourceBranch}\",\"startTime\":\"{this.expectedBuild.StartTime}\",\"finishTime\":\"{this.expectedBuild.FinishTime}\",\"queueTime\":\"{this.expectedBuild.QueueTime}\",\"url\":\"{this.expectedBuild.Url}\"}}]}}"),
         };
 
         private HttpResponseMessage OneArtifactResponse => new HttpResponseMessage
