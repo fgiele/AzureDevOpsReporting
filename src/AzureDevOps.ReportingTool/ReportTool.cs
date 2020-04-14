@@ -79,7 +79,8 @@ namespace AzureDevOps.ReportingTool
                             $"a / all: {nameof(ScanAllReport)}" + Environment.NewLine +
                             $"b / build: {nameof(BuildReport)}" + Environment.NewLine +
                             $"g / git: {nameof(GitRepositoryReport)}" + Environment.NewLine +
-                            $"r / release: {nameof(ReleaseReport)}" + Environment.NewLine;
+                            $"r / release: {nameof(ReleaseReport)}" + Environment.NewLine +
+                            $"t / time: {nameof(BuildDurationReport)}" + Environment.NewLine;
 
             Console.WriteLine(helptext);
         }
@@ -107,6 +108,10 @@ namespace AzureDevOps.ReportingTool
                     case "R":
                     case "RELEASE":
                         selectedReports.Add(new ReleaseReport());
+                        break;
+                    case "T":
+                    case "TIME":
+                        selectedReports.Add(new BuildDurationReport());
                         break;
                     default:
                         Console.WriteLine($"Unknown option: {argument}");

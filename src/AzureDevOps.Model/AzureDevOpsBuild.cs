@@ -53,6 +53,21 @@ namespace AzureDevOps.Model
         public string SourceBranch { get; set; }
 
         /// <summary>
+        /// Gets or sets time build was started.
+        /// </summary>
+        public string StartTime { get; set; }
+
+        /// <summary>
+        /// Gets or sets time build was finished.
+        /// </summary>
+        public string FinishTime { get; set; }
+
+        /// <summary>
+        /// Gets or sets time build was queued.
+        /// </summary>
+        public string QueueTime { get; set; }
+
+        /// <summary>
         /// Gets or sets artifacts.
         /// </summary>
         public IEnumerable<AzureDevOpsBuildArtifact> Artifacts { get; set; }

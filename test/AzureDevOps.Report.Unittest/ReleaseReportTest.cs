@@ -18,7 +18,7 @@ namespace AzureDevOps.Report.Unittest
     using Xunit;
 
     /// <summary>
-    /// Contains the actual tests being run against the build report.
+    /// Contains the actual tests being run against the release report.
     /// </summary>
     public class ReleaseReportTest
     {
