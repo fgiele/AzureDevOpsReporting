@@ -11,12 +11,19 @@
 namespace AzureDevOps.Model
 {
     using System.Collections.Generic;
+    using Newtonsoft.Json;
 
     /// <summary>
     /// DTO for build.
     /// </summary>
     public class AzureDevOpsBuild
     {
+        /// <summary>
+        /// Gets or sets links from this build.
+        /// </summary>
+        [JsonProperty("_links")]
+        public AzureDevOpsBuildLinks Links { get; set; }
+
         /// <summary>
         /// Gets or sets id.
         /// </summary>
@@ -71,5 +78,7 @@ namespace AzureDevOps.Model
         /// Gets or sets artifacts.
         /// </summary>
         public IEnumerable<AzureDevOpsBuildArtifact> Artifacts { get; set; }
+
+        public AzureDevOpsBuildTimeline Timeline { get; set; }
     }
 }

@@ -16,7 +16,7 @@ namespace AzureDevOps.Report
     /// <summary>
     /// Git compliance report definition.
     /// </summary>
-    public class GitRepositoryReport : ReportDefinition, IReport
+    public class GitRepositoryReport : CsvReportDefinition, IReport
     {
         /// <summary>
         /// Gets data-options in use with the git report.

@@ -15,7 +15,7 @@ namespace AzureDevOps.Report
     /// <summary>
     /// This report is only meant to trigger a complete scan. No output.
     /// </summary>
-    public class ScanAllReport : ReportDefinition, IReport
+    public class ScanAllReport : CsvReportDefinition, IReport
     {
         /// <summary>
         /// Gets the Data-Options for this report. All possible values.

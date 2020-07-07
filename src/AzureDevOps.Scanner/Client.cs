@@ -179,6 +179,10 @@ namespace AzureDevOps.Scanner
             HttpResponseMessage httpArtifactResponse = await this.RestClient.GetAsync(new Uri($"{build.Url}/artifacts?api-version=5.1")).ConfigureAwait(false);
             var artifactResponseContent = await httpArtifactResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
             build.Artifacts = JsonConvert.DeserializeObject<AzureDevOpsBuildArtifacts>(artifactResponseContent).Artifacts;
+
+            HttpResponseMessage httpTimelineResponse = await this.RestClient.GetAsync(new Uri($"{build.Url}/timeline")).ConfigureAwait(false);
+            var timeLineResponseContent = await httpTimelineResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+            build.Timeline = JsonConvert.DeserializeObject<AzureDevOpsBuildTimeline>(timeLineResponseContent, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
             return build;
         }
 
