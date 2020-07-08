@@ -38,7 +38,7 @@ namespace AzureDevOps.Scanner.Unittest
             .Do(moq => moq.Records = new HashSet<AzureDevOpsTimelineRecord>
             {
                 Builder<AzureDevOpsTimelineRecord>.CreateNew()
-                    .Do(moq=>moq.Task = Builder<AzureDevOpsTask>.CreateNew().Build())
+                    .Do(moq => moq.Task = Builder<AzureDevOpsTask>.CreateNew().Build())
                 .Build(),
             }).Build();
 
