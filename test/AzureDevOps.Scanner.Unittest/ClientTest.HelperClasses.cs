@@ -34,6 +34,14 @@ namespace AzureDevOps.Scanner.Unittest
         private readonly AzureDevOpsBuildArtifact expectedArtifact = Builder<AzureDevOpsBuildArtifact>.CreateNew()
             .Do(moq => moq.Resource = Builder<AzureDevOpsArtifactResource>.CreateNew().Build()).Build();
 
+        private readonly AzureDevOpsBuildTimeline expectedTimeline = Builder<AzureDevOpsBuildTimeline>.CreateNew()
+            .Do(moq => moq.Records = new HashSet<AzureDevOpsTimelineRecord>
+            {
+                Builder<AzureDevOpsTimelineRecord>.CreateNew()
+                    .Do(moq=>moq.Task = Builder<AzureDevOpsTask>.CreateNew().Build())
+                .Build(),
+            }).Build();
+
         private readonly AzureDevOpsRelease expectedRelease = Builder<AzureDevOpsRelease>.CreateNew()
             .Do(moq => moq.CreatedBy = Builder<AzureDevOpsIdentity>.CreateNew().Build())
             .Do(moq => moq.Url = new Uri($"{ExpectedUrl}/expectedrelease"))
@@ -128,6 +136,12 @@ namespace AzureDevOps.Scanner.Unittest
         {
             StatusCode = HttpStatusCode.OK,
             Content = new StringContent($"{{\"count\":1,\"value\":[{{\"id\":{this.expectedArtifact.Id},\"name\":\"{this.expectedArtifact.Name}\",\"resource\":{{\"type\":\"{this.expectedArtifact.Resource.Type}\",\"downloadUrl\":\"{this.expectedArtifact.Resource.DownloadUrl}\"}}}}]}}"),
+        };
+
+        private HttpResponseMessage OneTimelineResponse => new HttpResponseMessage
+        {
+            StatusCode = HttpStatusCode.OK,
+            Content = new StringContent($"{{\"records\":[{{\"type\":\"{this.expectedTimeline.Records.First().Type}\",\"name\":\"{this.expectedTimeline.Records.First().Name}\",\"state\":\"{this.expectedTimeline.Records.First().State}\",\"result\":\"{this.expectedTimeline.Records.First().Result}\",\"order\":{this.expectedTimeline.Records.First().Order},\"task\":{{\"id\":\"{this.expectedTimeline.Records.First().Task.Id}\",\"name\":\"{this.expectedTimeline.Records.First().Task.Name}\",\"version\":\"{this.expectedTimeline.Records.First().Task.Version}\"}}}}]}}"),
         };
 
         private HttpResponseMessage OneReleaseResponse => new HttpResponseMessage
@@ -294,6 +308,15 @@ namespace AzureDevOps.Scanner.Unittest
                         It.Is<HttpRequestMessage>(
                             req => req.RequestUri.ToString() == $"{this.expectedBuild.Url}/artifacts?api-version=5.1")))
                 .Returns(this.OneArtifactResponse);
+        }
+
+        private void HttpMockOneTimeline()
+        {
+            this.mockHttpMessageHandler.Setup(
+                    mh => mh.Send(
+                        It.Is<HttpRequestMessage>(
+                            req => req.RequestUri.ToString() == $"{this.expectedBuild.Url}/timeline")))
+                .Returns(this.OneTimelineResponse);
         }
 
         private void HttpMockOneRelease()

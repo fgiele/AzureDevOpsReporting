@@ -30,6 +30,8 @@ namespace AzureDevOps.Report
         /// </summary>
         public string Title => $"Compliance-{DateTime.Now:yyyyMMdd-HHmmss}.md";
 
+        private AzureDevOpsBuildReason[] CIReason => new[] { AzureDevOpsBuildReason.BatchedCI, AzureDevOpsBuildReason.IndividualCI, AzureDevOpsBuildReason.PullRequest, AzureDevOpsBuildReason.Triggered };
+
         /// <summary>
         /// Parses the collected data and generates a report.
         /// </summary>
@@ -47,10 +49,10 @@ namespace AzureDevOps.Report
             {
                 foreach (var project in collection.Projects)
                 {
-                    this.AddText($"# { collection.Name}/{ project.Name}");
-                    this.AddText($"## Git repositories");
+                    this.AddText($"# {collection.Name}/{project.Name}");
+                    this.AddText("## Git repositories");
                     this.MakeGitReport(project);
-                    this.AddText($"## Executed builds");
+                    this.AddText("## Executed builds");
                     this.MakeBuildReport(project);
                 }
             }
@@ -127,6 +129,7 @@ namespace AzureDevOps.Report
                 var hasSonarQube = false;
                 var hasTests = false;
                 var remark = string.Empty;
+                var ciBuild = this.CIReason.Contains(build.Reason);
                 if (build.Timeline == null)
                 {
                     remark = "No timeline found!";
@@ -151,7 +154,7 @@ namespace AzureDevOps.Report
 
                 this.AddRow(
                     build.BuildNumber,
-                    string.Empty,
+                    ciBuild ? "(/)" : "(x)",
                     hasSonarQube ? "(/)" : "(x)",
                     hasTests ? "(/)" : "(x)",
                     remark,

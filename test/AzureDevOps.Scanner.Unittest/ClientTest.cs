@@ -177,7 +177,9 @@ namespace AzureDevOps.Scanner.Unittest
             this.HttpMockOneProject();
             this.HttpMockOneBuild();
             this.HttpMockOneArtifact();
+            this.HttpMockOneTimeline();
 
+            this.expectedBuild.Timeline = this.expectedTimeline;
             this.expectedBuild.Artifacts = new HashSet<AzureDevOpsBuildArtifact> { this.expectedArtifact };
             this.expectedProject.Builds = new HashSet<AzureDevOpsBuild> { this.expectedBuild };
 

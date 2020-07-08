@@ -75,10 +75,18 @@ namespace AzureDevOps.Model
         public string QueueTime { get; set; }
 
         /// <summary>
+        /// Gets or sets reason this build was queued.
+        /// </summary>
+        public AzureDevOpsBuildReason Reason { get; set; }
+
+        /// <summary>
         /// Gets or sets artifacts.
         /// </summary>
         public IEnumerable<AzureDevOpsBuildArtifact> Artifacts { get; set; }
 
+        /// <summary>
+        /// Gets or sets the timeline.
+        /// </summary>
         public AzureDevOpsBuildTimeline Timeline { get; set; }
     }
 }
