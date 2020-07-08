@@ -30,7 +30,7 @@ namespace AzureDevOps.Report
         /// </summary>
         public string Title => $"Compliance-{DateTime.Now:yyyyMMdd-HHmmss}.md";
 
-        private AzureDevOpsBuildReason[] CIReason => new[] { AzureDevOpsBuildReason.BatchedCI, AzureDevOpsBuildReason.IndividualCI, AzureDevOpsBuildReason.PullRequest, AzureDevOpsBuildReason.Triggered };
+        private static AzureDevOpsBuildReason[] CIReason => new[] { AzureDevOpsBuildReason.BatchedCI, AzureDevOpsBuildReason.IndividualCI, AzureDevOpsBuildReason.PullRequest, AzureDevOpsBuildReason.Triggered };
 
         /// <summary>
         /// Parses the collected data and generates a report.
@@ -129,7 +129,7 @@ namespace AzureDevOps.Report
                 var hasSonarQube = false;
                 var hasTests = false;
                 var remark = string.Empty;
-                var ciBuild = this.CIReason.Contains(build.Reason);
+                var ciBuild = CIReason.Contains(build.Reason);
                 if (build.Timeline == null)
                 {
                     remark = "No timeline found!";

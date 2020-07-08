@@ -41,7 +41,7 @@ namespace AzureDevOps.Report.Unittest
         }
 
         [Theory]
-        [InlineData("Deze\rtext","Dezetext")]
+        [InlineData("Deze\rtext", "Dezetext")]
         [InlineData("Deze\ntext", "Dezetext")]
         [InlineData("Deze\ttext", "Deze text")]
         [InlineData("Deze\r\n\ttext", "Deze text")]
