@@ -23,7 +23,7 @@ namespace AzureDevOps.Report
         /// Creates the header for a MD Table.
         /// </summary>
         /// <param name="headers">Array of values to add as column headers.</param>
-        internal void CreateHeaders(params string[] headers)
+        protected internal void CreateHeaders(params string[] headers)
         {
             this.reportBuilder.Append("|");
 
@@ -49,7 +49,7 @@ namespace AzureDevOps.Report
         /// Adds a row to the report in the MD Table format.
         /// </summary>
         /// <param name="values">Array of values to add in the cells of the row.</param>
-        internal void AddRow(params object[] values)
+        protected internal void AddRow(params object[] values)
         {
             this.reportBuilder.Append("|");
 
@@ -66,7 +66,7 @@ namespace AzureDevOps.Report
         /// Adds a block of text to the report.
         /// </summary>
         /// <param name="text">Text to add to the report.</param>
-        internal void AddText(string text)
+        protected internal void AddText(string text)
         {
             this.reportBuilder.AppendLine(text);
         }
@@ -75,7 +75,7 @@ namespace AzureDevOps.Report
         /// Generate the content of the report.
         /// </summary>
         /// <returns>All data added so far to the report, in CSV format.</returns>
-        internal string GetReport()
+        protected internal string GetReport()
         {
             return this.reportBuilder.ToString();
         }

@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="CsvReportDefinitionTest.cs" company="Freek Giele">
+// <copyright file="MDResportDefinitionTest.cs" company="Freek Giele">
 //    This code is licensed under the CC BY License.
 //    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
 //    ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
@@ -19,17 +19,17 @@ namespace AzureDevOps.Report.Unittest
     /// <summary>
     /// Contains the actual tests being run against the build report.
     /// </summary>
-    public class CsvReportDefinitionTest
+    public class MDResportDefinitionTest
     {
         [Fact]
-        public void AddLine_WhenUsingSeperatorChar_EscapingHappens()
+        public void AddLine_WhenUsingPipeChar_EscapingHappens()
         {
             // Arrange
-            var expectedReport = $"\"Test;Name\";{Environment.NewLine}";
-            var textString = "Test;Name";
+            var expectedReport = $"|Test\\|Name|{Environment.NewLine}";
+            var textString = "Test|Name";
             var vsinstance = new AzureDevOpsInstance();
             vsinstance.Collections.Add(new AzureDevOpsCollection { Name = textString });
-            var systemUnderTest = new CsvTestClass();
+            var systemUnderTest = new MDTestClass();
 
             // Act
             var actual = systemUnderTest.Generate(vsinstance);
@@ -43,14 +43,13 @@ namespace AzureDevOps.Report.Unittest
         [InlineData("Deze\ntext", "Dezetext")]
         [InlineData("Deze\ttext", "Deze text")]
         [InlineData("Deze\r\n\ttext", "Deze text")]
-        [InlineData("Deze\"text", "Deze\"\"text")]
         public void AddLine_WhenWhitespaceChar_Removed(string testInput, string cleaned)
         {
             // Arrange
-            var expected = $"{cleaned};{Environment.NewLine}";
+            var expected = $"|{cleaned}|{Environment.NewLine}";
             var vsinstance = new AzureDevOpsInstance();
             vsinstance.Collections.Add(new AzureDevOpsCollection { Name = testInput });
-            var systemUnderTest = new CsvTestClass();
+            var systemUnderTest = new MDTestClass();
 
             // Act
             var actual = systemUnderTest.Generate(vsinstance);
@@ -59,7 +58,7 @@ namespace AzureDevOps.Report.Unittest
             actual.Should().Be(expected);
         }
 
-        private class CsvTestClass : CsvReportDefinition, IReport
+        private class MDTestClass : MDReportDefinition, IReport
         {
             public DataOptions DataOptions => throw new NotImplementedException();
 
@@ -67,7 +66,7 @@ namespace AzureDevOps.Report.Unittest
 
             public string Generate(AzureDevOpsInstance instance)
             {
-                this.AddLine(instance.Collections.FirstOrDefault().Name);
+                this.AddRow(instance.Collections.FirstOrDefault().Name);
 
                 return this.GetReport();
             }
