@@ -119,59 +119,5 @@ namespace AzureDevOps.Report.Unittest
             actual.Should().NotBeNull();
             actual.Should().Be(expected);
         }
-
-        [Fact]
-        public void Generate_WithInstanceWithTrickString_GeneratesReport()
-        {
-            // Arrange
-            var expected = $"SEP=;{Environment.NewLine}Collection;Project;Repistory;Branch;Build nr;Build status;Build result;Artifact name;Artifact type;Artifact download;{Environment.NewLine}testValue \"\";testValue \"\";testValue \"\";testValue \"\";testValue \"\";testValue \"\";testValue \"\";testValue \"\";testValue \"\";https://www.example.com/;{Environment.NewLine}";
-            var testUri = new Uri("https://www.example.com/");
-            var testString = "testValue\n\r\t\"";
-            var testInt = 1;
-            var testProject = new AzureDevOpsProject
-            {
-                Name = testString,
-                Builds = new HashSet<AzureDevOpsBuild>
-                {
-                    new AzureDevOpsBuild
-                    {
-                        SourceBranch = testString,
-                        BuildNumber = testString,
-                        Status = testString,
-                        Result = testString,
-                        Repository = new AzureDevOpsSourceRepository
-                        {
-                            Name = testString,
-                        },
-                        Artifacts = new HashSet<AzureDevOpsBuildArtifact>
-                        {
-                            new AzureDevOpsBuildArtifact
-                            {
-                                Id = testInt,
-                                Name = testString,
-                                Resource = new AzureDevOpsArtifactResource
-                                {
-                                    Type = testString,
-                                    DownloadUrl = testUri,
-                                },
-                            },
-                        },
-                    },
-                },
-            };
-            var testCollection = new AzureDevOpsCollection { Name = testString };
-            testCollection.Projects.Add(testProject);
-            var testAzureDevOpsInstance = new AzureDevOpsInstance();
-            testAzureDevOpsInstance.Collections.Add(testCollection);
-
-            var systemUnderTest = new BuildReport();
-
-            // Act
-            var actual = systemUnderTest.Generate(testAzureDevOpsInstance);
-
-            // Assert
-            actual.Should().NotBeNull();
-            actual.Should().Be(expected);
-        }
     }
 }
