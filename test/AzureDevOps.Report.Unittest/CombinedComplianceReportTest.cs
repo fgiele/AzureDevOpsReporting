@@ -192,7 +192,7 @@ namespace AzureDevOps.Report.Unittest
                         {
                             new AzureDevOpsPolicy
                             {
-                                IsBlocking  = true,
+                                IsBlocking = true,
                                 IsEnabled = true,
                                 PolicyType = new AzureDevOpsPolicyType
                                 {
@@ -213,7 +213,7 @@ namespace AzureDevOps.Report.Unittest
                             },
                             new AzureDevOpsPolicy
                             {
-                                IsBlocking  = true,
+                                IsBlocking = true,
                                 IsEnabled = true,
                                 PolicyType = new AzureDevOpsPolicyType
                                 {
@@ -232,7 +232,7 @@ namespace AzureDevOps.Report.Unittest
                             },
                             new AzureDevOpsPolicy
                             {
-                                IsBlocking  = true,
+                                IsBlocking = true,
                                 IsEnabled = true,
                                 PolicyType = new AzureDevOpsPolicyType
                                 {
@@ -248,6 +248,97 @@ namespace AzureDevOps.Report.Unittest
                                         },
                                     },
                                 },
+                            },
+                        },
+                    },
+                },
+                Releases = new HashSet<AzureDevOpsRelease>
+                {
+                    new AzureDevOpsRelease
+                    {
+                        Name = testString,
+                        Environments = new HashSet<AzureDevOpsEnvironment>
+                        {
+                            new AzureDevOpsEnvironment
+                            {
+                                Name = testString,
+                                TriggerReason = "Manual",
+                                PreDeployApprovals = new HashSet<AzureDevOpsDeployApproval>
+                                {
+                                    new AzureDevOpsDeployApproval
+                                    {
+                                        Attempt = testInt,
+                                        IsAutomated = true,
+                                    },
+                                },
+                                DeploySteps = new HashSet<AzureDevOpsDeployStep>
+                                {
+                                    new AzureDevOpsDeployStep
+                                    {
+                                        Attempt = testInt,
+                                    },
+                                },
+                            },
+                        },
+                        Links = new AzureDevOpsReleaseLinks
+                        {
+                            Web = new AzureDevOpsLink
+                            {
+                                Href = testUri,
+                            },
+                        },
+                    },
+                    new AzureDevOpsRelease
+                    {
+                        Name = testString,
+                        Environments = new HashSet<AzureDevOpsEnvironment>
+                        {
+                            new AzureDevOpsEnvironment
+                            {
+                                Name = testString,
+                                TriggerReason = testString,
+                                PreDeployApprovals = new HashSet<AzureDevOpsDeployApproval>
+                                {
+                                    new AzureDevOpsDeployApproval
+                                    {
+                                        Attempt = testInt,
+                                        IsAutomated = false,
+                                        ApprovedBy = new AzureDevOpsIdentity(),
+                                    },
+                                },
+                                DeploySteps = new HashSet<AzureDevOpsDeployStep>
+                                {
+                                    new AzureDevOpsDeployStep
+                                    {
+                                        Attempt = testInt,
+                                        ReleaseDeployPhases = new HashSet<AzureDevOpsReleaseDeployPhase>
+                                        {
+                                            new AzureDevOpsReleaseDeployPhase
+                                            {
+                                                DeploymentJobs = new HashSet<AzureDevOpsDeploymentJob>
+                                                {
+                                                    new AzureDevOpsDeploymentJob
+                                                    {
+                                                        Tasks = new HashSet<AzureDevOpsDeploymentTask>
+                                                        {
+                                                            new AzureDevOpsDeploymentTask
+                                                            {
+                                                                Name = "execTest",
+                                                            },
+                                                        },
+                                                    },
+                                                },
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                        Links = new AzureDevOpsReleaseLinks
+                        {
+                            Web = new AzureDevOpsLink
+                            {
+                                Href = testUri,
                             },
                         },
                     },
@@ -284,6 +375,11 @@ namespace AzureDevOps.Report.Unittest
             expectedBuilder.AppendLine("|testValue|(x)|(x)|(x)|No timeline found!|https://www.example.com/|");
             expectedBuilder.AppendLine("|testValue|(x)|(x)|(x)||https://www.example.com/|");
             expectedBuilder.AppendLine("|testValue|(/)|(/)|(/)|Tests executed: execTest|https://www.example.com/|");
+            expectedBuilder.AppendLine("## Executed releases");
+            expectedBuilder.AppendLine("|Name|CD|Environment|Attempt|Approval|Tests|Remarks|Link|");
+            expectedBuilder.AppendLine("|---|---|---|---|---|---|---|---|");
+            expectedBuilder.AppendLine("|testValue|(x)|testValue|1|(x)|(x)||https://www.example.com/|");
+            expectedBuilder.AppendLine("|testValue|(/)|testValue|1|(/)|(/)|Tests executed: execTest|https://www.example.com/|");
 
             return expectedBuilder.ToString();
         }

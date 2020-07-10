@@ -54,6 +54,8 @@ namespace AzureDevOps.Report
                     this.MakeGitReport(project);
                     this.AddText("## Executed builds");
                     this.MakeBuildReport(project);
+                    this.AddText("## Executed releases");
+                    this.MakeReleaseDefinitionReport(project);
                 }
             }
 
@@ -159,6 +161,55 @@ namespace AzureDevOps.Report
                     hasTests ? "(/)" : "(x)",
                     remark,
                     build.Links.Web.Href.AbsoluteUri);
+            }
+        }
+
+        private void MakeReleaseDefinitionReport(AzureDevOpsProject project)
+        {
+            this.CreateHeaders(
+                "Name",
+                "CD",
+                "Environment",
+                "Attempt",
+                "Approval",
+                "Tests",
+                "Remarks",
+                "Link");
+
+            foreach (var release in project.Releases)
+            {
+                foreach (var environment in release.Environments)
+                {
+                    foreach (var attempt in environment.DeploySteps.Select(deploystep => deploystep.Attempt))
+                    {
+                        var cdRelease = false;
+                        var hasApproval = false;
+                        var hasTests = false;
+                        var remark = string.Empty;
+
+                        cdRelease = environment.TriggerReason != "Manual";
+                        hasApproval = environment.PreDeployApprovals.FirstOrDefault(pda => pda.Attempt == attempt)?.ApprovedBy != null;
+                        var testTaskArray = environment.DeploySteps
+                            .FirstOrDefault(dep => dep.Attempt == attempt)?
+                            .ReleaseDeployPhases?
+                            .SelectMany(rdp => rdp.DeploymentJobs)?
+                            .SelectMany(dpj => dpj.Tasks)?
+                            .Where(task => task.Name.Contains("test", StringComparison.OrdinalIgnoreCase))?
+                            .Select(task => task.Name).ToArray();
+                        hasTests = testTaskArray != null && testTaskArray.Length > 0;
+                        remark = hasTests ? $"Tests executed: {string.Join(';', testTaskArray)}" : string.Empty;
+
+                        this.AddRow(
+                            release.Name,
+                            cdRelease ? "(/)" : "(x)",
+                            environment.Name,
+                            attempt,
+                            hasApproval ? "(/)" : "(x)",
+                            hasTests ? "(/)" : "(x)",
+                            remark,
+                            release.Links.Web.Href.AbsoluteUri);
+                    }
+                }
             }
         }
     }

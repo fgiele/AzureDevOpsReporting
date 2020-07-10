@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="AzureDevOpsDeploymentTask.cs" company="Freek Giele">
+// <copyright file="AzureDevOpsReleaseLinks.cs" company="Freek Giele">
 //    This code is licensed under the CC BY License.
 //    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
 //    ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
@@ -11,18 +11,13 @@
 namespace AzureDevOps.Model
 {
     /// <summary>
-    /// DTO for task executed during deployment.
+    /// DTO for buildlinks.
     /// </summary>
-    public class AzureDevOpsDeploymentTask
+    public class AzureDevOpsReleaseLinks
     {
         /// <summary>
-        /// Gets or sets displayname
+        /// Gets or sets the Uri to the Web UI of the build.
         /// </summary>
-        public string Name { get; set; }
-
-        /// <summary>
-        /// Gets or sets task.
-        /// </summary>
-        public AzureDevOpsTask Task { get; set; }
+        public AzureDevOpsLink Web { get; set; }
     }
 }
