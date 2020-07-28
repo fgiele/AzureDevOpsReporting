@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="DataOptions.cs" company="Freek Giele">
+// <copyright file="AzureDevOpsTask.cs" company="Freek Giele">
 //    This code is licensed under the CC BY License.
 //    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
 //    ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
@@ -13,44 +13,28 @@ namespace AzureDevOps.Model
     using System;
 
     /// <summary>
-    /// Bit flag containing scanning options required for specific reports.
+    /// DTO for Workflow Task.
     /// </summary>
-    [Flags]
-    public enum DataOptions
+    public class AzureDevOpsWorkflowTask
     {
         /// <summary>
-        /// Scan git repositories.
+        /// Gets or sets the task ID.
         /// </summary>
-        Git = 1,
+        public Guid TaskId { get; set; }
 
         /// <summary>
-        /// Scan git policies.
+        /// Gets or sets the name.
         /// </summary>
-        GitPolicies = 2,
+        public string Name { get; set; }
 
         /// <summary>
-        /// Scan builds.
+        /// Gets or sets a value indicating whether the step is enabled.
         /// </summary>
-        Build = 4,
+        public bool Enabled { get; set; }
 
         /// <summary>
-        /// Scan build artifacts.
+        /// Gets or sets the definition type.
         /// </summary>
-        BuildArtifacts = 8,
-
-        /// <summary>
-        /// Scan releases.
-        /// </summary>
-        Release = 16,
-
-        /// <summary>
-        /// Scan release details
-        /// </summary>
-        ReleaseDetails = 32,
-
-        /// <summary>
-        /// Scan release definitions
-        /// </summary>
-        ReleaseDefinitions = 64,
+        public string DefinitionType { get; set; }
     }
 }

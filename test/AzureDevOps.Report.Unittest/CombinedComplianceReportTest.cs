@@ -29,7 +29,7 @@ namespace AzureDevOps.Report.Unittest
         public void DataOptions_WhenCalled_ShouldRequestBuildAndArtifacts()
         {
             // Arrange
-            var expected = DataOptions.Build | DataOptions.BuildArtifacts | DataOptions.Git | DataOptions.GitPolicies | DataOptions.Release | DataOptions.ReleaseDetails;
+            var expected = DataOptions.Build | DataOptions.BuildArtifacts | DataOptions.Git | DataOptions.GitPolicies | DataOptions.Release | DataOptions.ReleaseDetails | DataOptions.ReleaseDefinitions;
             var systemUnderTest = new CombinedComplianceReport();
 
             // Act
@@ -246,6 +246,54 @@ namespace AzureDevOps.Report.Unittest
                                         {
                                             RefName = "refs/heads/master",
                                         },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ReleaseDefinitions = new HashSet<AzureDevOpsReleaseDefinition>
+                {
+                    new AzureDevOpsReleaseDefinition
+                    {
+                        Name = testString,
+                        Url = testUri,
+                        Triggers = new HashSet<AzureDevOpsTrigger>
+                        {
+                            new AzureDevOpsTrigger
+                            {
+                                TriggerType = testString,
+                                TriggerConditions = new HashSet<AzureDevOpsTriggerCondition>
+                                {
+                                    new AzureDevOpsTriggerCondition
+                                    {
+                                        SourceBranch = testString,
+                                    },
+                                },
+                            },
+                        },
+                        Environments = new HashSet<AzureDevOpsReleaseDefinitionEnvironment>
+                        {
+                            new AzureDevOpsReleaseDefinitionEnvironment
+                            {
+                                Name = testString,
+                                PreDeployApprovals = new AzureDevOpsReleaseDefinitionApproval
+                                {
+                                    Approvals = new HashSet<AzureDevOpsReleaseDefinitionApprovalStep>
+                                    {
+                                        new AzureDevOpsReleaseDefinitionApprovalStep
+                                        {
+                                            Approver = new AzureDevOpsIdentity(),
+                                        },
+                                    },
+                                },
+                                Conditions = new HashSet<AzureDevOpsCondition>
+                                {
+                                    new AzureDevOpsCondition
+                                    {
+                                        ConditionType = AzureDevOpsConditionType.Artifact,
+                                        Name = testString,
+                                        Value = testString,
                                     },
                                 },
                             },

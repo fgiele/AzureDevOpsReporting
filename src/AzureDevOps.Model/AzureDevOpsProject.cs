@@ -49,6 +49,11 @@ namespace AzureDevOps.Model
         public IEnumerable<AzureDevOpsRelease> Releases { get; set; }
 
         /// <summary>
+        /// Gets or sets releases.
+        /// </summary>
+        public IEnumerable<AzureDevOpsReleaseDefinition> ReleaseDefinitions { get; set; }
+
+        /// <summary>
         /// Gets or sets repositories.
         /// </summary>
         public IEnumerable<AzureDevOpsRepository> Repositories { get; set; }

@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="DataOptions.cs" company="Freek Giele">
+// <copyright file="AzureDevOpsReleaseDefinition.cs" company="Freek Giele">
 //    This code is licensed under the CC BY License.
 //    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
 //    ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
@@ -11,46 +11,31 @@
 namespace AzureDevOps.Model
 {
     using System;
+    using System.Collections.Generic;
 
     /// <summary>
-    /// Bit flag containing scanning options required for specific reports.
+    /// DTO for release definition.
     /// </summary>
-    [Flags]
-    public enum DataOptions
+    public class AzureDevOpsReleaseDefinition
     {
         /// <summary>
-        /// Scan git repositories.
+        /// Gets or sets the name.
         /// </summary>
-        Git = 1,
+        public string Name { get; set; }
 
         /// <summary>
-        /// Scan git policies.
+        /// Gets or sets the environments.
         /// </summary>
-        GitPolicies = 2,
+        public IEnumerable<AzureDevOpsReleaseDefinitionEnvironment> Environments { get; set; }
 
         /// <summary>
-        /// Scan builds.
+        /// Gets or sets the release triggers.
         /// </summary>
-        Build = 4,
+        public IEnumerable<AzureDevOpsTrigger> Triggers { get; set; }
 
         /// <summary>
-        /// Scan build artifacts.
+        /// Gets or sets the url of the release definition.
         /// </summary>
-        BuildArtifacts = 8,
-
-        /// <summary>
-        /// Scan releases.
-        /// </summary>
-        Release = 16,
-
-        /// <summary>
-        /// Scan release details
-        /// </summary>
-        ReleaseDetails = 32,
-
-        /// <summary>
-        /// Scan release definitions
-        /// </summary>
-        ReleaseDefinitions = 64,
+        public Uri Url { get; set; }
     }
 }

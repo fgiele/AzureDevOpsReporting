@@ -23,7 +23,7 @@ namespace AzureDevOps.Report
         /// <summary>
         /// Gets data-options in use with the report.
         /// </summary>
-        public DataOptions DataOptions => DataOptions.Build | DataOptions.BuildArtifacts | DataOptions.Git | DataOptions.GitPolicies | DataOptions.Release | DataOptions.ReleaseDetails;
+        public DataOptions DataOptions => DataOptions.Build | DataOptions.BuildArtifacts | DataOptions.Git | DataOptions.GitPolicies | DataOptions.Release | DataOptions.ReleaseDetails | DataOptions.ReleaseDefinitions;
 
         /// <summary>
         /// Gets title of the report.
