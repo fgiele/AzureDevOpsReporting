@@ -81,6 +81,7 @@ namespace AzureDevOps.ReportingTool
                             $"c / compliance: {nameof(CombinedComplianceReport)}" + Environment.NewLine +
                             $"g / git: {nameof(GitRepositoryReport)}" + Environment.NewLine +
                             $"r / release: {nameof(ReleaseReport)}" + Environment.NewLine +
+                            $"rd / releasedefinition: {nameof(ReleaseDefinitionReport)}" + Environment.NewLine +
                             $"t / time: {nameof(BuildDurationReport)}" + Environment.NewLine;
 
             Console.WriteLine(helptext);
@@ -113,6 +114,10 @@ namespace AzureDevOps.ReportingTool
                     case "R":
                     case "RELEASE":
                         selectedReports.Add(new ReleaseReport());
+                        break;
+                    case "RD":
+                    case "RELEASEDEFINITION":
+                        selectedReports.Add(new ReleaseDefinitionReport());
                         break;
                     case "T":
                     case "TIME":
