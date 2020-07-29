@@ -10,8 +10,6 @@
 
 namespace AzureDevOps.Model
 {
-    using System.Collections.Generic;
-
     /// <summary>
     /// DTO for release environment.
     /// </summary>

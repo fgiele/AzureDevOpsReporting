@@ -70,10 +70,8 @@ namespace AzureDevOps.Report.Unittest
         public void Generate_WithInstance_GeneratesReport()
         {
             // Arrange
-            var testDate = DateTime.Now;
             var expected = $"SEP=;{Environment.NewLine}Collection;Project;Name;Environment;CD;PreviousEnvironment;PreApproval;PreApprover(s);PostApproval;PostApprover(s);Test* tasks;Link;{Environment.NewLine}testValue;testValue;testValue;testValue;False;;False;;False;;;https://www.example.com/;{Environment.NewLine}testValue;testValue;testValue;testValue;True;;True;testIdentity;True;testIdentity;testValue;https://www.example.com/;{Environment.NewLine}testValue;testValue;testValue;testValue;True;testValue;True;testIdentity;True;testIdentity;testValue;https://www.example.com/;{Environment.NewLine}";
             var testString = "testValue";
-            var testInt = 1;
             var testIdentity = new AzureDevOpsIdentity { DisplayName = "testIdentity" };
             var testUri = new Uri("https://www.example.com/");
             var testProject = new AzureDevOpsProject
