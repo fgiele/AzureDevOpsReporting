@@ -268,6 +268,29 @@ namespace AzureDevOps.Scanner.Unittest
         }
 
         [Fact]
+        public async Task ScanAsync_WhenReleaseDefinition_ShouldReturnProperInstance()
+        {
+            // Arrange
+            this.HttpMockOneProject();
+            this.HttpMockListReleaseDefinitions();
+            this.HttpMockOneReleaseDefinition();
+
+            this.expectedProject.ReleaseDefinitions = new HashSet<AzureDevOpsReleaseDefinition> { this.expectedReleaseDefinition };
+
+            var systemUnderTest = new Client(this.httpClient);
+
+            // Act
+            var actual = await systemUnderTest.ScanAsync(DataOptions.ReleaseDefinitions, new string[] { ExpectedCollection }, new Uri(ExpectedUrl)).ConfigureAwait(false);
+
+            // Assert
+            this.mockHttpMessageHandler.Verify();
+            actual.Should().BeOfType<AzureDevOpsInstance>();
+            actual.Collections.Should().HaveCount(1);
+            actual.Collections[0].Projects.Should().HaveCount(1);
+            actual.Collections[0].Projects[0].Should().BeEquivalentTo(this.expectedProject);
+        }
+
+        [Fact]
         public async Task ScanAsync_WhenNoRepositories_ShouldReturnProperInstance()
         {
             // Arrange

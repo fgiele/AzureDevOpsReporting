@@ -90,7 +90,7 @@ namespace AzureDevOps.Report
                                 postApproval,
                                 postApprovers,
                                 tests,
-                                releaseDefinition.Url.AbsoluteUri);
+                                releaseDefinition.Links?.Web?.Href?.AbsoluteUri);
                         }
                     }
                 }

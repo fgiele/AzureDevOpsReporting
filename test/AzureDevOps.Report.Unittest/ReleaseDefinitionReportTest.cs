@@ -106,7 +106,13 @@ namespace AzureDevOps.Report.Unittest
                                 },
                             },
                         },
-                        Url = testUri,
+                        Links = new AzureDevOpsReleaseLinks
+                        {
+                            Web = new AzureDevOpsLink
+                            {
+                                Href = testUri,
+                            },
+                        },
                     },
                     new AzureDevOpsReleaseDefinition
                     {
@@ -160,7 +166,13 @@ namespace AzureDevOps.Report.Unittest
                                 },
                             },
                         },
-                        Url = testUri,
+                        Links = new AzureDevOpsReleaseLinks
+                        {
+                            Web = new AzureDevOpsLink
+                            {
+                                Href = testUri,
+                            },
+                        },
                     },
                     new AzureDevOpsReleaseDefinition
                     {
@@ -215,7 +227,13 @@ namespace AzureDevOps.Report.Unittest
                                 },
                             },
                         },
-                        Url = testUri,
+                        Links = new AzureDevOpsReleaseLinks
+                        {
+                            Web = new AzureDevOpsLink
+                            {
+                                Href = testUri,
+                            },
+                        },
                     },
                 },
             };

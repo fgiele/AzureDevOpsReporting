@@ -12,12 +12,24 @@ namespace AzureDevOps.Model
 {
     using System;
     using System.Collections.Generic;
+    using Newtonsoft.Json;
 
     /// <summary>
     /// DTO for release definition.
     /// </summary>
     public class AzureDevOpsReleaseDefinition
     {
+        /// <summary>
+        /// Gets or sets links from this build.
+        /// </summary>
+        [JsonProperty("_links")]
+        public AzureDevOpsReleaseLinks Links { get; set; }
+
+        /// <summary>
+        /// Gets or sets id.
+        /// </summary>
+        public int Id { get; set; }
+
         /// <summary>
         /// Gets or sets the name.
         /// </summary>
