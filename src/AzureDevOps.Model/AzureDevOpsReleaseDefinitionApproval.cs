@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="AzureDevOpsTask.cs" company="Freek Giele">
+// <copyright file="AzureDevOpsReleaseDefinitionApproval.cs" company="Freek Giele">
 //    This code is licensed under the CC BY License.
 //    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
 //    ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
@@ -10,26 +10,16 @@
 
 namespace AzureDevOps.Model
 {
-    using System;
+    using System.Collections.Generic;
 
     /// <summary>
-    /// DTO for Pipeline Task.
+    /// DTO for release definition approval.
     /// </summary>
-    public class AzureDevOpsTask
+    public class AzureDevOpsReleaseDefinitionApproval
     {
         /// <summary>
-        /// Gets or sets task ID.
+        /// Gets or sets the approvals.
         /// </summary>
-        public Guid Id { get; set; }
-
-        /// <summary>
-        /// Gets or sets task name.
-        /// </summary>
-        public string Name { get; set; }
-
-        /// <summary>
-        /// Gets or sets task version.
-        /// </summary>
-        public string Version { get; set; }
+        public IEnumerable<AzureDevOpsReleaseDefinitionApprovalStep> Approvals { get; set; }
     }
 }

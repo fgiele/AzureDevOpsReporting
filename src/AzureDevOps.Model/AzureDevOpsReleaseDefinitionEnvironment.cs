@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="AzureDevOpsRepository.cs" company="Freek Giele">
+// <copyright file="AzureDevOpsReleaseDefinitionEnvironment.cs" company="Freek Giele">
 //    This code is licensed under the CC BY License.
 //    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
 //    ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
@@ -10,47 +10,36 @@
 
 namespace AzureDevOps.Model
 {
-    using System;
     using System.Collections.Generic;
 
     /// <summary>
-    /// DTO for Repository.
+    /// DTO for release environment.
     /// </summary>
-    public class AzureDevOpsRepository
+    public class AzureDevOpsReleaseDefinitionEnvironment
     {
         /// <summary>
-        /// Gets or sets id.
-        /// </summary>
-        public Guid Id { get; set; }
-
-        /// <summary>
-        /// Gets or sets name.
+        /// Gets or sets the name.
         /// </summary>
         public string Name { get; set; }
 
         /// <summary>
-        /// Gets or sets url.
+        /// Gets or sets the deployment phases.
         /// </summary>
-        public System.Uri Url { get; set; }
+        public IEnumerable<AzureDevOpsDeployPhase> DeployPhases { get; set; }
 
         /// <summary>
-        /// Gets or sets web url.
+        /// Gets or sets the pre deployment approvals.
         /// </summary>
-        public System.Uri WebUrl { get; set; }
+        public AzureDevOpsReleaseDefinitionApproval PreDeployApprovals { get; set; }
 
         /// <summary>
-        /// Gets or sets defaultBranch.
+        /// Gets or sets the pre deployment approvals.
         /// </summary>
-        public string DefaultBranch { get; set; }
+        public AzureDevOpsReleaseDefinitionApproval PostDeployApprovals { get; set; }
 
         /// <summary>
-        /// Gets or sets size.
+        /// Gets or sets the conditions to deployent on this environment.
         /// </summary>
-        public long Size { get; set; }
-
-        /// <summary>
-        /// Gets or sets policies.
-        /// </summary>
-        public IEnumerable<AzureDevOpsPolicy> Policies { get; set; }
+        public IEnumerable<AzureDevOpsCondition> Conditions { get; set; }
     }
 }

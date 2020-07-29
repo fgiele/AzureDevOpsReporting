@@ -118,6 +118,7 @@ namespace AzureDevOps.Scanner
         {
             var buildScanTasks = this.ScanBuildsAsync(dataOptions, projectUrl);
             var releaseScanTasks = this.ScanReleasesAsync(dataOptions, projectUrl);
+            var releaseDefinitionScanTasks = this.ScanReleaseDefinitionsAsync(dataOptions, projectUrl);
             var repositoryScanTask = this.ScanRepositoriesAsync(dataOptions, projectUrl);
 
             if (buildScanTasks != null)
@@ -128,6 +129,11 @@ namespace AzureDevOps.Scanner
             if (releaseScanTasks != null)
             {
                 project.Releases = await releaseScanTasks.ConfigureAwait(false);
+            }
+
+            if (releaseScanTasks != null)
+            {
+                project.ReleaseDefinitions = await releaseDefinitionScanTasks.ConfigureAwait(false);
             }
 
             if (repositoryScanTask != null)
@@ -141,6 +147,41 @@ namespace AzureDevOps.Scanner
 #pragma warning restore CA1303 // Do not pass literals as localized parameters
 
             return project;
+        }
+
+        private async Task<IEnumerable<AzureDevOpsReleaseDefinition>> ScanReleaseDefinitionsAsync(DataOptions dataOptions, string projectUrl)
+        {
+            if (!dataOptions.HasFlag(DataOptions.ReleaseDefinitions))
+            {
+                return null;
+            }
+
+            HttpResponseMessage httpReleaseDefResponse = await this.RestClient.GetAsync(new Uri($"{projectUrl}/_apis/release/definitions")).ConfigureAwait(false);
+            var responseReleaseDefContent = await httpReleaseDefResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var releaseDefResult = JsonConvert.DeserializeObject<AzureDevOpsReleaseDefinitions>(responseReleaseDefContent);
+
+            var releaseDefinitions = Array.Empty<AzureDevOpsReleaseDefinition>();
+            if (releaseDefResult.Count > 0)
+            {
+                var releaseDefinitionScanTasks = new HashSet<Task<AzureDevOpsReleaseDefinition>>();
+                var releaseDefinitionUrls = releaseDefResult.ReleaseDefinitions.Select(rdef => rdef.Url).ToArray();
+
+                foreach (var releaseDefUrl in releaseDefinitionUrls)
+                {
+                    releaseDefinitionScanTasks.Add(this.ScanReleaseDefinitionAsync(releaseDefUrl));
+                }
+
+                releaseDefinitions = await Task.WhenAll(releaseDefinitionScanTasks).ConfigureAwait(false);
+            }
+
+            return releaseDefinitions;
+        }
+
+        private async Task<AzureDevOpsReleaseDefinition> ScanReleaseDefinitionAsync(Uri releaseDefinitionUri)
+        {
+            HttpResponseMessage httpReleaseDefinitionResponse = await this.RestClient.GetAsync(releaseDefinitionUri).ConfigureAwait(false);
+            var releaseDefinitionResponseContent = await httpReleaseDefinitionResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+            return JsonConvert.DeserializeObject<AzureDevOpsReleaseDefinition>(releaseDefinitionResponseContent, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
         }
 
         private async Task<IEnumerable<AzureDevOpsBuild>> ScanBuildsAsync(DataOptions dataOptions, string projectUrl)
@@ -179,6 +220,10 @@ namespace AzureDevOps.Scanner
             HttpResponseMessage httpArtifactResponse = await this.RestClient.GetAsync(new Uri($"{build.Url}/artifacts?api-version=5.1")).ConfigureAwait(false);
             var artifactResponseContent = await httpArtifactResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
             build.Artifacts = JsonConvert.DeserializeObject<AzureDevOpsBuildArtifacts>(artifactResponseContent).Artifacts;
+
+            HttpResponseMessage httpTimelineResponse = await this.RestClient.GetAsync(new Uri($"{build.Url}/timeline")).ConfigureAwait(false);
+            var timeLineResponseContent = await httpTimelineResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+            build.Timeline = JsonConvert.DeserializeObject<AzureDevOpsBuildTimeline>(timeLineResponseContent, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
             return build;
         }
 

@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="AzureDevOpsRepository.cs" company="Freek Giele">
+// <copyright file="AzureDevOpsTimelineRecord.cs" company="Freek Giele">
 //    This code is licensed under the CC BY License.
 //    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
 //    ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
@@ -10,47 +10,39 @@
 
 namespace AzureDevOps.Model
 {
-    using System;
-    using System.Collections.Generic;
-
     /// <summary>
-    /// DTO for Repository.
+    /// Timeline of the tasks run while executing a pipeline.
     /// </summary>
-    public class AzureDevOpsRepository
+    public class AzureDevOpsTimelineRecord
     {
         /// <summary>
-        /// Gets or sets id.
+        /// Gets or sets the order of this step in the timeline.
         /// </summary>
-        public Guid Id { get; set; }
+        public int Order { get; set; }
 
         /// <summary>
-        /// Gets or sets name.
+        /// Gets or sets the displayname of the step in the timeline.
         /// </summary>
         public string Name { get; set; }
 
         /// <summary>
-        /// Gets or sets url.
+        /// Gets or sets the Type of step in the timeline.
         /// </summary>
-        public System.Uri Url { get; set; }
+        public string Type { get; set; }
 
         /// <summary>
-        /// Gets or sets web url.
+        /// Gets or sets the task identity.
         /// </summary>
-        public System.Uri WebUrl { get; set; }
+        public AzureDevOpsTask Task { get; set; }
 
         /// <summary>
-        /// Gets or sets defaultBranch.
+        /// Gets or sets the state of the step in the timeline.
         /// </summary>
-        public string DefaultBranch { get; set; }
+        public AzureDevOpsTimelineRecordState State { get; set; }
 
         /// <summary>
-        /// Gets or sets size.
+        /// Gets or sets the result of the step in the timeline.
         /// </summary>
-        public long Size { get; set; }
-
-        /// <summary>
-        /// Gets or sets policies.
-        /// </summary>
-        public IEnumerable<AzureDevOpsPolicy> Policies { get; set; }
+        public AzureDevOpsTaskResult Result { get; set; }
     }
 }

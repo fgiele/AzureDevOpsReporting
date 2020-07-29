@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="AzureDevOpsRepository.cs" company="Freek Giele">
+// <copyright file="AzureDevOpsReleaseDefinition.cs" company="Freek Giele">
 //    This code is licensed under the CC BY License.
 //    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
 //    ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
@@ -12,45 +12,42 @@ namespace AzureDevOps.Model
 {
     using System;
     using System.Collections.Generic;
+    using Newtonsoft.Json;
 
     /// <summary>
-    /// DTO for Repository.
+    /// DTO for release definition.
     /// </summary>
-    public class AzureDevOpsRepository
+    public class AzureDevOpsReleaseDefinition
     {
+        /// <summary>
+        /// Gets or sets links from this build.
+        /// </summary>
+        [JsonProperty("_links")]
+        public AzureDevOpsReleaseLinks Links { get; set; }
+
         /// <summary>
         /// Gets or sets id.
         /// </summary>
-        public Guid Id { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
-        /// Gets or sets name.
+        /// Gets or sets the name.
         /// </summary>
         public string Name { get; set; }
 
         /// <summary>
-        /// Gets or sets url.
+        /// Gets or sets the environments.
         /// </summary>
-        public System.Uri Url { get; set; }
+        public IEnumerable<AzureDevOpsReleaseDefinitionEnvironment> Environments { get; set; }
 
         /// <summary>
-        /// Gets or sets web url.
+        /// Gets or sets the release triggers.
         /// </summary>
-        public System.Uri WebUrl { get; set; }
+        public IEnumerable<AzureDevOpsTrigger> Triggers { get; set; }
 
         /// <summary>
-        /// Gets or sets defaultBranch.
+        /// Gets or sets the url of the release definition.
         /// </summary>
-        public string DefaultBranch { get; set; }
-
-        /// <summary>
-        /// Gets or sets size.
-        /// </summary>
-        public long Size { get; set; }
-
-        /// <summary>
-        /// Gets or sets policies.
-        /// </summary>
-        public IEnumerable<AzureDevOpsPolicy> Policies { get; set; }
+        public Uri Url { get; set; }
     }
 }

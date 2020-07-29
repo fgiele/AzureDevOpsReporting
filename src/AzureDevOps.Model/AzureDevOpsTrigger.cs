@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="AzureDevOpsTask.cs" company="Freek Giele">
+// <copyright file="AzureDevOpsTrigger.cs" company="Freek Giele">
 //    This code is licensed under the CC BY License.
 //    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
 //    ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
@@ -10,26 +10,21 @@
 
 namespace AzureDevOps.Model
 {
-    using System;
+    using System.Collections.Generic;
 
     /// <summary>
-    /// DTO for Pipeline Task.
+    /// DTO for release definition trigger.
     /// </summary>
-    public class AzureDevOpsTask
+    public class AzureDevOpsTrigger
     {
         /// <summary>
-        /// Gets or sets task ID.
+        /// Gets or sets the type of trigger.
         /// </summary>
-        public Guid Id { get; set; }
+        public string TriggerType { get; set; }
 
         /// <summary>
-        /// Gets or sets task name.
+        /// Gets or sets the trigger conditions.
         /// </summary>
-        public string Name { get; set; }
-
-        /// <summary>
-        /// Gets or sets task version.
-        /// </summary>
-        public string Version { get; set; }
+        public IEnumerable<AzureDevOpsTriggerCondition> TriggerConditions { get; set; }
     }
 }

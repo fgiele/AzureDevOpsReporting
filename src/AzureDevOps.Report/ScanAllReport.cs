@@ -15,12 +15,12 @@ namespace AzureDevOps.Report
     /// <summary>
     /// This report is only meant to trigger a complete scan. No output.
     /// </summary>
-    public class ScanAllReport : ReportDefinition, IReport
+    public class ScanAllReport : CsvReportDefinition, IReport
     {
         /// <summary>
         /// Gets the Data-Options for this report. All possible values.
         /// </summary>
-        public DataOptions DataOptions => DataOptions.Build | DataOptions.BuildArtifacts | DataOptions.Git | DataOptions.GitPolicies | DataOptions.Release | DataOptions.ReleaseDetails;
+        public DataOptions DataOptions => DataOptions.Build | DataOptions.BuildArtifacts | DataOptions.Git | DataOptions.GitPolicies | DataOptions.Release | DataOptions.ReleaseDetails | DataOptions.ReleaseDefinitions;
 
         /// <summary>
         /// Gets the name of the report. Placeholder, since no report is to be written.

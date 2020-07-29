@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="AzureDevOpsTask.cs" company="Freek Giele">
+// <copyright file="AzureDevOpsDeployPhase.cs" company="Freek Giele">
 //    This code is licensed under the CC BY License.
 //    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
 //    ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
@@ -10,26 +10,26 @@
 
 namespace AzureDevOps.Model
 {
-    using System;
+    using System.Collections.Generic;
 
     /// <summary>
-    /// DTO for Pipeline Task.
+    /// DTO for release environment.
     /// </summary>
-    public class AzureDevOpsTask
+    public class AzureDevOpsDeployPhase
     {
         /// <summary>
-        /// Gets or sets task ID.
-        /// </summary>
-        public Guid Id { get; set; }
-
-        /// <summary>
-        /// Gets or sets task name.
+        /// Gets or sets the name.
         /// </summary>
         public string Name { get; set; }
 
         /// <summary>
-        /// Gets or sets task version.
+        /// Gets or sets the rank of the approval step.
         /// </summary>
-        public string Version { get; set; }
+        public int Rank { get; set; }
+
+        /// <summary>
+        /// Gets or sets the workflow tasks.
+        /// </summary>
+        public IEnumerable<AzureDevOpsWorkflowTask> WorkflowTasks { get; set; }
     }
 }

@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="AzureDevOpsTask.cs" company="Freek Giele">
+// <copyright file="AzureDevOpsCondition.cs" company="Freek Giele">
 //    This code is licensed under the CC BY License.
 //    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
 //    ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
@@ -10,26 +10,24 @@
 
 namespace AzureDevOps.Model
 {
-    using System;
-
     /// <summary>
-    /// DTO for Pipeline Task.
+    /// DTO for release environment.
     /// </summary>
-    public class AzureDevOpsTask
+    public class AzureDevOpsCondition
     {
         /// <summary>
-        /// Gets or sets task ID.
-        /// </summary>
-        public Guid Id { get; set; }
-
-        /// <summary>
-        /// Gets or sets task name.
+        /// Gets or sets the name.
         /// </summary>
         public string Name { get; set; }
 
         /// <summary>
-        /// Gets or sets task version.
+        /// Gets or sets the type of condition.
         /// </summary>
-        public string Version { get; set; }
+        public AzureDevOpsConditionType ConditionType { get; set; }
+
+        /// <summary>
+        /// Gets or sets the value.
+        /// </summary>
+        public string Value { get; set; }
     }
 }

@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="AzureDevOpsTask.cs" company="Freek Giele">
+// <copyright file="AzureDevOpsConditionType.cs" company="Freek Giele">
 //    This code is licensed under the CC BY License.
 //    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
 //    ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
@@ -10,26 +10,29 @@
 
 namespace AzureDevOps.Model
 {
-    using System;
-
     /// <summary>
-    /// DTO for Pipeline Task.
+    /// Enumeration for the Condition type.
     /// </summary>
-    public class AzureDevOpsTask
+    public enum AzureDevOpsConditionType
     {
         /// <summary>
-        /// Gets or sets task ID.
+        /// The condition type is artifact.
         /// </summary>
-        public Guid Id { get; set; }
+        Artifact,
 
         /// <summary>
-        /// Gets or sets task name.
+        /// The condition type is environment state.
         /// </summary>
-        public string Name { get; set; }
+        EnvironmentState,
 
         /// <summary>
-        /// Gets or sets task version.
+        /// The condition type is event.
         /// </summary>
-        public string Version { get; set; }
+        Event,
+
+        /// <summary>
+        /// The condition type is undefined.
+        /// </summary>
+        Undefined,
     }
 }

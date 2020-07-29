@@ -34,6 +34,14 @@ namespace AzureDevOps.Scanner.Unittest
         private readonly AzureDevOpsBuildArtifact expectedArtifact = Builder<AzureDevOpsBuildArtifact>.CreateNew()
             .Do(moq => moq.Resource = Builder<AzureDevOpsArtifactResource>.CreateNew().Build()).Build();
 
+        private readonly AzureDevOpsBuildTimeline expectedTimeline = Builder<AzureDevOpsBuildTimeline>.CreateNew()
+            .Do(moq => moq.Records = new HashSet<AzureDevOpsTimelineRecord>
+            {
+                Builder<AzureDevOpsTimelineRecord>.CreateNew()
+                    .Do(moq => moq.Task = Builder<AzureDevOpsTask>.CreateNew().Build())
+                .Build(),
+            }).Build();
+
         private readonly AzureDevOpsRelease expectedRelease = Builder<AzureDevOpsRelease>.CreateNew()
             .Do(moq => moq.CreatedBy = Builder<AzureDevOpsIdentity>.CreateNew().Build())
             .Do(moq => moq.Url = new Uri($"{ExpectedUrl}/expectedrelease"))
@@ -95,6 +103,49 @@ namespace AzureDevOps.Scanner.Unittest
             })
                 .Build();
 
+        private readonly AzureDevOpsReleaseDefinition expectedReleaseDefinition = Builder<AzureDevOpsReleaseDefinition>.CreateNew()
+            .Do(moq => moq.Environments = new HashSet<AzureDevOpsReleaseDefinitionEnvironment>
+            {
+                Builder<AzureDevOpsReleaseDefinitionEnvironment>.CreateNew()
+                    .Do(moq => moq.Conditions = new HashSet<AzureDevOpsCondition>
+                    {
+                        Builder<AzureDevOpsCondition>.CreateNew().Build(),
+                    })
+                    .Do(moq => moq.DeployPhases = new HashSet<AzureDevOpsDeployPhase>
+                    {
+                        Builder<AzureDevOpsDeployPhase>.CreateNew()
+                        .Do(moq => moq.WorkflowTasks = new HashSet<AzureDevOpsWorkflowTask>
+                        {
+                            Builder<AzureDevOpsWorkflowTask>.CreateNew().Build(),
+                        })
+                        .Build(),
+                    })
+                    .Do(moq => moq.PreDeployApprovals = Builder<AzureDevOpsReleaseDefinitionApproval>.CreateNew()
+                        .Do(moq => moq.Approvals = new HashSet<AzureDevOpsReleaseDefinitionApprovalStep>
+                        {
+                            Builder<AzureDevOpsReleaseDefinitionApprovalStep>.CreateNew()
+                            .Do(moq => moq.Approver = Builder<AzureDevOpsIdentity>.CreateNew().Build())
+                            .Build(),
+                        })
+                        .Build())
+                    .Do(moq => moq.PostDeployApprovals = Builder<AzureDevOpsReleaseDefinitionApproval>.CreateNew()
+                        .Do(moq => moq.Approvals = new HashSet<AzureDevOpsReleaseDefinitionApprovalStep>
+                        {
+                            Builder<AzureDevOpsReleaseDefinitionApprovalStep>.CreateNew()
+                            .Do(moq => moq.Approver = Builder<AzureDevOpsIdentity>.CreateNew().Build())
+                            .Build(),
+                        })
+                        .Build())
+                    .Build(),
+            })
+            .Do(moq => moq.Url = new Uri($"{ExpectedUrl}/expectedreleasedefinition"))
+            .Do(moq => moq.Links = Builder<AzureDevOpsReleaseLinks>.CreateNew()
+                .Do(moq => moq.Web = Builder<AzureDevOpsLink>.CreateNew()
+                    .Do(moq => moq.Href = new Uri(ExpectedUrl))
+                    .Build())
+                .Build())
+            .Build();
+
         private readonly AzureDevOpsRepository expectedRepository = Builder<AzureDevOpsRepository>.CreateNew().Build();
 
         private readonly AzureDevOpsPolicy expectedPolicy = Builder<AzureDevOpsPolicy>.CreateNew()
@@ -130,6 +181,12 @@ namespace AzureDevOps.Scanner.Unittest
             Content = new StringContent($"{{\"count\":1,\"value\":[{{\"id\":{this.expectedArtifact.Id},\"name\":\"{this.expectedArtifact.Name}\",\"resource\":{{\"type\":\"{this.expectedArtifact.Resource.Type}\",\"downloadUrl\":\"{this.expectedArtifact.Resource.DownloadUrl}\"}}}}]}}"),
         };
 
+        private HttpResponseMessage OneTimelineResponse => new HttpResponseMessage
+        {
+            StatusCode = HttpStatusCode.OK,
+            Content = new StringContent($"{{\"records\":[{{\"type\":\"{this.expectedTimeline.Records.First().Type}\",\"name\":\"{this.expectedTimeline.Records.First().Name}\",\"state\":\"{this.expectedTimeline.Records.First().State}\",\"result\":\"{this.expectedTimeline.Records.First().Result}\",\"order\":{this.expectedTimeline.Records.First().Order},\"task\":{{\"id\":\"{this.expectedTimeline.Records.First().Task.Id}\",\"name\":\"{this.expectedTimeline.Records.First().Task.Name}\",\"version\":\"{this.expectedTimeline.Records.First().Task.Version}\"}}}}]}}"),
+        };
+
         private HttpResponseMessage OneReleaseResponse => new HttpResponseMessage
         {
             StatusCode = HttpStatusCode.OK,
@@ -147,6 +204,40 @@ namespace AzureDevOps.Scanner.Unittest
         {
             StatusCode = HttpStatusCode.OK,
             Content = new StringContent(this.ReleaseDetailJson),
+        };
+
+        private HttpResponseMessage OneReleaseDefinitionsResponse => new HttpResponseMessage
+        {
+            StatusCode = HttpStatusCode.OK,
+            Content = new StringContent($"{{\"count\":1,\"value\":[{{\"id\":{this.expectedReleaseDefinition.Id},\"url\":\"{this.expectedReleaseDefinition.Url}\"}}]}}"),
+        };
+
+        private HttpResponseMessage OneReleaseDefinitionResponse => new HttpResponseMessage
+        {
+            StatusCode = HttpStatusCode.OK,
+            Content = new StringContent($"{{\"id\":\"{this.expectedReleaseDefinition.Id}\",\"name\":\"{this.expectedReleaseDefinition.Name}\",\"environments\":[{{\"name\":\"{this.expectedReleaseDefinition.Environments.First().Name}\"" +
+                                $",\"preDeployApprovals\":{{\"approvals\":[" +
+                                $"{{\"rank\":{this.expectedReleaseDefinition.Environments.First().PreDeployApprovals.Approvals.First().Rank}" +
+                                $",\"isAutomated\":\"{this.expectedReleaseDefinition.Environments.First().PreDeployApprovals.Approvals.First().IsAutomated}\"" +
+                                $",\"approver\":{{\"displayName\":\"{this.expectedReleaseDefinition.Environments.First().PreDeployApprovals.Approvals.First().Approver.DisplayName}\"" +
+                                $",\"id\":\"{this.expectedReleaseDefinition.Environments.First().PreDeployApprovals.Approvals.First().Approver.Id}\"" +
+                                $",\"uniqueName\":\"{this.expectedReleaseDefinition.Environments.First().PreDeployApprovals.Approvals.First().Approver.UniqueName}\"}}}}]}}" +
+                                $",\"postDeployApprovals\":{{\"approvals\":[" +
+                                $"{{\"rank\":{this.expectedReleaseDefinition.Environments.First().PostDeployApprovals.Approvals.First().Rank}" +
+                                $",\"isAutomated\":\"{this.expectedReleaseDefinition.Environments.First().PostDeployApprovals.Approvals.First().IsAutomated}\"" +
+                                $",\"approver\":{{\"displayName\":\"{this.expectedReleaseDefinition.Environments.First().PostDeployApprovals.Approvals.First().Approver.DisplayName}\"" +
+                                $",\"id\":\"{this.expectedReleaseDefinition.Environments.First().PostDeployApprovals.Approvals.First().Approver.Id}\"" +
+                                $",\"uniqueName\":\"{this.expectedReleaseDefinition.Environments.First().PostDeployApprovals.Approvals.First().Approver.UniqueName}\"}}}}]}}" +
+                                $",\"deployPhases\":[{{\"rank\":{this.expectedReleaseDefinition.Environments.First().DeployPhases.First().Rank}" +
+                                $",\"name\":\"{this.expectedReleaseDefinition.Environments.First().DeployPhases.First().Name}\"" +
+                                $",\"workflowTasks\":[{{\"taskId\":\"{this.expectedReleaseDefinition.Environments.First().DeployPhases.First().WorkflowTasks.First().TaskId}\"" +
+                                $",\"name\":\"{this.expectedReleaseDefinition.Environments.First().DeployPhases.First().WorkflowTasks.First().Name}\"" +
+                                $",\"enabled\":\"{this.expectedReleaseDefinition.Environments.First().DeployPhases.First().WorkflowTasks.First().Enabled}\"" +
+                                $",\"definitionType\":\"{this.expectedReleaseDefinition.Environments.First().DeployPhases.First().WorkflowTasks.First().DefinitionType}\"}}]}}]" +
+                                $",\"conditions\":[{{\"name\":\"{this.expectedReleaseDefinition.Environments.First().Conditions.First().Name}\"" +
+                                $",\"conditionType\":\"{this.expectedReleaseDefinition.Environments.First().Conditions.First().ConditionType}\"" +
+                                $",\"value\":\"{this.expectedReleaseDefinition.Environments.First().Conditions.First().Value}\"}}]}},],\"url\":\"{this.expectedReleaseDefinition.Url}\"" +
+                                $",\"_links\":{{\"web\":{{\"href\":\"{this.expectedReleaseDefinition.Links.Web.Href}\"}}}}}}"),
         };
 
         private HttpResponseMessage OnePolicyResponse => new HttpResponseMessage
@@ -296,6 +387,15 @@ namespace AzureDevOps.Scanner.Unittest
                 .Returns(this.OneArtifactResponse);
         }
 
+        private void HttpMockOneTimeline()
+        {
+            this.mockHttpMessageHandler.Setup(
+                    mh => mh.Send(
+                        It.Is<HttpRequestMessage>(
+                            req => req.RequestUri.ToString() == $"{this.expectedBuild.Url}/timeline")))
+                .Returns(this.OneTimelineResponse);
+        }
+
         private void HttpMockOneRelease()
         {
             this.mockHttpMessageHandler.Setup(
@@ -330,6 +430,24 @@ namespace AzureDevOps.Scanner.Unittest
                     It.Is<HttpRequestMessage>(
                         req => req.RequestUri.ToString() == $"{this.expectedRelease.Url}")))
                 .Returns(this.OneReleaseDetailResponse);
+        }
+
+        private void HttpMockListReleaseDefinitions()
+        {
+            this.mockHttpMessageHandler.Setup(
+                mh => mh.Send(
+                    It.Is<HttpRequestMessage>(
+                        req => req.RequestUri.ToString() == $"{ExpectedUrl}/{ExpectedCollection}/{this.expectedProject.Id}/_apis/release/definitions")))
+                .Returns(this.OneReleaseDefinitionsResponse);
+        }
+
+        private void HttpMockOneReleaseDefinition()
+        {
+            this.mockHttpMessageHandler.Setup(
+                mh => mh.Send(
+                    It.Is<HttpRequestMessage>(
+                        req => req.RequestUri.ToString() == $"{this.expectedReleaseDefinition.Url}")))
+                .Returns(this.OneReleaseDefinitionResponse);
         }
     }
 }

@@ -11,12 +11,19 @@
 namespace AzureDevOps.Model
 {
     using System.Collections.Generic;
+    using Newtonsoft.Json;
 
     /// <summary>
     /// DTO for build.
     /// </summary>
     public class AzureDevOpsBuild
     {
+        /// <summary>
+        /// Gets or sets links from this build.
+        /// </summary>
+        [JsonProperty("_links")]
+        public AzureDevOpsBuildLinks Links { get; set; }
+
         /// <summary>
         /// Gets or sets id.
         /// </summary>
@@ -68,8 +75,18 @@ namespace AzureDevOps.Model
         public string QueueTime { get; set; }
 
         /// <summary>
+        /// Gets or sets reason this build was queued.
+        /// </summary>
+        public AzureDevOpsBuildReason Reason { get; set; }
+
+        /// <summary>
         /// Gets or sets artifacts.
         /// </summary>
         public IEnumerable<AzureDevOpsBuildArtifact> Artifacts { get; set; }
+
+        /// <summary>
+        /// Gets or sets the timeline.
+        /// </summary>
+        public AzureDevOpsBuildTimeline Timeline { get; set; }
     }
 }

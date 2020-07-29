@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="AzureDevOpsTask.cs" company="Freek Giele">
+// <copyright file="AzureDevOpsReleaseDefinitions.cs" company="Freek Giele">
 //    This code is licensed under the CC BY License.
 //    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
 //    ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
@@ -10,26 +10,23 @@
 
 namespace AzureDevOps.Model
 {
-    using System;
+    using System.Collections.Generic;
+    using Newtonsoft.Json;
 
     /// <summary>
-    /// DTO for Pipeline Task.
+    /// DTO for release definitions.
     /// </summary>
-    public class AzureDevOpsTask
+    public class AzureDevOpsReleaseDefinitions
     {
         /// <summary>
-        /// Gets or sets task ID.
+        /// Gets or sets number of found release definitions.
         /// </summary>
-        public Guid Id { get; set; }
+        public int Count { get; set; }
 
         /// <summary>
-        /// Gets or sets task name.
+        /// Gets or sets list of release definitions.
         /// </summary>
-        public string Name { get; set; }
-
-        /// <summary>
-        /// Gets or sets task version.
-        /// </summary>
-        public string Version { get; set; }
+        [JsonProperty("value")]
+        public IEnumerable<AzureDevOpsReleaseDefinition> ReleaseDefinitions { get; set; }
     }
 }

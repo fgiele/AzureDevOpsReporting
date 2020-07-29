@@ -47,5 +47,10 @@ namespace AzureDevOps.Model
         /// Scan release details
         /// </summary>
         ReleaseDetails = 32,
+
+        /// <summary>
+        /// Scan release definitions
+        /// </summary>
+        ReleaseDefinitions = 64,
     }
 }

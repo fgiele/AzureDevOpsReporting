@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="AzureDevOpsTask.cs" company="Freek Giele">
+// <copyright file="AzureDevOpsTaskResult.cs" company="Freek Giele">
 //    This code is licensed under the CC BY License.
 //    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
 //    ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
@@ -10,26 +10,39 @@
 
 namespace AzureDevOps.Model
 {
-    using System;
-
     /// <summary>
-    /// DTO for Pipeline Task.
+    /// Result of task within a timeline record.
     /// </summary>
-    public class AzureDevOpsTask
+    public enum AzureDevOpsTaskResult
     {
         /// <summary>
-        /// Gets or sets task ID.
+        /// Not executed, subsequently abandoned run.
         /// </summary>
-        public Guid Id { get; set; }
+        Abandoned,
 
         /// <summary>
-        /// Gets or sets task name.
+        /// Not executed, cancelled.
         /// </summary>
-        public string Name { get; set; }
+        Canceled,
 
         /// <summary>
-        /// Gets or sets task version.
+        /// Failed in execution.
         /// </summary>
-        public string Version { get; set; }
+        Failed,
+
+        /// <summary>
+        /// Skipped during execution.
+        /// </summary>
+        Skipped,
+
+        /// <summary>
+        /// Succesfully executed.
+        /// </summary>
+        Succeeded,
+
+        /// <summary>
+        /// Succesfully executed with warnings.
+        /// </summary>
+        SucceededWithIssues,
     }
 }

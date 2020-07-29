@@ -17,7 +17,7 @@ namespace AzureDevOps.Report
     /// <summary>
     /// Release report definition.
     /// </summary>
-    public class ReleaseReport : ReportDefinition, IReport
+    public class ReleaseReport : CsvReportDefinition, IReport
     {
         private readonly Guid replaceTokenTaskId = new Guid("a8515ec8-7254-4ffd-912c-86772e2b5962");
 

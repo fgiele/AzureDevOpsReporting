@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="AzureDevOpsTask.cs" company="Freek Giele">
+// <copyright file="AzureDevOpsTimelineRecordState.cs" company="Freek Giele">
 //    This code is licensed under the CC BY License.
 //    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
 //    ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
@@ -10,26 +10,24 @@
 
 namespace AzureDevOps.Model
 {
-    using System;
-
     /// <summary>
-    /// DTO for Pipeline Task.
+    /// State of task within a timeline record.
     /// </summary>
-    public class AzureDevOpsTask
+    public enum AzureDevOpsTimelineRecordState
     {
         /// <summary>
-        /// Gets or sets task ID.
+        /// Completed state
         /// </summary>
-        public Guid Id { get; set; }
+        Completed,
 
         /// <summary>
-        /// Gets or sets task name.
+        /// In progress state
         /// </summary>
-        public string Name { get; set; }
+        InProgress,
 
         /// <summary>
-        /// Gets or sets task version.
+        /// Pending state
         /// </summary>
-        public string Version { get; set; }
+        Pending,
     }
 }

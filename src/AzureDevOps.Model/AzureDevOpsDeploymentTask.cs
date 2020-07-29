@@ -16,6 +16,11 @@ namespace AzureDevOps.Model
     public class AzureDevOpsDeploymentTask
     {
         /// <summary>
+        /// Gets or sets displayname.
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
         /// Gets or sets task.
         /// </summary>
         public AzureDevOpsTask Task { get; set; }

@@ -16,7 +16,7 @@ namespace AzureDevOps.Report
     /// <summary>
     /// Build report definition.
     /// </summary>
-    public class BuildReport : ReportDefinition, IReport
+    public class BuildReport : CsvReportDefinition, IReport
     {
         /// <summary>
         /// Gets data-options in use with the build report.
