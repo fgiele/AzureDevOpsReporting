@@ -55,6 +55,8 @@ namespace AzureDevOps.Report
                     this.AddText("## Executed builds");
                     this.MakeBuildReport(project);
                     this.AddText("## Executed releases");
+                    this.MakeReleaseReport(project);
+                    this.AddText("## Release definitions");
                     this.MakeReleaseDefinitionReport(project);
                 }
             }
@@ -164,7 +166,7 @@ namespace AzureDevOps.Report
             }
         }
 
-        private void MakeReleaseDefinitionReport(AzureDevOpsProject project)
+        private void MakeReleaseReport(AzureDevOpsProject project)
         {
             this.CreateHeaders(
                 "Name",
@@ -209,6 +211,54 @@ namespace AzureDevOps.Report
                             remark,
                             release.Links.Web.Href.AbsoluteUri);
                     }
+                }
+            }
+        }
+
+        private void MakeReleaseDefinitionReport(AzureDevOpsProject project)
+        {
+            this.CreateHeaders(
+                 "Name",
+                 "Environment",
+                 "CD",
+                 "PreviousEnvironment",
+                 "PreApproval",
+                 "PreApprover(s)",
+                 "PostApproval",
+                 "PostApprover(s)",
+                 "Test* tasks",
+                 "Link");
+
+            foreach (var releaseDefinition in project.ReleaseDefinitions)
+            {
+                foreach (var environment in releaseDefinition.Environments)
+                {
+                    var cdRelease = environment.Conditions.Any(cond => cond.ConditionType == AzureDevOpsConditionType.Artifact || cond.ConditionType == AzureDevOpsConditionType.EnvironmentState);
+                    var environmentTriggers = string.Join(", ", environment.Conditions.Where(cond => cond.ConditionType == AzureDevOpsConditionType.EnvironmentState).Select(cond => cond.Name));
+                    var preApproval = environment.PreDeployApprovals.Approvals.Any(app => !app.IsAutomated);
+                    var preApprovers = string.Join(", ", environment.PreDeployApprovals.Approvals.Where(app => !app.IsAutomated).Select(app => app.Approver.DisplayName));
+                    var postApproval = environment.PostDeployApprovals.Approvals.Any(app => !app.IsAutomated);
+                    var postApprovers = string.Join(", ", environment.PostDeployApprovals.Approvals.Where(app => !app.IsAutomated).Select(app => app.Approver.DisplayName));
+
+                    var testTaskArray = environment
+                        .DeployPhases?
+                        .SelectMany(depPhase => depPhase.WorkflowTasks)?
+                        .Where(task => task.Name.Contains("test", StringComparison.OrdinalIgnoreCase))?
+                        .Select(task => task.Name).ToArray();
+                    var hasTests = testTaskArray != null && testTaskArray.Length > 0;
+                    var tests = hasTests ? string.Join(", ", testTaskArray) : string.Empty;
+
+                    this.AddRow(
+                        releaseDefinition.Name,
+                        environment.Name,
+                        cdRelease ? "(/)" : "(x)",
+                        environmentTriggers,
+                        preApproval ? "(/)" : "(x)",
+                        preApprovers,
+                        postApproval ? "(/)" : "(x)",
+                        postApprovers,
+                        tests,
+                        releaseDefinition.Links?.Web?.Href?.AbsoluteUri);
                 }
             }
         }

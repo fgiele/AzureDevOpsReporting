@@ -258,6 +258,13 @@ namespace AzureDevOps.Report.Unittest
                     {
                         Name = testString,
                         Url = testUri,
+                        Links = new AzureDevOpsReleaseLinks
+                        {
+                            Web = new AzureDevOpsLink
+                            {
+                                Href = testUri,
+                            },
+                        },
                         Triggers = new HashSet<AzureDevOpsTrigger>
                         {
                             new AzureDevOpsTrigger
@@ -283,7 +290,17 @@ namespace AzureDevOps.Report.Unittest
                                     {
                                         new AzureDevOpsReleaseDefinitionApprovalStep
                                         {
-                                            Approver = new AzureDevOpsIdentity(),
+                                            IsAutomated = true,
+                                        },
+                                    },
+                                },
+                                PostDeployApprovals = new AzureDevOpsReleaseDefinitionApproval
+                                {
+                                    Approvals = new HashSet<AzureDevOpsReleaseDefinitionApprovalStep>
+                                    {
+                                        new AzureDevOpsReleaseDefinitionApprovalStep
+                                        {
+                                            IsAutomated = true,
                                         },
                                     },
                                 },
@@ -291,9 +308,67 @@ namespace AzureDevOps.Report.Unittest
                                 {
                                     new AzureDevOpsCondition
                                     {
-                                        ConditionType = AzureDevOpsConditionType.Artifact,
+                                        ConditionType = AzureDevOpsConditionType.Event,
                                         Name = testString,
                                         Value = testString,
+                                    },
+                                },
+                            },
+                            new AzureDevOpsReleaseDefinitionEnvironment
+                            {
+                                Name = testString,
+                                PreDeployApprovals = new AzureDevOpsReleaseDefinitionApproval
+                                {
+                                    Approvals = new HashSet<AzureDevOpsReleaseDefinitionApprovalStep>
+                                    {
+                                        new AzureDevOpsReleaseDefinitionApprovalStep
+                                        {
+                                            IsAutomated = false,
+                                            Approver = new AzureDevOpsIdentity
+                                            {
+                                                DisplayName = testString,
+                                            },
+                                        },
+                                    },
+                                },
+                                PostDeployApprovals = new AzureDevOpsReleaseDefinitionApproval
+                                {
+                                    Approvals = new HashSet<AzureDevOpsReleaseDefinitionApprovalStep>
+                                    {
+                                        new AzureDevOpsReleaseDefinitionApprovalStep
+                                        {
+                                            IsAutomated = false,
+                                            Approver = new AzureDevOpsIdentity
+                                            {
+                                                DisplayName = testString,
+                                            },
+                                        },
+                                    },
+                                },
+                                Conditions = new HashSet<AzureDevOpsCondition>
+                                {
+                                    new AzureDevOpsCondition
+                                    {
+                                        ConditionType = AzureDevOpsConditionType.EnvironmentState,
+                                        Name = testString,
+                                        Value = testString,
+                                    },
+                                },
+                                DeployPhases = new HashSet<AzureDevOpsDeployPhase>
+                                {
+                                    new AzureDevOpsDeployPhase
+                                    {
+                                        WorkflowTasks = new HashSet<AzureDevOpsWorkflowTask>
+                                        {
+                                            new AzureDevOpsWorkflowTask
+                                            {
+                                                Name = testString,
+                                            },
+                                            new AzureDevOpsWorkflowTask
+                                            {
+                                                Name = testString,
+                                            },
+                                        },
                                     },
                                 },
                             },
@@ -428,6 +503,11 @@ namespace AzureDevOps.Report.Unittest
             expectedBuilder.AppendLine("|---|---|---|---|---|---|---|---|");
             expectedBuilder.AppendLine("|testValue|(x)|testValue|1|(x)|(x)||https://www.example.com/|");
             expectedBuilder.AppendLine("|testValue|(/)|testValue|1|(/)|(/)|Tests executed: execTest|https://www.example.com/|");
+            expectedBuilder.AppendLine("## Release definitions");
+            expectedBuilder.AppendLine("|Name|Environment|CD|PreviousEnvironment|PreApproval|PreApprover(s)|PostApproval|PostApprover(s)|Test* tasks|Link|");
+            expectedBuilder.AppendLine("|---|---|---|---|---|---|---|---|---|---|");
+            expectedBuilder.AppendLine("|testValue|testValue|(x)||(x)||(x)|||https://www.example.com/|");
+            expectedBuilder.AppendLine("|testValue|testValue|(/)|testValue|(/)|testValue|(/)|testValue|testValue, testValue|https://www.example.com/|");
 
             return expectedBuilder.ToString();
         }

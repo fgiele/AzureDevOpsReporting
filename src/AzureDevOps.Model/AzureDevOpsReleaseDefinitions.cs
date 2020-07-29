@@ -14,17 +14,17 @@ namespace AzureDevOps.Model
     using Newtonsoft.Json;
 
     /// <summary>
-    /// DTO for builds.
+    /// DTO for release definitions.
     /// </summary>
     public class AzureDevOpsReleaseDefinitions
     {
         /// <summary>
-        /// Gets or sets number of found builds.
+        /// Gets or sets number of found release definitions.
         /// </summary>
         public int Count { get; set; }
 
         /// <summary>
-        /// Gets or sets list of builds.
+        /// Gets or sets list of release definitions.
         /// </summary>
         [JsonProperty("value")]
         public IEnumerable<AzureDevOpsReleaseDefinition> ReleaseDefinitions { get; set; }
