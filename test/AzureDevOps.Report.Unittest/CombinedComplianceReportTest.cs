@@ -269,7 +269,7 @@ namespace AzureDevOps.Report.Unittest
                         {
                             new AzureDevOpsTrigger
                             {
-                                TriggerType = testString,
+                                TriggerType = AzureDevOpsTriggerType.ArtifactSource,
                                 TriggerConditions = new HashSet<AzureDevOpsTriggerCondition>
                                 {
                                     new AzureDevOpsTriggerCondition
