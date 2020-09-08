@@ -70,7 +70,7 @@ namespace AzureDevOps.Report.Unittest
         public void Generate_WithInstance_GeneratesReport()
         {
             // Arrange
-            var expected = $"SEP=;{Environment.NewLine}Collection;Project;Name;Environment;CD;PreviousEnvironment;PreApproval;PreApprover(s);PostApproval;PostApprover(s);Test* tasks;Link;{Environment.NewLine}testValue;testValue;testValue;testValue;False;;False;;False;;;https://www.example.com/;{Environment.NewLine}testValue;testValue;testValue;testValue;True;;True;testIdentity;True;testIdentity;testValue;https://www.example.com/;{Environment.NewLine}testValue;testValue;testValue;testValue;True;testValue;True;testIdentity;True;testIdentity;testValue;https://www.example.com/;{Environment.NewLine}";
+            var expected = $"SEP=;{Environment.NewLine}Collection;Project;Name;Environment;Filter;CD trigger;Prev. Environment;PreApproval;PreApprover(s);PostApproval;PostApprover(s);Test* tasks;Link;{Environment.NewLine}testValue;testValue;testValue;testValue;;False;;False;;False;;;https://www.example.com/;{Environment.NewLine}testValue;testValue;testValue;testValue;{{\"\"sourceBranch\"\":\"\"master\"\"}};True;;True;testIdentity;True;testIdentity;testValue;https://www.example.com/;{Environment.NewLine}testValue;testValue;testValue;testValue;{{\"\"sourceBranch\"\":\"\"master\"\"}};True;testValue;True;testIdentity;True;testIdentity;testValue;https://www.example.com/;{Environment.NewLine}";
             var testString = "testValue";
             var testIdentity = new AzureDevOpsIdentity { DisplayName = "testIdentity" };
             var testUri = new Uri("https://www.example.com/");
@@ -104,6 +104,7 @@ namespace AzureDevOps.Report.Unittest
                                 },
                             },
                         },
+                        Triggers = new HashSet<AzureDevOpsTrigger>(),
                         Links = new AzureDevOpsReleaseLinks
                         {
                             Web = new AzureDevOpsLink
@@ -125,6 +126,7 @@ namespace AzureDevOps.Report.Unittest
                                     new AzureDevOpsCondition
                                     {
                                         ConditionType = AzureDevOpsConditionType.Artifact,
+                                        Value = $"{{\"sourceBranch\":\"master\"}}",
                                     },
                                 },
                                 DeployPhases = new HashSet<AzureDevOpsDeployPhase>
@@ -160,6 +162,20 @@ namespace AzureDevOps.Report.Unittest
                                             IsAutomated = false,
                                             Approver = testIdentity,
                                         },
+                                    },
+                                },
+                            },
+                        },
+                        Triggers = new HashSet<AzureDevOpsTrigger>
+                        {
+                            new AzureDevOpsTrigger
+                            {
+                                TriggerType = AzureDevOpsTriggerType.ArtifactSource,
+                                TriggerConditions = new HashSet<AzureDevOpsTriggerCondition>
+                                {
+                                    new AzureDevOpsTriggerCondition
+                                    {
+                                        SourceBranch = testString,
                                     },
                                 },
                             },
@@ -187,6 +203,11 @@ namespace AzureDevOps.Report.Unittest
                                         ConditionType = AzureDevOpsConditionType.EnvironmentState,
                                         Name = testString,
                                     },
+                                    new AzureDevOpsCondition
+                                    {
+                                        ConditionType = AzureDevOpsConditionType.Artifact,
+                                        Value = $"{{\"sourceBranch\":\"master\"}}",
+                                    },
                                 },
                                 DeployPhases = new HashSet<AzureDevOpsDeployPhase>
                                 {
@@ -223,6 +244,13 @@ namespace AzureDevOps.Report.Unittest
                                         },
                                     },
                                 },
+                            },
+                        },
+                        Triggers = new HashSet<AzureDevOpsTrigger>
+                        {
+                            new AzureDevOpsTrigger
+                            {
+                                TriggerType = AzureDevOpsTriggerType.ArtifactSource,
                             },
                         },
                         Links = new AzureDevOpsReleaseLinks

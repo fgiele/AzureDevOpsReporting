@@ -46,8 +46,9 @@ namespace AzureDevOps.Report
                 "Project",
                 "Name",
                 "Environment",
-                "CD",
-                "PreviousEnvironment",
+                "Filter",
+                "CD trigger",
+                "Prev. Environment",
                 "PreApproval",
                 "PreApprover(s)",
                 "PostApproval",
@@ -63,8 +64,9 @@ namespace AzureDevOps.Report
                     {
                         foreach (var environment in releaseDefinition.Environments)
                         {
-                            var cdRelease = environment.Conditions.Any(cond => cond.ConditionType == AzureDevOpsConditionType.Artifact || cond.ConditionType == AzureDevOpsConditionType.EnvironmentState);
-                            var environmentTriggers = string.Join(", ", environment.Conditions.Where(cond => cond.ConditionType == AzureDevOpsConditionType.EnvironmentState).Select(cond => cond.Name));
+                            var cdRelease = releaseDefinition.Triggers.Any(tr => tr.TriggerType == AzureDevOpsTriggerType.ArtifactSource);
+                            var environmentSource = environment.Conditions.Where(cond => cond.ConditionType == AzureDevOpsConditionType.EnvironmentState).Select(cond => cond.Name).ToArray();
+                            var filter = string.Join(", ", environment.Conditions.Where(cond => cond.ConditionType == AzureDevOpsConditionType.Artifact).Select(cond => cond.Value));
                             var preApproval = environment.PreDeployApprovals.Approvals.Any(app => !app.IsAutomated);
                             var preApprovers = string.Join(", ", environment.PreDeployApprovals.Approvals.Where(app => !app.IsAutomated).Select(app => app.Approver.DisplayName));
                             var postApproval = environment.PostDeployApprovals.Approvals.Any(app => !app.IsAutomated);
@@ -83,8 +85,9 @@ namespace AzureDevOps.Report
                                 project.Name,
                                 releaseDefinition.Name,
                                 environment.Name,
+                                filter,
                                 cdRelease,
-                                environmentTriggers,
+                                string.Join(", ", environmentSource),
                                 preApproval,
                                 preApprovers,
                                 postApproval,

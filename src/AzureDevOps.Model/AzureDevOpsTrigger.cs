@@ -20,7 +20,7 @@ namespace AzureDevOps.Model
         /// <summary>
         /// Gets or sets the type of trigger.
         /// </summary>
-        public string TriggerType { get; set; }
+        public AzureDevOpsTriggerType TriggerType { get; set; }
 
         /// <summary>
         /// Gets or sets the trigger conditions.
