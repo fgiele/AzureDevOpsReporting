@@ -163,6 +163,18 @@ namespace AzureDevOps.Scanner.Unittest
             Content = new StringContent("{\"count\":0,\"value\":[]}"),
         };
 
+        private HttpResponseMessage NoContentResponse => new HttpResponseMessage
+        {
+            StatusCode = HttpStatusCode.NoContent,
+            Content = new StringContent(string.Empty),
+        };
+
+        private HttpResponseMessage UnauthenticatedResponse => new HttpResponseMessage
+        {
+            StatusCode = HttpStatusCode.Unauthorized,
+            Content = new StringContent(string.Empty),
+        };
+
         private HttpResponseMessage OneProjectResponse => new HttpResponseMessage
         {
             StatusCode = HttpStatusCode.OK,
@@ -367,6 +379,24 @@ namespace AzureDevOps.Scanner.Unittest
                     It.Is<HttpRequestMessage>(
                         req => req.RequestUri.ToString() == $"{ExpectedUrl}/{ExpectedCollection}/_apis/projects")))
                 .Returns(this.OneProjectResponse);
+        }
+
+        private void HttpMockNoProject()
+        {
+            this.mockHttpMessageHandler.Setup(
+                mh => mh.Send(
+                    It.Is<HttpRequestMessage>(
+                        req => req.RequestUri.ToString() == $"{ExpectedUrl}/{ExpectedCollection}/_apis/projects")))
+                .Returns(this.NoContentResponse);
+        }
+
+        private void HttpMockFailProject()
+        {
+            this.mockHttpMessageHandler.Setup(
+                mh => mh.Send(
+                    It.Is<HttpRequestMessage>(
+                        req => req.RequestUri.ToString() == $"{ExpectedUrl}/{ExpectedCollection}/_apis/projects")))
+                .Returns(this.UnauthenticatedResponse);
         }
 
         private void HttpMockOneBuild()
