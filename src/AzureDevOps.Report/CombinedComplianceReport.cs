@@ -86,7 +86,7 @@ namespace AzureDevOps.Report
                 foreach (var policy in repository.Policies.Where(pol => pol.IsEnabled && pol.IsBlocking))
                 {
                     hasPolicy = true;
-                    foreach (var scope in policy.Settings.Scope.Where(scope => scope.RefName.Contains("master", StringComparison.OrdinalIgnoreCase)))
+                    foreach (var scope in policy.Settings.Scope.Where(scope => scope.RefName != null && scope.RefName.Contains("master", StringComparison.OrdinalIgnoreCase)))
                     {
                         if (policy.PolicyType.Id.ToString() == PolicyType.MinimumNumberOfReviewers)
                         {

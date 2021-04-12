@@ -61,6 +61,37 @@ namespace AzureDevOps.Scanner
             return this.ScanAzDOAsync(dataOptions, collections, azureDevOpsUrl);
         }
 
+        private static async Task<T> GetTypedAsync<T>(HttpClient restClient, string restUrl)
+        {
+            var restUri = new Uri(restUrl);
+            var retry = 0;
+            HttpResponseMessage httpResponse;
+            var statusCode = System.Net.HttpStatusCode.Unused;
+            var statusMessage = string.Empty;
+            while (retry < 3)
+            {
+                httpResponse = await restClient.GetAsync(restUri).ConfigureAwait(false);
+
+                statusCode = httpResponse.StatusCode;
+                statusMessage = httpResponse.ReasonPhrase;
+
+                if (statusCode == System.Net.HttpStatusCode.OK)
+                {
+                    var responseContent = await httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    return JsonConvert.DeserializeObject<T>(responseContent, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                }
+                else if (statusCode == System.Net.HttpStatusCode.NoContent)
+                {
+                    return default;
+                }
+
+                await Task.Delay(1000).ConfigureAwait(false);
+                retry++;
+            }
+
+            throw new HttpRequestException($"Unable to request {restUri}, statuscode: {statusCode}, message: {statusMessage}");
+        }
+
         private async Task<AzureDevOpsInstance> ScanAzDOAsync(DataOptions dataOptions, IEnumerable<string> collections, Uri azureDevOpsUrl)
         {
             this.projectsDoneCount = 0;
@@ -93,10 +124,7 @@ namespace AzureDevOps.Scanner
 
         private async Task<AzureDevOpsCollection> ScanCollectionAsync(DataOptions dataOptions, string collection, string azureDevOpsUrl)
         {
-            HttpResponseMessage httpProjectResponse = await this.RestClient.GetAsync(new Uri($"{azureDevOpsUrl}{collection}/_apis/projects")).ConfigureAwait(false);
-            var responseProjectContent = await httpProjectResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
-            var projectResult = JsonConvert.DeserializeObject<AzureDevOpsProjects>(responseProjectContent);
-
+            var projectResult = await GetTypedAsync<AzureDevOpsProjects>(this.RestClient, $"{azureDevOpsUrl}{collection}/_apis/projects").ConfigureAwait(false);
             var azDOCollection = new AzureDevOpsCollection { Name = collection };
             var scanProjectTasks = new HashSet<Task<AzureDevOpsProject>>();
 
@@ -156,9 +184,7 @@ namespace AzureDevOps.Scanner
                 return null;
             }
 
-            HttpResponseMessage httpReleaseDefResponse = await this.RestClient.GetAsync(new Uri($"{projectUrl}/_apis/release/definitions")).ConfigureAwait(false);
-            var responseReleaseDefContent = await httpReleaseDefResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
-            var releaseDefResult = JsonConvert.DeserializeObject<AzureDevOpsReleaseDefinitions>(responseReleaseDefContent);
+            var releaseDefResult = await GetTypedAsync<AzureDevOpsReleaseDefinitions>(this.RestClient, $"{projectUrl}/_apis/release/definitions").ConfigureAwait(false);
 
             var releaseDefinitions = Array.Empty<AzureDevOpsReleaseDefinition>();
             if (releaseDefResult.Count > 0)
@@ -168,7 +194,7 @@ namespace AzureDevOps.Scanner
 
                 foreach (var releaseDefUrl in releaseDefinitionUrls)
                 {
-                    releaseDefinitionScanTasks.Add(this.ScanReleaseDefinitionAsync(releaseDefUrl));
+                    releaseDefinitionScanTasks.Add(this.ScanReleaseDefinitionAsync(releaseDefUrl.AbsoluteUri));
                 }
 
                 releaseDefinitions = await Task.WhenAll(releaseDefinitionScanTasks).ConfigureAwait(false);
@@ -177,11 +203,9 @@ namespace AzureDevOps.Scanner
             return releaseDefinitions;
         }
 
-        private async Task<AzureDevOpsReleaseDefinition> ScanReleaseDefinitionAsync(Uri releaseDefinitionUri)
+        private async Task<AzureDevOpsReleaseDefinition> ScanReleaseDefinitionAsync(string releaseDefinitionUrl)
         {
-            HttpResponseMessage httpReleaseDefinitionResponse = await this.RestClient.GetAsync(releaseDefinitionUri).ConfigureAwait(false);
-            var releaseDefinitionResponseContent = await httpReleaseDefinitionResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
-            return JsonConvert.DeserializeObject<AzureDevOpsReleaseDefinition>(releaseDefinitionResponseContent, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+            return await GetTypedAsync<AzureDevOpsReleaseDefinition>(this.RestClient, releaseDefinitionUrl).ConfigureAwait(false);
         }
 
         private async Task<IEnumerable<AzureDevOpsBuild>> ScanBuildsAsync(DataOptions dataOptions, string projectUrl)
@@ -192,9 +216,7 @@ namespace AzureDevOps.Scanner
                 return null;
             }
 
-            HttpResponseMessage httpBuildResponse = await this.RestClient.GetAsync(new Uri($"{projectUrl}/_apis/build/builds")).ConfigureAwait(false);
-            var responseBuildContent = await httpBuildResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
-            var buildresult = JsonConvert.DeserializeObject<AzureDevOpsBuilds>(responseBuildContent);
+            var buildresult = await GetTypedAsync<AzureDevOpsBuilds>(this.RestClient, $"{projectUrl}/_apis/build/builds").ConfigureAwait(false);
 
             var builds = Array.Empty<AzureDevOpsBuild>();
             if (buildresult.Count > 0)
@@ -217,13 +239,8 @@ namespace AzureDevOps.Scanner
 
         private async Task<AzureDevOpsBuild> ScanBuildAsync(AzureDevOpsBuild build)
         {
-            HttpResponseMessage httpArtifactResponse = await this.RestClient.GetAsync(new Uri($"{build.Url}/artifacts?api-version=5.1")).ConfigureAwait(false);
-            var artifactResponseContent = await httpArtifactResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
-            build.Artifacts = JsonConvert.DeserializeObject<AzureDevOpsBuildArtifacts>(artifactResponseContent).Artifacts;
-
-            HttpResponseMessage httpTimelineResponse = await this.RestClient.GetAsync(new Uri($"{build.Url}/timeline")).ConfigureAwait(false);
-            var timeLineResponseContent = await httpTimelineResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
-            build.Timeline = JsonConvert.DeserializeObject<AzureDevOpsBuildTimeline>(timeLineResponseContent, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+            build.Artifacts = (await GetTypedAsync<AzureDevOpsBuildArtifacts>(this.RestClient, $"{build.Url}/artifacts?api-version=5.1").ConfigureAwait(false)).Artifacts;
+            build.Timeline = await GetTypedAsync<AzureDevOpsBuildTimeline>(this.RestClient, $"{build.Url}/timeline").ConfigureAwait(false);
             return build;
         }
 
@@ -237,9 +254,7 @@ namespace AzureDevOps.Scanner
 
             // Azure DevOps services uses a different host for release management Rest calls
             projectUrl = projectUrl.Replace("https://dev.azure.com", "https://vsrm.dev.azure.com", StringComparison.OrdinalIgnoreCase);
-            HttpResponseMessage httpReleaseResponse = await this.RestClient.GetAsync(new Uri($"{projectUrl}/_apis/release/releases")).ConfigureAwait(false);
-            var responseReleaseContent = await httpReleaseResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
-            var releaseresult = JsonConvert.DeserializeObject<AzureDevOpsReleases>(responseReleaseContent);
+            var releaseresult = await GetTypedAsync<AzureDevOpsReleases>(this.RestClient, $"{projectUrl}/_apis/release/releases").ConfigureAwait(false);
 
             var releases = Array.Empty<AzureDevOpsRelease>();
             if (releaseresult.Count > 0)
@@ -262,9 +277,7 @@ namespace AzureDevOps.Scanner
 
         private async Task<AzureDevOpsRelease> ScanReleaseDetailAsync(AzureDevOpsRelease release)
         {
-            HttpResponseMessage httpReleaseDetailResponse = await this.RestClient.GetAsync(new Uri($"{release.Url}")).ConfigureAwait(false);
-            var releaseDetailResponseContent = await httpReleaseDetailResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
-            return JsonConvert.DeserializeObject<AzureDevOpsRelease>(releaseDetailResponseContent);
+            return await GetTypedAsync<AzureDevOpsRelease>(this.RestClient, $"{release.Url}").ConfigureAwait(false);
         }
 
         private async Task<IEnumerable<AzureDevOpsRepository>> ScanRepositoriesAsync(DataOptions dataOptions, string projectUrl)
@@ -275,9 +288,7 @@ namespace AzureDevOps.Scanner
                 return null;
             }
 
-            HttpResponseMessage httpRepositoriesResponse = await this.RestClient.GetAsync(new Uri($"{projectUrl}/_apis/git/repositories?api-version=5.0")).ConfigureAwait(false);
-            var policiesResponseContent = await httpRepositoriesResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
-            var repositoryResult = JsonConvert.DeserializeObject<AzureDevOpsRepositories>(policiesResponseContent);
+            var repositoryResult = await GetTypedAsync<AzureDevOpsRepositories>(this.RestClient, $"{projectUrl}/_apis/git/repositories?api-version=5.0").ConfigureAwait(false);
 
             var repositories = Array.Empty<AzureDevOpsRepository>();
             if (repositoryResult.Count > 0)
@@ -300,9 +311,7 @@ namespace AzureDevOps.Scanner
 
         private async Task<AzureDevOpsRepository> ScanBranchPoliciesAsync(string projectUrl, AzureDevOpsRepository repository, string branchName = "refs/heads/master")
         {
-            HttpResponseMessage httpPoliciesResponse = await this.RestClient.GetAsync(new Uri($"{projectUrl}/_apis/git/policy/configurations?repositoryId={repository.Id}&refName={branchName}")).ConfigureAwait(false);
-            var policiesResponseContent = await httpPoliciesResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
-            repository.Policies = JsonConvert.DeserializeObject<AzureDevOpsPolicies>(policiesResponseContent).Policies;
+            repository.Policies = (await GetTypedAsync<AzureDevOpsPolicies>(this.RestClient, $"{projectUrl}/_apis/git/policy/configurations?repositoryId={repository.Id}&refName={branchName}").ConfigureAwait(false)).Policies;
             return repository;
         }
     }

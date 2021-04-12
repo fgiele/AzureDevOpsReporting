@@ -56,6 +56,11 @@ namespace AzureDevOps.Model
         PullRequest,
 
         /// <summary>
+        /// The build was started when resources in pipeline triggered it
+        /// </summary>
+        ResourceTrigger,
+
+        /// <summary>
         /// The build was started for the trigger TriggerType.Schedule.
         /// </summary>
         Schedule,
