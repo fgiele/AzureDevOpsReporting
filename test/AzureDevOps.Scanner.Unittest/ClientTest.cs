@@ -363,6 +363,39 @@ namespace AzureDevOps.Scanner.Unittest
             actual.Collections[0].Projects[0].Should().BeEquivalentTo(this.expectedProject);
         }
 
+        [Fact]
+        public async Task ScanAsync_WhenRestAPINoContent_ShouldShowEmpty()
+        {
+            // Arrange
+            this.HttpMockNoProject();
+
+            var systemUnderTest = new Client(this.httpClient);
+
+            // Act
+            // Expect NullReference, since NoContent returns a typed null object
+            var actual = await Assert.ThrowsAsync<NullReferenceException>(async () => await systemUnderTest.ScanAsync(DataOptions.Git | DataOptions.GitPolicies, new string[] { ExpectedCollection }, new Uri(ExpectedUrl)).ConfigureAwait(false)).ConfigureAwait(false);
+
+            // Assert
+            this.mockHttpMessageHandler.Verify();
+            actual.Should().BeOfType<NullReferenceException>();
+        }
+
+        [Fact]
+        public async Task ScanAsync_WhenRestAPIError_ShouldThrowAfterRetries()
+        {
+            // Arrange
+            this.HttpMockFailProject();
+
+            var systemUnderTest = new Client(this.httpClient);
+
+            // Act
+            var actual = await Assert.ThrowsAsync<HttpRequestException>(async () => await systemUnderTest.ScanAsync(DataOptions.Git | DataOptions.GitPolicies, new string[] { ExpectedCollection }, new Uri(ExpectedUrl)).ConfigureAwait(false)).ConfigureAwait(false);
+
+            // Assert
+            this.mockHttpMessageHandler.Verify();
+            actual.Should().BeOfType<HttpRequestException>();
+        }
+
         public void Dispose()
         {
             this.Dispose(true);
