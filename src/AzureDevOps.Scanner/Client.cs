@@ -23,6 +23,7 @@ namespace AzureDevOps.Scanner
     /// </summary>
     public class Client : IClient
     {
+        private const string CONTINUATIONHEADER = "x-ms-continuationtoken";
         private int projectsDoneCount = 0;
 
         /// <summary>
@@ -103,6 +104,67 @@ namespace AzureDevOps.Scanner
             throw new HttpRequestException($"Unable to request {restUri}, statuscode: {statusCode}, message: {statusMessage}", innerException);
         }
 
+        private static async Task<List<T>> GetListTypedAsync<T>(HttpClient restClient, string restUrl)
+        {
+            var restUri = new Uri(restUrl);
+            var retry = 0;
+            HttpResponseMessage httpResponse;
+            var statusCode = System.Net.HttpStatusCode.OK;
+            var statusMessage = string.Empty;
+            HttpRequestException innerException = null;
+            var resultValues = new List<T>();
+
+            while (retry < 3)
+            {
+                try
+                {
+                    while (statusCode == System.Net.HttpStatusCode.OK)
+                    {
+                        httpResponse = await restClient.GetAsync(restUri).ConfigureAwait(false);
+
+                        statusCode = httpResponse.StatusCode;
+                        statusMessage = httpResponse.ReasonPhrase;
+
+                        if (statusCode == System.Net.HttpStatusCode.NoContent)
+                        {
+                            return null;
+                        }
+                        else if (statusCode != System.Net.HttpStatusCode.OK)
+                        {
+                            break;
+                        }
+
+                        var responseContent = await httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+                        resultValues.Add(JsonConvert.DeserializeObject<T>(responseContent, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }));
+
+                        if (httpResponse.Headers.Contains(CONTINUATIONHEADER))
+                        {
+                            var continuationtoken = httpResponse.Headers.GetValues(CONTINUATIONHEADER).FirstOrDefault();
+                            var uriBuilder = new UriBuilder(restUrl);
+                            var query = System.Web.HttpUtility.ParseQueryString(uriBuilder.Query);
+                            query["continuationToken"] = continuationtoken;
+                            uriBuilder.Query = query.ToString();
+                            restUri = uriBuilder.Uri;
+                        }
+                        else
+                        {
+                            return resultValues;
+                        }
+                    }
+                }
+                catch (HttpRequestException ex)
+                {
+                    innerException = ex;
+                }
+
+                await Task.Delay(1000).ConfigureAwait(false);
+                retry++;
+            }
+
+            throw new HttpRequestException($"Unable to request {restUri}, statuscode: {statusCode}, message: {statusMessage}", innerException);
+        }
+
         private async Task<AzureDevOpsInstance> ScanAzDOAsync(DataOptions dataOptions, IEnumerable<string> collections, Uri azureDevOpsUrl)
         {
             this.projectsDoneCount = 0;
@@ -135,7 +197,14 @@ namespace AzureDevOps.Scanner
 
         private async Task<AzureDevOpsCollection> ScanCollectionAsync(DataOptions dataOptions, string collection, string azureDevOpsUrl)
         {
-            var projectResult = await GetTypedAsync<AzureDevOpsProjects>(this.RestClient, $"{azureDevOpsUrl}{collection}/_apis/projects").ConfigureAwait(false);
+            var projectResults = await GetListTypedAsync<AzureDevOpsProjects>(this.RestClient, $"{azureDevOpsUrl}{collection}/_apis/projects").ConfigureAwait(false);
+
+            var projectResult = new AzureDevOpsProjects
+            {
+                Count = projectResults.Sum(prr => prr.Count),
+                Projects = projectResults.SelectMany(prr => prr.Projects),
+            };
+
             var azDOCollection = new AzureDevOpsCollection { Name = collection };
             var scanProjectTasks = new HashSet<Task<AzureDevOpsProject>>();
 
@@ -195,7 +264,13 @@ namespace AzureDevOps.Scanner
                 return null;
             }
 
-            var releaseDefResult = await GetTypedAsync<AzureDevOpsReleaseDefinitions>(this.RestClient, $"{projectUrl}/_apis/release/definitions").ConfigureAwait(false);
+            var releaseDefResults = await GetListTypedAsync<AzureDevOpsReleaseDefinitions>(this.RestClient, $"{projectUrl}/_apis/release/definitions").ConfigureAwait(false);
+
+            var releaseDefResult = new AzureDevOpsReleaseDefinitions
+            {
+                Count = releaseDefResults.Sum(rdr => rdr.Count),
+                ReleaseDefinitions = releaseDefResults.SelectMany(rdr => rdr.ReleaseDefinitions),
+            };
 
             var releaseDefinitions = Array.Empty<AzureDevOpsReleaseDefinition>();
             if (releaseDefResult.Count > 0)
@@ -227,7 +302,13 @@ namespace AzureDevOps.Scanner
                 return null;
             }
 
-            var buildresult = await GetTypedAsync<AzureDevOpsBuilds>(this.RestClient, $"{projectUrl}/_apis/build/builds").ConfigureAwait(false);
+            var buildresults = await GetListTypedAsync<AzureDevOpsBuilds>(this.RestClient, $"{projectUrl}/_apis/build/builds").ConfigureAwait(false);
+
+            var buildresult = new AzureDevOpsBuilds
+            {
+                Count = buildresults.Sum(bur => bur.Count),
+                Builds = buildresults.SelectMany(bur => bur.Builds),
+            };
 
             var builds = Array.Empty<AzureDevOpsBuild>();
             if (buildresult.Count > 0)
@@ -265,7 +346,13 @@ namespace AzureDevOps.Scanner
 
             // Azure DevOps services uses a different host for release management Rest calls
             projectUrl = projectUrl.Replace("https://dev.azure.com", "https://vsrm.dev.azure.com", StringComparison.OrdinalIgnoreCase);
-            var releaseresult = await GetTypedAsync<AzureDevOpsReleases>(this.RestClient, $"{projectUrl}/_apis/release/releases").ConfigureAwait(false);
+            var releaseresults = await GetListTypedAsync<AzureDevOpsReleases>(this.RestClient, $"{projectUrl}/_apis/release/releases").ConfigureAwait(false);
+
+            var releaseresult = new AzureDevOpsReleases
+            {
+                Count = releaseresults.Sum(rer => rer.Count),
+                Releases = releaseresults.SelectMany(rer => rer.Releases),
+            };
 
             var releases = Array.Empty<AzureDevOpsRelease>();
             if (releaseresult.Count > 0)
@@ -299,7 +386,13 @@ namespace AzureDevOps.Scanner
                 return null;
             }
 
-            var repositoryResult = await GetTypedAsync<AzureDevOpsRepositories>(this.RestClient, $"{projectUrl}/_apis/git/repositories?api-version=5.0").ConfigureAwait(false);
+            var repositoryResults = await GetListTypedAsync<AzureDevOpsRepositories>(this.RestClient, $"{projectUrl}/_apis/git/repositories?api-version=5.0").ConfigureAwait(false);
+
+            var repositoryResult = new AzureDevOpsRepositories
+            {
+                Count = repositoryResults.Sum(rer => rer.Count),
+                Repositories = repositoryResults.SelectMany(rer => rer.Repositories),
+            };
 
             var repositories = Array.Empty<AzureDevOpsRepository>();
             if (repositoryResult.Count > 0)

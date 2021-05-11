@@ -152,7 +152,7 @@ namespace AzureDevOps.Scanner.Unittest
         public async Task ScanAsync_WhenBuildsNoArtifacts_ShouldReturnProperInstance()
         {
             // Arrange
-            this.HttpMockOneProject();
+            this.HttpMockMultipleProject();
             this.HttpMockOneBuild();
 
             this.expectedProject.Builds = new HashSet<AzureDevOpsBuild> { this.expectedBuild };
@@ -166,8 +166,7 @@ namespace AzureDevOps.Scanner.Unittest
             this.mockHttpMessageHandler.Verify();
             actual.Should().BeOfType<AzureDevOpsInstance>();
             actual.Collections.Should().HaveCount(1);
-            actual.Collections[0].Projects.Should().HaveCount(1);
-            actual.Collections[0].Projects[0].Should().BeEquivalentTo(this.expectedProject);
+            actual.Collections[0].Projects.Should().HaveCount(2);
         }
 
         [Fact]
@@ -372,12 +371,12 @@ namespace AzureDevOps.Scanner.Unittest
             var systemUnderTest = new Client(this.httpClient);
 
             // Act
-            // Expect NullReference, since NoContent returns a typed null object
-            var actual = await Assert.ThrowsAsync<NullReferenceException>(async () => await systemUnderTest.ScanAsync(DataOptions.Git | DataOptions.GitPolicies, new string[] { ExpectedCollection }, new Uri(ExpectedUrl)).ConfigureAwait(false)).ConfigureAwait(false);
+            // Expect ArgumentNullException, since NoContent returns a typed null object which is then parsed through
+            var actual = await Assert.ThrowsAsync<ArgumentNullException>(async () => await systemUnderTest.ScanAsync(DataOptions.Git | DataOptions.GitPolicies, new string[] { ExpectedCollection }, new Uri(ExpectedUrl)).ConfigureAwait(false)).ConfigureAwait(false);
 
             // Assert
             this.mockHttpMessageHandler.Verify();
-            actual.Should().BeOfType<NullReferenceException>();
+            actual.Should().BeOfType<ArgumentNullException>();
         }
 
         [Fact]
@@ -394,6 +393,29 @@ namespace AzureDevOps.Scanner.Unittest
             // Assert
             this.mockHttpMessageHandler.Verify();
             actual.Should().BeOfType<HttpRequestException>();
+        }
+
+        [Fact]
+        public async Task ScanAsync_WhenContinuationToken_GetsFullList()
+        {
+            // Arrange
+            this.HttpMockMultipleProject();
+            this.HttpMockOneBuild();
+            this.expectedProject.Builds = new HashSet<AzureDevOpsBuild> { this.expectedBuild };
+            this.secondProject.Builds = new HashSet<AzureDevOpsBuild> { this.expectedBuild };
+
+            var systemUnderTest = new Client(this.httpClient);
+
+            // Act
+            var actual = await systemUnderTest.ScanAsync(DataOptions.Build, new string[] { ExpectedCollection }, new Uri(ExpectedUrl)).ConfigureAwait(false);
+
+            // Assert
+            this.mockHttpMessageHandler.Verify();
+            actual.Should().BeOfType<AzureDevOpsInstance>();
+            actual.Collections.Should().HaveCount(1);
+            actual.Collections[0].Projects.Should().HaveCount(2);
+            actual.Collections[0].Projects[0].Should().BeEquivalentTo(this.expectedProject);
+            actual.Collections[0].Projects[0].Should().BeEquivalentTo(this.secondProject);
         }
 
         public void Dispose()
