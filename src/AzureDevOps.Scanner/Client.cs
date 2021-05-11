@@ -68,28 +68,39 @@ namespace AzureDevOps.Scanner
             HttpResponseMessage httpResponse;
             var statusCode = System.Net.HttpStatusCode.Unused;
             var statusMessage = string.Empty;
+            HttpRequestException innerException = null;
+
             while (retry < 3)
             {
-                httpResponse = await restClient.GetAsync(restUri).ConfigureAwait(false);
-
-                statusCode = httpResponse.StatusCode;
-                statusMessage = httpResponse.ReasonPhrase;
-
-                if (statusCode == System.Net.HttpStatusCode.OK)
+                try
                 {
-                    var responseContent = await httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
-                    return JsonConvert.DeserializeObject<T>(responseContent, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                    httpResponse = await restClient.GetAsync(restUri).ConfigureAwait(false);
+
+                    statusCode = httpResponse.StatusCode;
+                    statusMessage = httpResponse.ReasonPhrase;
+
+                    if (statusCode == System.Net.HttpStatusCode.OK)
+                    {
+                        var responseContent = await httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+                        var returnValue = JsonConvert.DeserializeObject<T>(responseContent, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                        return returnValue;
+                    }
+                    else if (statusCode == System.Net.HttpStatusCode.NoContent)
+                    {
+                        return default;
+                    }
                 }
-                else if (statusCode == System.Net.HttpStatusCode.NoContent)
+                catch (HttpRequestException ex)
                 {
-                    return default;
+                    innerException = ex;
                 }
 
                 await Task.Delay(1000).ConfigureAwait(false);
                 retry++;
             }
 
-            throw new HttpRequestException($"Unable to request {restUri}, statuscode: {statusCode}, message: {statusMessage}");
+            throw new HttpRequestException($"Unable to request {restUri}, statuscode: {statusCode}, message: {statusMessage}", innerException);
         }
 
         private async Task<AzureDevOpsInstance> ScanAzDOAsync(DataOptions dataOptions, IEnumerable<string> collections, Uri azureDevOpsUrl)
