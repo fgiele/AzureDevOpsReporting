@@ -163,7 +163,7 @@ namespace AzureDevOps.Scanner.Unittest
             Content = new StringContent("{\"count\":0,\"value\":[]}"),
         };
 
-        private HttpResponseMessage NoContentResponse => new HttpResponseMessage
+        private static HttpResponseMessage NoContentResponse => new HttpResponseMessage
         {
             StatusCode = HttpStatusCode.NoContent,
             Content = new StringContent(string.Empty),
@@ -387,7 +387,7 @@ namespace AzureDevOps.Scanner.Unittest
                 mh => mh.Send(
                     It.Is<HttpRequestMessage>(
                         req => req.RequestUri.ToString() == $"{ExpectedUrl}/{ExpectedCollection}/_apis/projects")))
-                .Returns(this.NoContentResponse);
+                .Returns(NoContentResponse);
         }
 
         private void HttpMockFailProject()
