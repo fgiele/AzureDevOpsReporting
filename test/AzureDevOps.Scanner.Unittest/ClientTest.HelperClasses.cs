@@ -26,8 +26,11 @@ namespace AzureDevOps.Scanner.Unittest
     {
         private const string ExpectedUrl = "https://example.com";
         private const string ExpectedCollection = "expectedcol";
+        private const string ContinuationToken = "1234";
+        private const string ContinuationHeader = "x-ms-continuationtoken";
 
         private readonly AzureDevOpsProject expectedProject = Builder<AzureDevOpsProject>.CreateNew().Build();
+        private readonly AzureDevOpsProject secondProject = Builder<AzureDevOpsProject>.CreateNew().Build();
 
         private readonly AzureDevOpsBuild expectedBuild = Builder<AzureDevOpsBuild>.CreateNew().Do(moq => moq.Url = new Uri($"{ExpectedUrl}/expectedbuild")).Build();
 
@@ -169,7 +172,7 @@ namespace AzureDevOps.Scanner.Unittest
             Content = new StringContent(string.Empty),
         };
 
-        private HttpResponseMessage UnauthenticatedResponse => new HttpResponseMessage
+        private static HttpResponseMessage UnauthenticatedResponse => new HttpResponseMessage
         {
             StatusCode = HttpStatusCode.Unauthorized,
             Content = new StringContent(string.Empty),
@@ -179,6 +182,18 @@ namespace AzureDevOps.Scanner.Unittest
         {
             StatusCode = HttpStatusCode.OK,
             Content = new StringContent($"{{\"count\":1,\"value\":[{{\"id\":\"{this.expectedProject.Id}\",\"name\":\"{this.expectedProject.Name}\",\"description\":\"{this.expectedProject.Description}\",\"url\":\"{this.expectedProject.Url}\"}}]}}"),
+        };
+
+        private HttpResponseMessage ContinueProjectResponse => new HttpResponseMessage
+        {
+            StatusCode = HttpStatusCode.OK,
+            Content = new StringContent($"{{\"count\":1,\"value\":[{{\"id\":\"{this.expectedProject.Id}\",\"name\":\"{this.expectedProject.Name}\",\"description\":\"{this.expectedProject.Description}\",\"url\":\"{this.expectedProject.Url}\"}}]}}"),
+        };
+
+        private HttpResponseMessage SecondProjectResponse => new HttpResponseMessage
+        {
+            StatusCode = HttpStatusCode.OK,
+            Content = new StringContent($"{{\"count\":1,\"value\":[{{\"id\":\"{this.secondProject.Id}\",\"name\":\"{this.secondProject.Name}\",\"description\":\"{this.secondProject.Description}\",\"url\":\"{this.secondProject.Url}\"}}]}}"),
         };
 
         private HttpResponseMessage OneBuildResponse => new HttpResponseMessage
@@ -390,13 +405,30 @@ namespace AzureDevOps.Scanner.Unittest
                 .Returns(NoContentResponse);
         }
 
+        private void HttpMockMultipleProject()
+        {
+            var response = this.ContinueProjectResponse;
+            response.Headers.Add(ContinuationHeader, ContinuationToken);
+            this.mockHttpMessageHandler.Setup(
+                mh => mh.Send(
+                    It.Is<HttpRequestMessage>(
+                        req => req.RequestUri.ToString() == $"{ExpectedUrl}/{ExpectedCollection}/_apis/projects")))
+                .Returns(response);
+
+            this.mockHttpMessageHandler.Setup(
+                mh => mh.Send(
+                    It.Is<HttpRequestMessage>(
+                        req => req.RequestUri.ToString() == $"{ExpectedUrl}/{ExpectedCollection}/_apis/projects?continuationToken={ContinuationToken}")))
+                .Returns(this.SecondProjectResponse);
+        }
+
         private void HttpMockFailProject()
         {
             this.mockHttpMessageHandler.Setup(
                 mh => mh.Send(
                     It.Is<HttpRequestMessage>(
                         req => req.RequestUri.ToString() == $"{ExpectedUrl}/{ExpectedCollection}/_apis/projects")))
-                .Returns(this.UnauthenticatedResponse);
+                .Returns(UnauthenticatedResponse);
         }
 
         private void HttpMockOneBuild()
