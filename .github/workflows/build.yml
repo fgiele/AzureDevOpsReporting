@@ -26,3 +26,14 @@ jobs:
         run: dotnet test --logger trx /p:CollectCoverage=true  /p:CoverletOutputFormat='opencover' /p:CoverletOutput=./coverage/reportingtool/ /p:exclude=\"[Microsoft*]*,[xunit*]*\" test/AzureDevOps.ReportingTool.Unittest/AzureDevOps.ReportingTool.Unittest.csproj
       - name: Dotnet test Scanner
         run: dotnet test --logger trx /p:CollectCoverage=true  /p:CoverletOutputFormat='opencover' /p:CoverletOutput=./coverage/scanner/ /p:exclude=\"[Microsoft*]*,[xunit*]*\" test/AzureDevOps.Scanner.Unittest/AzureDevOps.Scanner.Unittest.csproj
+      - name: Concatenate test report
+        run: |
+          dotnet tool install dotnet-reportgenerator-globaltool --tool-path . 
+          ./reportgenerator "-reports:./coverage/*/coverage.opencover.xml" "-targetdir:coverage/Cobertura" "-reporttypes:Cobertura;HTMLInline;HTMLChart"
+      - name: Upload dotnet test results
+        uses: actions/upload-artifact@v2
+        with:
+          name: dotnet-results-3.1
+          path: coverage/Cobertura
+        # Use always() to always run this step to publish test results when there are test failures
+        if: ${{ always() }}          
