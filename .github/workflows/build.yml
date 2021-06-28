@@ -21,15 +21,15 @@ jobs:
       - name: Build
         run: dotnet build --configuration Release --no-restore AzureDevOps.ReportingTool.sln
       - name: Dotnet test Reports
-        run: dotnet test --logger trx /p:CollectCoverage=true  /p:CoverletOutputFormat='opencover' /p:CoverletOutput=./coverage/reports/ /p:exclude=\"[Microsoft*]*,[xunit*]*\" test/AzureDevOps.Report.Unittest/AzureDevOps.Report.Unittest.csproj
+        run: dotnet test --logger trx /p:CollectCoverage=true  /p:CoverletOutputFormat='opencover' /p:CoverletOutput=./coverage/reports.opencover.xml /p:exclude=\"[Microsoft*]*,[xunit*]*\" test/AzureDevOps.Report.Unittest/AzureDevOps.Report.Unittest.csproj
       - name: Dotnet test ReportTool
-        run: dotnet test --logger trx /p:CollectCoverage=true  /p:CoverletOutputFormat='opencover' /p:CoverletOutput=./coverage/reportingtool/ /p:exclude=\"[Microsoft*]*,[xunit*]*\" test/AzureDevOps.ReportingTool.Unittest/AzureDevOps.ReportingTool.Unittest.csproj
+        run: dotnet test --logger trx /p:CollectCoverage=true  /p:CoverletOutputFormat='opencover' /p:CoverletOutput=./coverage/reportingtool.opencover.xml /p:exclude=\"[Microsoft*]*,[xunit*]*\" test/AzureDevOps.ReportingTool.Unittest/AzureDevOps.ReportingTool.Unittest.csproj
       - name: Dotnet test Scanner
-        run: dotnet test --logger trx /p:CollectCoverage=true  /p:CoverletOutputFormat='opencover' /p:CoverletOutput=./coverage/scanner/ /p:exclude=\"[Microsoft*]*,[xunit*]*\" test/AzureDevOps.Scanner.Unittest/AzureDevOps.Scanner.Unittest.csproj
+        run: dotnet test --logger trx /p:CollectCoverage=true  /p:CoverletOutputFormat='opencover' /p:CoverletOutput=./coverage/scanner.opencover.xml /p:exclude=\"[Microsoft*]*,[xunit*]*\" test/AzureDevOps.Scanner.Unittest/AzureDevOps.Scanner.Unittest.csproj
       - name: Concatenate test report
         run: |
           dotnet tool install dotnet-reportgenerator-globaltool --tool-path . 
-          ./reportgenerator "-reports:./coverage/*/coverage.opencover.xml" "-targetdir:coverage/Cobertura" "-reporttypes:Cobertura;HTMLInline;HTMLChart"
+          ./reportgenerator "-reports:./coverage/" "-targetdir:coverage/Cobertura" "-reporttypes:Cobertura;HTMLInline;HTMLChart"
       - name: Upload dotnet test results
         uses: actions/upload-artifact@v2
         with:
