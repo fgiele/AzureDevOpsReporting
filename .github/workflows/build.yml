@@ -19,10 +19,10 @@ jobs:
       - name: Install dependencies
         run: dotnet restore
       - name: Build
-        run: dotnet build --configuration Release --no-restore AzureDevOps.ReportingTool.sln"
-      - name: 'dotnet test Reports'
+        run: dotnet build --configuration Release --no-restore AzureDevOps.ReportingTool.sln
+      - name: Dotnet test Reports
         run: dotnet test --logger trx --no-build /p:CollectCoverage=true  /p:CoverletOutputFormat='opencover' /p:CoverletOutput=$(Build.SourcesDirectory)/coverage/reports/ /p:exclude=\"[Microsoft*]*,[xunit*]*\" test/AzureDevOps.Report.Unittest/AzureDevOps.Report.Unittest.csproj
-      - name: 'dotnet test ReportTool'
+      - name: Dotnet test ReportTool
         run: dotnet test --logger trx --no-build /p:CollectCoverage=true  /p:CoverletOutputFormat='opencover' /p:CoverletOutput=$(Build.SourcesDirectory)/coverage/reportingtool/ /p:exclude=\"[Microsoft*]*,[xunit*]*\" test/AzureDevOps.ReportingTool.Unittest/AzureDevOps.ReportingTool.Unittest.csproj
-      - name: 'dotnet test Scanner'
+      - name: Dotnet test Scanner
         run: dotnet test --logger trx --no-build /p:CollectCoverage=true  /p:CoverletOutputFormat='opencover' /p:CoverletOutput=$(Build.SourcesDirectory)/coverage/scanner/ /p:exclude=\"[Microsoft*]*,[xunit*]*\" test/AzureDevOps.Scanner.Unittest/AzureDevOps.Scanner.Unittest.csproj
