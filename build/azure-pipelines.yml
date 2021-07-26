@@ -14,8 +14,9 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  disable.coverage.autogenerate: 'true'
 - group: SPECTRAL_DSN
+- name: disable.coverage.autogenerate
+  value: 'true'
 
 steps:
   - task: CmdLine@2
