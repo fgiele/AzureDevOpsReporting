@@ -30,7 +30,7 @@ jobs:
       - name: Concatenate test report
         run: |
           dotnet tool install dotnet-reportgenerator-globaltool --tool-path . 
-          ./reportgenerator "-reports:${{ env.coverage_directory }}/*.xml" "-targetdir:coverage/Cobertura" "-reporttypes:Cobertura;HTMLInline;HTMLChart"
+          ./reportgenerator "-reports:${{ env.coverage_directory }}/*.xml" "-targetdir:coverage/Cobertura" "-reporttypes:Cobertura;HTMLInline;HTMLChart;Badges"
       - name: Upload dotnet test results
         uses: actions/upload-artifact@v2
         with:
