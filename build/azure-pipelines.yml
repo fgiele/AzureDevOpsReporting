@@ -20,9 +20,9 @@ variables:
 
 steps:
   - task: CmdLine@2
-    displayName: Checkout $(Build.SourceBranchName)
+    displayName: Checkout $(Build.SourceBranch)
     inputs:
-      script: 'git checkout $(Build.SourceBranchName)'
+      script: 'git checkout $(Build.SourceBranch)'
   - script: curl -L 'https://get.spectralops.io/latest/x/sh?dsn=$(SPECTRAL_DSN)' | sh
     displayName: 'Install Spectral'
   - script: $HOME/.spectral/spectral scan --ok --dsn $(SPECTRAL_DSN)
