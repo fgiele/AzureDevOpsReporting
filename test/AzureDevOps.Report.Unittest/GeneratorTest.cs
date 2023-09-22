@@ -23,74 +23,72 @@ namespace AzureDevOps.Report.Unittest
     public class GeneratorTest
     {
         [Fact]
-        public void CreateReportsAsync_WhenReportsNullInstance_ThrowsException()
+        public async Task CreateReportsAsync_WhenReportsNullInstance_ThrowsException()
         {
             // Arrange
             var systemUnderTest = new Generator();
 
             // Act
-            var actualException = Record.ExceptionAsync(async () => await systemUnderTest.CreateReportsAsync(null, new AzureDevOpsInstance(), "testVal").ConfigureAwait(false));
+            var actualException = await Record.ExceptionAsync(async () => await systemUnderTest.CreateReportsAsync(null, new AzureDevOpsInstance(), "testVal"));
 
             // Assert
             actualException.Should().NotBeNull();
-            actualException.Result.Should().BeOfType<ArgumentNullException>();
+            actualException.Should().BeOfType<ArgumentNullException>();
         }
 
         [Fact]
-        public void CreateReportsAsync_WhenAzDOInstanceNullInstance_ThrowsException()
+        public async Task CreateReportsAsync_WhenAzDOInstanceNullInstance_ThrowsException()
         {
             // Arrange
             var systemUnderTest = new Generator();
 
             // Act
-            var actualException = Record.ExceptionAsync(async () => await systemUnderTest.CreateReportsAsync(new HashSet<IReport>(), null, "testVal").ConfigureAwait(false));
+            var actualException = await Record.ExceptionAsync(async () => await systemUnderTest.CreateReportsAsync(new HashSet<IReport>(), null, "testVal"));
 
             // Assert
             actualException.Should().NotBeNull();
-            actualException.Result.Should().BeOfType<ArgumentNullException>();
+            actualException.Should().BeOfType<ArgumentNullException>();
         }
 
         [Fact]
-        public void CreateReportsAsync_WhenFolderNotExist_ThrowsException()
+        public async Task CreateReportsAsync_WhenFolderNotExist_ThrowsException()
         {
             // Arrange
             var systemUnderTest = new Generator();
 
             // Act
-            var actualException = Record.ExceptionAsync(async () => await systemUnderTest.CreateReportsAsync(new HashSet<IReport>(), new AzureDevOpsInstance(), "testVal").ConfigureAwait(false));
+            var actualException = await Record.ExceptionAsync(async () => await systemUnderTest.CreateReportsAsync(new HashSet<IReport>(), new AzureDevOpsInstance(), "testVal"));
 
             // Assert
             actualException.Should().NotBeNull();
-            actualException.Result.Should().BeOfType<System.IO.DirectoryNotFoundException>();
+            actualException.Should().BeOfType<System.IO.DirectoryNotFoundException>();
         }
 
         [Fact]
-        public void CreateReportsAsync_WhenCorrectEmpty_ExitsCorrect()
+        public async Task CreateReportsAsync_WhenCorrectEmpty_ExitsCorrect()
         {
             // Arrange
             var systemUnderTest = new Generator();
 
             // Act
-            var actualException = Record.ExceptionAsync(async () => await systemUnderTest.CreateReportsAsync(new HashSet<IReport>(), new AzureDevOpsInstance(), ".").ConfigureAwait(false));
+            var actualException = await Record.ExceptionAsync(async () => await systemUnderTest.CreateReportsAsync(new HashSet<IReport>(), new AzureDevOpsInstance(), "."));
 
             // Assert
-            actualException.Should().NotBeNull();
-            actualException.Result.Should().BeNull();
+            actualException.Should().BeNull();
         }
 
         [Fact]
-        public void CreateReportsAsync_WhenCorrect_GeneratesFile()
+        public async Task CreateReportsAsync_WhenCorrect_GeneratesFile()
         {
             // Arrange
             var systemUnderTest = new Generator();
             var testReport = new ScanAllReport();
 
             // Act
-            var actualException = Record.ExceptionAsync(async () => await systemUnderTest.CreateReportsAsync(new HashSet<IReport> { testReport }, new AzureDevOpsInstance(), ".").ConfigureAwait(false));
+            var actualException = await Record.ExceptionAsync(async () => await systemUnderTest.CreateReportsAsync(new HashSet<IReport> { testReport }, new AzureDevOpsInstance(), "."));
 
             // Assert
-            actualException.Should().NotBeNull();
-            actualException.Result.Should().BeNull();
+            actualException.Should().BeNull();
             System.IO.File.Exists(testReport.Title).Should().BeTrue();
 
             System.IO.File.Delete(testReport.Title);

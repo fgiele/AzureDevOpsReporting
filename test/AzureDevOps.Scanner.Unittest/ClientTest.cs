@@ -45,7 +45,7 @@ namespace AzureDevOps.Scanner.Unittest
             var systemUnderTest = new Client(this.httpClient);
 
             // Act
-            var actual = await systemUnderTest.ScanAsync(DataOptions.Build, new string[] { ExpectedCollection }, new Uri(ExpectedUrl)).ConfigureAwait(false);
+            var actual = await systemUnderTest.ScanAsync(DataOptions.Build, new string[] { ExpectedCollection }, new Uri(ExpectedUrl));
 
             // Assert
             this.mockHttpMessageHandler.Verify();
@@ -69,7 +69,7 @@ namespace AzureDevOps.Scanner.Unittest
             var systemUnderTest = new Client(this.httpClient);
 
             // Act
-            var actual = await systemUnderTest.ScanAsync(DataOptions.Build, new string[] { expectedCollection1, expectedCollection2 }, new Uri(ExpectedUrl)).ConfigureAwait(false);
+            var actual = await systemUnderTest.ScanAsync(DataOptions.Build, new string[] { expectedCollection1, expectedCollection2 }, new Uri(ExpectedUrl));
 
             // Assert
             this.mockHttpMessageHandler.Verify();
@@ -91,7 +91,7 @@ namespace AzureDevOps.Scanner.Unittest
             var systemUnderTest = new Client(this.httpClient);
 
             // Act
-            var actual = await systemUnderTest.ScanAsync(DataOptions.Build, new string[] { ExpectedCollection }, new Uri(azureUrl)).ConfigureAwait(false);
+            var actual = await systemUnderTest.ScanAsync(DataOptions.Build, new string[] { ExpectedCollection }, new Uri(azureUrl));
 
             // Assert
             this.mockHttpMessageHandler.Verify();
@@ -101,7 +101,7 @@ namespace AzureDevOps.Scanner.Unittest
         }
 
         [Fact]
-        public void ScanAsync_WhenAzureDevOpsUrl_FailsOnMultipleCollection()
+        public async Task ScanAsync_WhenAzureDevOpsUrl_FailsOnMultipleCollection()
         {
             // Arrange
             var azureUrl = "https://dev.azure.com";
@@ -116,11 +116,11 @@ namespace AzureDevOps.Scanner.Unittest
             var systemUnderTest = new Client(this.httpClient);
 
             // Act
-            var actualException = Record.ExceptionAsync(async () => await systemUnderTest.ScanAsync(DataOptions.Build, new string[] { expectedCollection1, expectedCollection2 }, new Uri(azureUrl)).ConfigureAwait(false));
+            var actualException = await Record.ExceptionAsync(async () => await systemUnderTest.ScanAsync(DataOptions.Build, new string[] { expectedCollection1, expectedCollection2 }, new Uri(azureUrl)));
 
             // Assert
             actualException.Should().NotBeNull();
-            actualException.Result.Should().BeOfType<InvalidOperationException>();
+            actualException.Should().BeOfType<InvalidOperationException>();
         }
 
         [Fact]
@@ -138,7 +138,7 @@ namespace AzureDevOps.Scanner.Unittest
             var systemUnderTest = new Client(this.httpClient);
 
             // Act
-            var actual = await systemUnderTest.ScanAsync(DataOptions.Build, new string[] { ExpectedCollection }, new Uri(ExpectedUrl)).ConfigureAwait(false);
+            var actual = await systemUnderTest.ScanAsync(DataOptions.Build, new string[] { ExpectedCollection }, new Uri(ExpectedUrl));
 
             // Assert
             this.mockHttpMessageHandler.Verify();
@@ -160,7 +160,7 @@ namespace AzureDevOps.Scanner.Unittest
             var systemUnderTest = new Client(this.httpClient);
 
             // Act
-            var actual = await systemUnderTest.ScanAsync(DataOptions.Build, new string[] { ExpectedCollection }, new Uri(ExpectedUrl)).ConfigureAwait(false);
+            var actual = await systemUnderTest.ScanAsync(DataOptions.Build, new string[] { ExpectedCollection }, new Uri(ExpectedUrl));
 
             // Assert
             this.mockHttpMessageHandler.Verify();
@@ -185,7 +185,7 @@ namespace AzureDevOps.Scanner.Unittest
             var systemUnderTest = new Client(this.httpClient);
 
             // Act
-            var actual = await systemUnderTest.ScanAsync(DataOptions.Build | DataOptions.BuildArtifacts, new string[] { ExpectedCollection }, new Uri(ExpectedUrl)).ConfigureAwait(false);
+            var actual = await systemUnderTest.ScanAsync(DataOptions.Build | DataOptions.BuildArtifacts, new string[] { ExpectedCollection }, new Uri(ExpectedUrl));
 
             // Assert
             this.mockHttpMessageHandler.Verify();
@@ -211,7 +211,7 @@ namespace AzureDevOps.Scanner.Unittest
             var systemUnderTest = new Client(this.httpClient);
 
             // Act
-            var actual = await systemUnderTest.ScanAsync(DataOptions.Release, new string[] { ExpectedCollection }, new Uri(ExpectedUrl)).ConfigureAwait(false);
+            var actual = await systemUnderTest.ScanAsync(DataOptions.Release, new string[] { ExpectedCollection }, new Uri(ExpectedUrl));
 
             // Assert
             this.mockHttpMessageHandler.Verify();
@@ -233,7 +233,7 @@ namespace AzureDevOps.Scanner.Unittest
             var systemUnderTest = new Client(this.httpClient);
 
             // Act
-            var actual = await systemUnderTest.ScanAsync(DataOptions.Release, new string[] { ExpectedCollection }, new Uri(ExpectedUrl)).ConfigureAwait(false);
+            var actual = await systemUnderTest.ScanAsync(DataOptions.Release, new string[] { ExpectedCollection }, new Uri(ExpectedUrl));
 
             // Assert
             this.mockHttpMessageHandler.Verify();
@@ -256,7 +256,7 @@ namespace AzureDevOps.Scanner.Unittest
             var systemUnderTest = new Client(this.httpClient);
 
             // Act
-            var actual = await systemUnderTest.ScanAsync(DataOptions.Release | DataOptions.ReleaseDetails, new string[] { ExpectedCollection }, new Uri(ExpectedUrl)).ConfigureAwait(false);
+            var actual = await systemUnderTest.ScanAsync(DataOptions.Release | DataOptions.ReleaseDetails, new string[] { ExpectedCollection }, new Uri(ExpectedUrl));
 
             // Assert
             this.mockHttpMessageHandler.Verify();
@@ -279,7 +279,7 @@ namespace AzureDevOps.Scanner.Unittest
             var systemUnderTest = new Client(this.httpClient);
 
             // Act
-            var actual = await systemUnderTest.ScanAsync(DataOptions.ReleaseDefinitions, new string[] { ExpectedCollection }, new Uri(ExpectedUrl)).ConfigureAwait(false);
+            var actual = await systemUnderTest.ScanAsync(DataOptions.ReleaseDefinitions, new string[] { ExpectedCollection }, new Uri(ExpectedUrl));
 
             // Assert
             this.mockHttpMessageHandler.Verify();
@@ -306,7 +306,7 @@ namespace AzureDevOps.Scanner.Unittest
             var systemUnderTest = new Client(this.httpClient);
 
             // Act
-            var actual = await systemUnderTest.ScanAsync(DataOptions.Git, new string[] { ExpectedCollection }, new Uri(ExpectedUrl)).ConfigureAwait(false);
+            var actual = await systemUnderTest.ScanAsync(DataOptions.Git, new string[] { ExpectedCollection }, new Uri(ExpectedUrl));
 
             // Assert
             this.mockHttpMessageHandler.Verify();
@@ -328,7 +328,7 @@ namespace AzureDevOps.Scanner.Unittest
             var systemUnderTest = new Client(this.httpClient);
 
             // Act
-            var actual = await systemUnderTest.ScanAsync(DataOptions.Git, new string[] { ExpectedCollection }, new Uri(ExpectedUrl)).ConfigureAwait(false);
+            var actual = await systemUnderTest.ScanAsync(DataOptions.Git, new string[] { ExpectedCollection }, new Uri(ExpectedUrl));
 
             // Assert
             this.mockHttpMessageHandler.Verify();
@@ -352,7 +352,7 @@ namespace AzureDevOps.Scanner.Unittest
             var systemUnderTest = new Client(this.httpClient);
 
             // Act
-            var actual = await systemUnderTest.ScanAsync(DataOptions.Git | DataOptions.GitPolicies, new string[] { ExpectedCollection }, new Uri(ExpectedUrl)).ConfigureAwait(false);
+            var actual = await systemUnderTest.ScanAsync(DataOptions.Git | DataOptions.GitPolicies, new string[] { ExpectedCollection }, new Uri(ExpectedUrl));
 
             // Assert
             this.mockHttpMessageHandler.Verify();
@@ -372,7 +372,7 @@ namespace AzureDevOps.Scanner.Unittest
 
             // Act
             // Expect ArgumentNullException, since NoContent returns a typed null object which is then parsed through
-            var actual = await Assert.ThrowsAsync<ArgumentNullException>(async () => await systemUnderTest.ScanAsync(DataOptions.Git | DataOptions.GitPolicies, new string[] { ExpectedCollection }, new Uri(ExpectedUrl)).ConfigureAwait(false)).ConfigureAwait(false);
+            var actual = await Assert.ThrowsAsync<ArgumentNullException>(async () => await systemUnderTest.ScanAsync(DataOptions.Git | DataOptions.GitPolicies, new string[] { ExpectedCollection }, new Uri(ExpectedUrl)));
 
             // Assert
             this.mockHttpMessageHandler.Verify();
@@ -388,7 +388,7 @@ namespace AzureDevOps.Scanner.Unittest
             var systemUnderTest = new Client(this.httpClient);
 
             // Act
-            var actual = await Assert.ThrowsAsync<HttpRequestException>(async () => await systemUnderTest.ScanAsync(DataOptions.Git | DataOptions.GitPolicies, new string[] { ExpectedCollection }, new Uri(ExpectedUrl)).ConfigureAwait(false)).ConfigureAwait(false);
+            var actual = await Assert.ThrowsAsync<HttpRequestException>(async () => await systemUnderTest.ScanAsync(DataOptions.Git | DataOptions.GitPolicies, new string[] { ExpectedCollection }, new Uri(ExpectedUrl)));
 
             // Assert
             this.mockHttpMessageHandler.Verify();
@@ -407,7 +407,7 @@ namespace AzureDevOps.Scanner.Unittest
             var systemUnderTest = new Client(this.httpClient);
 
             // Act
-            var actual = await systemUnderTest.ScanAsync(DataOptions.Build, new string[] { ExpectedCollection }, new Uri(ExpectedUrl)).ConfigureAwait(false);
+            var actual = await systemUnderTest.ScanAsync(DataOptions.Build, new string[] { ExpectedCollection }, new Uri(ExpectedUrl));
 
             // Assert
             this.mockHttpMessageHandler.Verify();
@@ -426,13 +426,10 @@ namespace AzureDevOps.Scanner.Unittest
 
         protected virtual void Dispose(bool disposing)
         {
-            if (disposing)
+            if (disposing && this.httpClient != null)
             {
-                if (this.httpClient != null)
-                {
-                    this.httpClient.Dispose();
-                    this.httpClient = null;
-                }
+                this.httpClient.Dispose();
+                this.httpClient = null;
             }
         }
     }

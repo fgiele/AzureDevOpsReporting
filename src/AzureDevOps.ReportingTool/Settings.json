@@ -1,12 +1,18 @@
 {
   "AzureDevOps": {
-    "PAT": "#_Your_PAT_#",
-    "URL": "#_Your_Azure_DevOps_URL_#",
+    "PAT": "qnjaw5mejgp5sduawqt5nysm4s3lsoi7xjlmuqqupjdzc3cyw5mq",
+    "URL": "https://devops.belastingdienst.nl",
     "Collections": [
-      "DefaultCollection"
+      "ALM",
+	  "CDN",
+	  "SDS"
     ]
   },
   "Reports": [
-    "GIT", "RELEASE", "BUILD"
+    "B",
+	"C",
+	"G",
+	"R",
+	"RD"	
   ]
 }

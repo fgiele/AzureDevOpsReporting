@@ -47,7 +47,7 @@ namespace AzureDevOps.Report.Unittest
 
             // Act
             var actual = systemUnderTest.Title;
-            await Task.Delay(2000).ConfigureAwait(false); // Wait 2 seconds
+            await Task.Delay(2000); // Wait 2 seconds
             var secondTitle = systemUnderTest.Title;
 
             // Assert
