@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<ProjectGuid>{71037CEE-4E1B-4833-85DE-A06482E2576B}</ProjectGuid>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFramework>net7.0</TargetFramework>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<NoWarn>$(NoWarn),1573,1591,1712</NoWarn>
 		<IsPackable>false</IsPackable>
@@ -24,12 +24,12 @@
 
 	<ItemGroup>
 		<PackageReference Include="FluentAssertions" Version="6.12.0" />
-		<PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="6.0.0">
+		<PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="7.0.4">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
-		<PackageReference Include="Moq" Version="4.20.69" />
+		<PackageReference Include="Moq" Version="4.18.4" />
 		<PackageReference Include="NBuilder" Version="6.1.0" />
 		<PackageReference Include="xunit" Version="2.5.1" />
 		<PackageReference Include="xunit.runner.visualstudio" Version="2.5.1">
